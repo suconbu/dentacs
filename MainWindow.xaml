@@ -1,0 +1,58 @@
+﻿<Window x:Class="Suconbu.Dentacs.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Suconbu.Dentacs"
+        mc:Ignorable="d"
+        Title="denta" SizeToContent="WidthAndHeight" MinWidth="400" ResizeMode="NoResize"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime">
+    <Window.Resources>
+        <System:String x:Key="ButtonToolTip">Copy value to clipboard</System:String>
+        <Style TargetType="TextBox" x:Key="InputTextBoxStyle">
+            <Setter Property="TextBox.FontSize" Value="30"></Setter>
+            <Setter Property="TextBox.Padding" Value="10,10"></Setter>
+            <Setter Property="TextBox.BorderThickness" Value="0,0,0,1"></Setter>
+        </Style>
+        <Style TargetType="TextBox" x:Key="ResultTextBoxStyle">
+            <Setter Property="TextBox.FontSize" Value="20"></Setter>
+            <Setter Property="TextBox.Padding" Value="2,2"></Setter>
+            <Setter Property="TextBox.BorderThickness" Value="0"></Setter>
+            <Setter Property="TextBox.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsResultEnabled.Value}" Value="true">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsResultEnabled.Value}" Value="false">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <local:HexResultConverter x:Key="HexResultConverter"/>
+        <local:BinResultConverter x:Key="BinResultConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBox Name="DecResult" Text="{Binding Result.Value}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
+            <TextBox Name="HexResult" Text="{Binding Result.Value, Converter={StaticResource HexResultConverter}}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="1" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
+            <TextBox Name="BinResult" Text="{Binding Result.Value, Converter={StaticResource BinResultConverter}}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="2" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
+            <Button Name="DecButton" Content="10" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="DecButton_Click" />
+            <Button Name="HexButton" Content="16" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="HexButton_Click"/>
+            <Button Name="BinButton" Content="02" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="2" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="BinButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
