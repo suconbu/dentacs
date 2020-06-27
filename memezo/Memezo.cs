@@ -67,7 +67,7 @@ namespace Suconbu.Scripting.Memezo
         public bool Run()
         {
             this.lexer = this.lexer ?? this.PrepareLexer(this.source);
-            return this.RunInternal(false, out var finished);
+            return this.RunInternal(false, out var _);
         }
 
         public bool Step(out int nextIndex)
@@ -110,7 +110,7 @@ namespace Suconbu.Scripting.Memezo
             nextIndex = -1;
             try
             {
-                if(this.lexer == null) throw new InternalErrorException(ErrorType.NothingSource);
+                if (this.lexer == null) throw new InternalErrorException(ErrorType.NothingSource);
                 if (stepByStep)
                 {
                     nextIndex = this.Statement() ? this.lexer.Token.Location.CharIndex : nextIndex;
@@ -123,10 +123,7 @@ namespace Suconbu.Scripting.Memezo
             }
             catch (Exception ex)
             {
-                var errorType = (ex as InternalErrorException)?.ErrorType ?? ErrorType.UnknownError;
-                this.LastError = new ErrorInfo(errorType, ex.Message, this.lexer?.Token.Location ?? new SourceLocation());
-                this.ErrorOccurred(this, this.LastError);
-                this.clauses.Clear();
+                this.HandleException(ex);
                 return false;
             }
         }
@@ -455,16 +452,32 @@ namespace Suconbu.Scripting.Memezo
         Lexer PrepareLexer(string input)
         {
             if (input == null) return null;
-            var lexer = new Lexer(input);
-            lexer.TokenRead += (s, e) => RunStat.Increment(this.Stat.TokenCounts, e.Type.ToString());
-            lexer.ReadToken();
-            return lexer;
+            try
+            {
+                var lexer = new Lexer(input);
+                lexer.TokenRead += (s, e) => RunStat.Increment(this.Stat.TokenCounts, e.Type.ToString());
+                lexer.ReadToken();
+                return lexer;
+            }
+            catch(Exception ex)
+            {
+                this.HandleException(ex);
+                return null;
+            }
         }
 
         void UpdateSource(string source)
         {
             this.source = source;
             this.lexer = null;
+            this.clauses.Clear();
+        }
+
+        void HandleException(Exception ex)
+        {
+            var errorType = (ex as InternalErrorException)?.ErrorType ?? ErrorType.UnknownError;
+            this.LastError = new ErrorInfo(errorType, ex.Message, this.lexer?.Token.Location ?? new SourceLocation());
+            this.ErrorOccurred(this, this.LastError);
             this.clauses.Clear();
         }
 
