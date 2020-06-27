@@ -47,7 +47,12 @@ namespace Suconbu.Dentacs
         void CopyTextToClipboard(TextBox textBox)
         {
             if (string.IsNullOrWhiteSpace(textBox?.Text)) return;
+
+            // コピーしたことがわかるようチカっとさせる
+            textBox.Focus();
+            textBox.SelectAll();
             Clipboard.SetText(textBox.Text);
+            Task.Delay(100).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.SelectionLength = 0; }); });
         }
 
         private void InputTextBox_SelectionChanged(object sender, RoutedEventArgs e)
