@@ -41,46 +41,35 @@ namespace Suconbu.Dentacs
         {
             result = null;
 
-            if (!decimal.TryParse(value.ToString(), out var number)) return false;
-            var fixedNumber = (long)Math.Floor(number);
-
-            int bitCount =
-                    (fixedNumber < -0x10000 || 0xFFFFFFFF < fixedNumber) ? 64 :
-                    (fixedNumber < 0 || 0xFFFF < fixedNumber) ? 32 :
-                    16;
-
-            if (radix == 16)
+            if (radix == 16 || radix == 2)
             {
-                var hex = System.Convert.ToString(fixedNumber, 16);
-                int digitCount = bitCount / 4;
-                if(hex.Length <= digitCount)
+                if (!decimal.TryParse(value.ToString(), out var number)) return false;
+                var fixedNumber = (long)Math.Floor(number);
+
+                int bitCount =
+                        (fixedNumber < -0x10000 || 0xFFFFFFFF < fixedNumber) ? 64 :
+                        (fixedNumber < 0 || 0xFFFF < fixedNumber) ? 32 :
+                        16;
+                var digits = System.Convert.ToString(fixedNumber, radix).ToUpper();
+                int digitCount = (radix == 16) ? (bitCount / 4) : bitCount;
+
+                if(digits.Length <= digitCount)
                 {
-                    hex = hex.PadLeft(digitCount, '0');
+                    digits = digits.PadLeft(digitCount, '0');
                 }
                 else
                 {
-                    hex = hex.Substring(hex.Length - digitCount, digitCount);
+                    digits = digits.Substring(digits.Length - digitCount, digitCount);
                 }
-                result = $"0x{hex}";
-            }
-            else if (radix == 2)
-            {
-                var bin = System.Convert.ToString(fixedNumber, 2);
-                if (bin.Length <= bitCount)
-                {
-                    bin = bin.PadLeft(bitCount, '0');
-                }
-                else
-                {
-                    bin = bin.Substring(bin.Length - bitCount, bitCount);
-                }
-                var fours = new List<string>();
+
                 // Insert a space each 4 digits
-                for (int i = 0; i < bitCount; i += 4)
+                var parts = new List<string>();
+                for (int i = 0; i < digitCount; i += 4)
                 {
-                    fours.Add(bin.Substring(i, 4));
+                    parts.Add(digits.Substring(i, 4));
                 }
-                result = string.Join(" ", fours);
+
+                result = string.Join(' ', parts);
             }
             else
             {
