@@ -10,7 +10,8 @@ namespace Suconbu.Dentacs
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value == null) return null;
-            if (!ResultConvertHelper.ConvertTo(value.ToString(), 10, out var result)) return "--";
+            // Show value as-is if fails
+            if (!ResultConvertHelper.ConvertTo(value.ToString(), 10, out var result)) return value.ToString();
             return result;
         }
 
@@ -60,7 +61,7 @@ namespace Suconbu.Dentacs
 
             if (radix == 10)
             {
-                result = $"{number:#,0}";
+                result = $"{number:#,0.################}";
             }
             else if (radix == 16 || radix == 2)
             {

@@ -761,14 +761,42 @@ namespace Suconbu.Scripting.Memezo
         {
             var location = this.currentLocation;
             var sb = new StringBuilder();
-            while (char.IsDigit(this.currentChar) || this.currentChar == '.')
+            int radix = 10;
+            if (this.currentChar == '0' && this.nextChar != '.')
+            {
+                var type = this.ReadChar();
+                radix = (type == 'x') ? 16 : (type == 'o') ? 8 : (type == 'b') ? 2 : 0;
+                this.ReadChar();
+            }
+            while (char.IsLetterOrDigit(this.currentChar) || this.currentChar == '.')
             {
                 sb.Append(this.currentChar);
                 this.ReadChar();
             }
-            var s = sb.ToString();
-            if (!double.TryParse(s, out var n))
+            var s = sb.ToString().ToLower();
+            double n = 0.0;
+            if (radix <= 0 || 36 < radix || s.Length == 0)
+            {
                 throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+            }
+            if (radix == 10)
+            {
+                if (!double.TryParse(s, out n))
+                    throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+            }
+            else
+            {
+                foreach (char d in s)
+                {
+                    n *= radix;
+                    int v =
+                        ('0' <= d && d <= '9') ? (d - '0') :
+                        ('a' <= d && d <= 'z') ? (d - 'a' + 10) :
+                        int.MaxValue;
+                    if (radix <= v) throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    n += v;
+                }
+            }
             return new Token(TokenType.Value, location, s, new Value(n));
         }
 
