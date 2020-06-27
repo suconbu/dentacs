@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Suconbu.Dentacs"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         Title="{Binding CaptionText.Value}" SizeToContent="WidthAndHeight" MinWidth="400" ResizeMode="NoResize"
-        xmlns:System="clr-namespace:System;assembly=System.Runtime">
+        FontFamily="Consolas">
     <Window.Resources>
         <System:String x:Key="Caption">dentacs</System:String>
         <System:String x:Key="CaptionTopmost">dentacs [front]</System:String>
