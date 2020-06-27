@@ -21,6 +21,7 @@ namespace Suconbu.Scripting.Memezo
         public event EventHandler<string> Output = delegate { };
         public event EventHandler<ErrorInfo> ErrorOccurred = delegate { };
         public event EventHandler<string> FunctionInvoking = delegate { };
+        public event EventHandler<AssigningEventArgs> Assigning = delegate { };
 
         public static readonly string[] Keywords = Lexer.Keywords;
         public static readonly string LineCommentMarker = Lexer.LineCommentMarker;
@@ -350,7 +351,9 @@ namespace Suconbu.Scripting.Memezo
             if (this.Functions.ContainsKey(name)) throw new InternalErrorException(ErrorType.InvalidOperation, $"'{name}' is a function");
             this.VerifyToken(this.lexer.ReadToken(), TokenType.Assign);
             this.lexer.ReadToken();
-            this.Vars[name] = this.Expr();
+            var value = this.Expr();
+            this.Assigning(this, new AssigningEventArgs(name, value));
+            this.Vars[name] = value;
             this.DebugLog($"{this.lexer.Token.Location.Line + 1}: Assign {name}={this.Vars[name].ToString()}");
         }
 
@@ -637,6 +640,18 @@ namespace Suconbu.Scripting.Memezo
                     (tokenType == TokenType.Or) ? new Value(a.Number != 0.0 || b.Number != 0.0 ? 1 : 0) :
                     throw new InternalErrorException(ErrorType.UnknownOperator, $"{tokenType}");
             }
+        }
+    }
+
+    public class AssigningEventArgs : EventArgs
+    {
+        public string VarName { get; private set; }
+        public Value Value { get; private set; }
+
+        public AssigningEventArgs(string varName, Value value)
+        {
+            this.VarName = varName;
+            this.Value = value;
         }
     }
 

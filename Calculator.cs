@@ -32,6 +32,11 @@ namespace Suconbu.Dentacs
                 this.Result = e;
                 this.IsResultEnabled = true;
             };
+            this.memezo.Assigning += (sender, e) =>
+            {
+                this.Result = e.Value.ToString();
+                this.IsResultEnabled = true;
+            };
             this.memezo.ErrorOccurred += (sender, e) =>
             {
                 if (e.Type == Memezo.ErrorType.UndeclaredIdentifier ||
