@@ -91,7 +91,7 @@ namespace Suconbu.Dentacs
         {
             if (string.IsNullOrWhiteSpace(textBox?.Text)) return;
 
-            // コピーしたことがわかるようチカっとさせる
+            // Blink the selection area to show the value has been copied
             textBox.Focus();
             textBox.SelectAll();
             Clipboard.SetText(textBox.Text);

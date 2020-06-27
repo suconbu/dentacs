@@ -43,7 +43,7 @@ namespace Suconbu.Dentacs
                     e.Type == Memezo.ErrorType.UnknownOperator ||
                     e.Type == Memezo.ErrorType.UnknownToken)
                 {
-                    this.Result = $"ERROR: {e.Message}";
+                    this.Result = e.Message;
                 }
             };
         }
