@@ -44,18 +44,39 @@ namespace Suconbu.Dentacs
             if (!decimal.TryParse(value.ToString(), out var number)) return false;
             var fixedNumber = (long)Math.Floor(number);
 
-            int bits = (fixedNumber <= 0xFFFF) ? 16 : (fixedNumber <= 0xFFFFFFFF) ? 32 : 64;
+            int bitCount =
+                    (fixedNumber < -0x10000 || 0xFFFFFFFF < fixedNumber) ? 64 :
+                    (fixedNumber < 0 || 0xFFFF < fixedNumber) ? 32 :
+                    16;
+
             if (radix == 16)
             {
                 var hex = System.Convert.ToString(fixedNumber, 16);
-                result = "0x" + new string('0', ((bits / 4) - hex.Length)) + hex;
+                int digitCount = bitCount / 4;
+                if(hex.Length <= digitCount)
+                {
+                    hex = hex.PadLeft(digitCount, '0');
+                }
+                else
+                {
+                    hex = hex.Substring(hex.Length - digitCount, digitCount);
+                }
+                result = $"0x{hex}";
             }
             else if (radix == 2)
             {
                 var bin = System.Convert.ToString(fixedNumber, 2);
-                bin = new string('0', bits - bin.Length) + bin;
+                if (bin.Length <= bitCount)
+                {
+                    bin = bin.PadLeft(bitCount, '0');
+                }
+                else
+                {
+                    bin = bin.Substring(bin.Length - bitCount, bitCount);
+                }
                 var fours = new List<string>();
-                for (int i = 0; i < bits; i += 4)
+                // Insert a space each 4 digits
+                for (int i = 0; i < bitCount; i += 4)
                 {
                     fours.Add(bin.Substring(i, 4));
                 }
