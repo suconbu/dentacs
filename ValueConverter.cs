@@ -5,6 +5,21 @@ using System.Windows.Data;
 
 namespace Suconbu.Dentacs
 {
+    class DecResultConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value == null) return null;
+            if (!ResultConvertHelper.ConvertTo(value.ToString(), 10, out var result)) return "--";
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     class HexResultConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -41,9 +56,14 @@ namespace Suconbu.Dentacs
         {
             result = null;
 
-            if (radix == 16 || radix == 2)
+            if (!decimal.TryParse(value.ToString(), out var number)) return false;
+
+            if (radix == 10)
             {
-                if (!decimal.TryParse(value.ToString(), out var number)) return false;
+                result = $"{number:#,0}";
+            }
+            else if (radix == 16 || radix == 2)
+            {
                 var fixedNumber = (long)Math.Floor(number);
 
                 int bitCount =
