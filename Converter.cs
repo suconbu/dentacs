@@ -42,10 +42,15 @@ namespace Suconbu.Dentacs
                 }
 
                 var sb = new StringBuilder();
-                int spacingInterval = 4;
+                int brInterval = 32;
+                int spInterval = 4;
                 for (int i = 0; i < digits.Length; i++)
                 {
-                    if (0 < i && (digits.Length - i) % spacingInterval == 0)
+                    if (0 < i && (digits.Length - i) % brInterval == 0)
+                    {
+                        sb.AppendLine();
+                    }
+                    else if (0 < i && (digits.Length - i) % spInterval == 0)
                     {
                         sb.Append(' ');
                     }

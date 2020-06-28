@@ -20,7 +20,7 @@
         </Style>
         <Style TargetType="TextBox" x:Key="ResultTextBoxStyle">
             <Setter Property="TextBox.FontSize" Value="20"></Setter>
-            <Setter Property="TextBox.Padding" Value="2,2"></Setter>
+            <Setter Property="TextBox.Padding" Value="5,5"></Setter>
             <Setter Property="TextBox.BorderThickness" Value="0"></Setter>
             <Setter Property="TextBox.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"></Setter>
             <Style.Triggers>
