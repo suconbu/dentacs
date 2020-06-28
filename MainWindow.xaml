@@ -32,8 +32,13 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <local:ResultConverter x:Key="ResultConverter"/>
+        <local:ResultValueConverter x:Key="ResultValueConverter"/>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.CopyCommand}"
+                        Executed="CopyCommand_Executed"
+                        CanExecute="CopyCommand_CanExecute"/>
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -50,12 +55,12 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBox Name="DecResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
-            <TextBox Name="HexResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="1" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
-            <TextBox Name="BinResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="2" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True"/>
-            <Button Name="DecButton" Content="10" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="DecButton_Click" />
-            <Button Name="HexButton" Content="16" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="HexButton_Click"/>
-            <Button Name="BinButton" Content="02" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="2" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Click="BinButton_Click"/>
+            <TextBox Name="DecResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True" Tag="10"/>
+            <TextBox Name="HexResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="1" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True" Tag="16"/>
+            <TextBox Name="BinResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" HorizontalAlignment="Stretch" TextWrapping="NoWrap" VerticalAlignment="Stretch" Grid.Row="2" ClipToBounds="True" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True" Tag="2"/>
+            <Button Name="DecButton" Content="10" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=DecResult, Delay=1000}"/>
+            <Button Name="HexButton" Content="16" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=HexResult}"/>
+                <Button Name="BinButton" Content="02" FontSize="10" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="2" BorderThickness="0,0,0,0" ToolTip="{DynamicResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}"/>
         </Grid>
     </Grid>
 </Window>

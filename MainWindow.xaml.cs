@@ -19,6 +19,7 @@ using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System.Windows.Interop;
 using System.Reactive.Linq;
+using System.Runtime.Serialization.Json;
 
 namespace Suconbu.Dentacs
 {
@@ -87,17 +88,6 @@ namespace Suconbu.Dentacs
             }
         }
 
-        void CopyTextToClipboard(TextBox textBox)
-        {
-            if (string.IsNullOrWhiteSpace(textBox?.Text)) return;
-
-            // Blink the selection area to show the value has been copied
-            textBox.Focus();
-            textBox.SelectAll();
-            Clipboard.SetText(textBox.Text);
-            Task.Delay(100).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.SelectionLength = 0; }); });
-        }
-
         private void InputTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             if (!this.IsInitialized) return;
@@ -106,19 +96,27 @@ namespace Suconbu.Dentacs
             this.Expression.Value = this.InputTextBox.GetLineText(lineIndex);
         }
 
-        private void DecButton_Click(object sender, RoutedEventArgs e)
+        public static RoutedCommand CopyCommand = new RoutedCommand();
+
+        void CopyCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.CopyTextToClipboard(this.DecResult);
+            if (!(e.Parameter is TextBox textBox)) return;
+            if (!int.TryParse((string)textBox.Tag, out var radix)) return;
+
+            if (!decimal.TryParse(this.calculator.Result, out var number)) return;
+            var text = ResultValueConvertHelper.ToString(number, radix, ResultValueConvertHelper.Styles.Prefix);
+
+            // Blink the selection area to show the value has been copied
+            textBox.Focus();
+            textBox.SelectAll();
+            Clipboard.SetText(text);
+            Task.Delay(100).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.SelectionLength = 0; }); });
         }
 
-        private void HexButton_Click(object sender, RoutedEventArgs e)
+        void CopyCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            this.CopyTextToClipboard(this.HexResult);
-        }
-
-        private void BinButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.CopyTextToClipboard(this.BinResult);
+            if (!(e.Parameter is TextBox textBox)) return;
+            e.CanExecute = !string.IsNullOrWhiteSpace(textBox.Text) && (textBox.Text != ResultValueConverter.InvalidValueText);
         }
     }
 
