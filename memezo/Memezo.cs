@@ -762,11 +762,15 @@ namespace Suconbu.Scripting.Memezo
             var location = this.currentLocation;
             var sb = new StringBuilder();
             int radix = 10;
-            if (this.currentChar == '0' && this.nextChar != '.')
+            if (this.currentChar == '0')
             {
-                var type = this.ReadChar();
-                radix = (type == 'x') ? 16 : (type == 'o') ? 8 : (type == 'b') ? 2 : 0;
-                this.ReadChar();
+                var type = this.nextChar;
+                radix = (type == 'x') ? 16 : (type == 'o') ? 8 : (type == 'b') ? 2 : radix;
+                if (radix != 10)
+                {
+                    this.ReadChar();
+                    this.ReadChar();
+                }
             }
             while (char.IsLetterOrDigit(this.currentChar) || this.currentChar == '.')
             {
