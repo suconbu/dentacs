@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="test\**" />
+    <EmbeddedResource Remove="test\**" />
+    <None Remove="test\**" />
+    <Page Remove="test\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ReactiveProperty" Version="7.1.0" />
   </ItemGroup>
 
