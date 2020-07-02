@@ -62,6 +62,7 @@ namespace Suconbu.Dentacs
             this.IsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactiveProperty();
             this.IsTopmost = this.ObserveProperty(x => x.Topmost).ToReadOnlyReactiveProperty();
             this.CaptionText = this.IsTopmost.Select(x => (string)this.FindResource(x ? "CaptionTopmost" : "Caption")).ToReadOnlyReactiveProperty();
+            this.MaxWidth = System.Windows.SystemParameters.WorkArea.Width * 0.9;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
