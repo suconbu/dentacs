@@ -12,7 +12,7 @@ namespace Suconbu.Scripting.Memezo
     {
         NothingSource, UnexpectedToken, UnknownToken, MissingToken, UndeclaredIdentifier,
         NotSupportedOperation, UnknownOperator, InvalidNumberOfArguments, InvalidDataType, InvalidOperation, InvalidParameter,
-        InvalidNumberFormat, InvalidStringLiteral, UnknownError
+        InvalidNumberFormat, InvalidStringLiteral, NumberOverflow, UnknownError
     }
     public delegate Value Function(List<Value> args);
 
@@ -373,6 +373,13 @@ namespace Suconbu.Scripting.Memezo
                 lhs = lhs.BinaryOperation(rhs, type);
                 RunStat.Increment(this.Stat.OperatorCounts, type.ToString());
             }
+            if (lhs.Type == DataType.Number)
+            {
+                if (lhs.Number < Int64.MinValue || Int64.MaxValue < lhs.Number)
+                {
+                    throw new InternalErrorException(ErrorType.NumberOverflow);
+                }
+            }
 
             return lhs;
         }
@@ -394,7 +401,7 @@ namespace Suconbu.Scripting.Memezo
             else if (this.lexer.Token.Type == TokenType.Not)
             {
                 this.lexer.ReadToken();
-                primary = new Value(this.Primary().Boolean() ? 0.0 : 1.0);
+                primary = new Value(this.Primary().Boolean() ? 0m : 1m);
             }
             else if (this.lexer.Token.Type == TokenType.LeftParen)
             {
@@ -549,13 +556,13 @@ namespace Suconbu.Scripting.Memezo
 
     public struct Value
     {
-        public static readonly Value Zero = new Value(0.0);
+        public static readonly Value Zero = new Value(0m);
 
         public DataType Type { get; private set; }
-        public double Number { get; private set; }
+        public decimal Number { get; private set; }
         public string String { get; private set; }
 
-        public Value(double n) : this()
+        public Value(decimal n) : this()
         {
             this.Type = DataType.Number;
             this.Number = n;
@@ -565,7 +572,7 @@ namespace Suconbu.Scripting.Memezo
         public Value(string s) : this()
         {
             this.Type = DataType.String;
-            this.Number = 0.0;
+            this.Number = 0m;
             this.String = s;
         }
 
@@ -573,7 +580,7 @@ namespace Suconbu.Scripting.Memezo
             (this.Type == DataType.Number) ? this.String : $"'{this.String}'";
 
         internal bool Boolean() =>
-            (this.Type == DataType.Number) ? (this.Number != 0.0) : !string.IsNullOrEmpty(this.String);
+            (this.Type == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
 
         internal Value BinaryOperation(Value b, TokenType tokenType)
         {
@@ -585,9 +592,9 @@ namespace Suconbu.Scripting.Memezo
                     (a.Type == DataType.Number && b.Type == DataType.Number) ?
                         new Value(a.Number * b.Number) :
                     (a.Type == DataType.String && b.Type == DataType.Number) ?
-                        new Value((new StringBuilder().Insert(0, a.String, (int)Math.Max(b.Number, 0.0))).ToString()) :
+                        new Value((new StringBuilder().Insert(0, a.String, (int)Math.Max(b.Number, 0m))).ToString()) :
                     (a.Type == DataType.Number && b.Type == DataType.String) ?
-                        new Value((new StringBuilder().Insert(0, b.String, (int)Math.Max(a.Number, 0.0))).ToString()) :
+                        new Value((new StringBuilder().Insert(0, b.String, (int)Math.Max(a.Number, 0m))).ToString()) :
                     throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
             }
 
@@ -631,13 +638,13 @@ namespace Suconbu.Scripting.Memezo
                     (tokenType == TokenType.Division) ? new Value(a.Number / b.Number) :
                     (tokenType == TokenType.FloorDivision) ? new Value(Math.Floor(a.Number / b.Number)) :
                     (tokenType == TokenType.Remainder) ? new Value(a.Number % b.Number) :
-                    (tokenType == TokenType.Exponent) ? new Value(Math.Pow(a.Number, b.Number)) :
+                    (tokenType == TokenType.Exponent) ? new Value((decimal)Math.Pow((double)a.Number, (double)b.Number)) :
                     (tokenType == TokenType.Less) ? new Value(a.Number < b.Number ? 1 : 0) :
                     (tokenType == TokenType.Greater) ? new Value(a.Number > b.Number ? 1 : 0) :
                     (tokenType == TokenType.LessEqual) ? new Value(a.Number <= b.Number ? 1 : 0) :
                     (tokenType == TokenType.GreaterEqual) ? new Value(a.Number >= b.Number ? 1 : 0) :
-                    (tokenType == TokenType.And) ? new Value(a.Number != 0.0 && b.Number != 0.0 ? 1 : 0) :
-                    (tokenType == TokenType.Or) ? new Value(a.Number != 0.0 || b.Number != 0.0 ? 1 : 0) :
+                    (tokenType == TokenType.And) ? new Value(a.Number != 0m && b.Number != 0m ? 1 : 0) :
+                    (tokenType == TokenType.Or) ? new Value(a.Number != 0m || b.Number != 0m ? 1 : 0) :
                     throw new InternalErrorException(ErrorType.UnknownOperator, $"{tokenType}");
             }
         }
@@ -778,15 +785,17 @@ namespace Suconbu.Scripting.Memezo
                 this.ReadChar();
             }
             var s = sb.ToString().ToLower();
-            double n = 0.0;
+            decimal n = 0m;
             if (radix <= 0 || 36 < radix || s.Length == 0)
             {
                 throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
             }
-            if (radix == 10)
+            else if (radix == 10)
             {
-                if (!double.TryParse(s, out n))
+                if (!decimal.TryParse(s, out n))
+                {
                     throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                }
             }
             else
             {
@@ -800,6 +809,10 @@ namespace Suconbu.Scripting.Memezo
                     if (radix <= v) throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
                     n += v;
                 }
+            }
+            if(n < Int64.MinValue || Int64.MaxValue < n)
+            {
+                throw new InternalErrorException(ErrorType.NumberOverflow, $"'{sb}'");
             }
             return new Token(TokenType.Value, location, s, new Value(n));
         }
@@ -952,7 +965,7 @@ namespace Suconbu.Scripting.Memezo
     {
         public ErrorType ErrorType { get; private set; }
 
-        public InternalErrorException(ErrorType type, string message = null) : base($"{type}:{message}")
+        public InternalErrorException(ErrorType type, string message = null) : base((message != null) ? $"{type}:{message}" : $"{type}")
         {
             this.ErrorType = type;
         }

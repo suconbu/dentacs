@@ -41,6 +41,7 @@ namespace Suconbu.Dentacs
             {
                 if (e.Type == Memezo.ErrorType.UndeclaredIdentifier ||
                     e.Type == Memezo.ErrorType.UnknownOperator ||
+                    e.Type == Memezo.ErrorType.NumberOverflow ||
                     e.Type == Memezo.ErrorType.UnknownToken)
                 {
                     this.Result = e.Message;

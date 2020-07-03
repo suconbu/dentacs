@@ -42,7 +42,7 @@ namespace Suconbu.Scripting.Memezo
             if (args.Count != 1) throw new InternalErrorException(ErrorType.InvalidNumberOfArguments);
             var value = args[0];
             return new Value(
-                (value.Type == DataType.String) ? (double.TryParse(value.String, out var n) ? n : throw new InternalErrorException(ErrorType.InvalidParameter)) :
+                (value.Type == DataType.String) ? (decimal.TryParse(value.String, out var n) ? n : throw new InternalErrorException(ErrorType.InvalidParameter)) :
                 (value.Type == DataType.Number) ? value.Number :
                 throw new InternalErrorException(ErrorType.InvalidDataType));
         }
@@ -59,7 +59,7 @@ namespace Suconbu.Scripting.Memezo
         public static Value Min(List<Value> args)
         {
             if (args.Count < 2) throw new InternalErrorException(ErrorType.InvalidNumberOfArguments);
-            var min = double.MaxValue;
+            var min = decimal.MaxValue;
             foreach (var arg in args)
             {
                 if (arg.Type != DataType.Number) throw new InternalErrorException(ErrorType.InvalidDataType);
@@ -72,7 +72,7 @@ namespace Suconbu.Scripting.Memezo
         public static Value Max(List<Value> args)
         {
             if (args.Count < 2) throw new InternalErrorException(ErrorType.InvalidNumberOfArguments);
-            var max = double.MinValue;
+            var max = decimal.MinValue;
             foreach (var arg in args)
             {
                 if (arg.Type != DataType.Number) throw new InternalErrorException(ErrorType.InvalidDataType);
