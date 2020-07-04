@@ -101,23 +101,27 @@ namespace Suconbu.Dentacs
 
         void CopyCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!(e.Parameter is TextBox textBox)) return;
-            if (!int.TryParse((string)textBox.Tag, out var radix)) return;
-
-            if (!decimal.TryParse(this.calculator.Result, out var number)) return;
-            var text = ResultValueConvertHelper.ToString(number, radix, ResultValueConvertHelper.Styles.Prefix);
-
             // Blink the selection area to show the value has been copied
+            var textBox = e.Parameter as TextBox;
+            var copyText = this.GetResultTextForCopy(textBox);
+            if (copyText == null) return;
             textBox.Focus();
             textBox.SelectAll();
-            Clipboard.SetText(text);
+            Clipboard.SetText(copyText);
             Task.Delay(100).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.SelectionLength = 0; }); });
         }
 
         void CopyCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (!(e.Parameter is TextBox textBox)) return;
-            e.CanExecute = !string.IsNullOrWhiteSpace(textBox.Text) && (textBox.Text != ResultValueConverter.InvalidValueText);
+            e.CanExecute = (this.GetResultTextForCopy(e.Parameter as TextBox) != null);
+        }
+
+        string GetResultTextForCopy(TextBox textBox)
+        {
+            if (textBox == null) return null;
+            if (!int.TryParse((string)textBox.Tag, out var radix)) return null;
+            if (!decimal.TryParse(this.calculator.Result, out var number)) return null;
+            return ResultValueConvertHelper.ToString(number, radix, ResultValueConvertHelper.Styles.Prefix);
         }
     }
 
