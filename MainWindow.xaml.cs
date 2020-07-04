@@ -30,14 +30,18 @@ namespace Suconbu.Dentacs
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public ReactiveProperty<string> Expression { get; private set; }
-        public ReadOnlyReactiveProperty<string> Result { get; private set; }
-        public ReadOnlyReactiveProperty<bool> IsResultEnabled { get; private set; }
-        public ReadOnlyReactiveProperty<bool> IsTopmost { get; private set; }
+        public ReadOnlyReactivePropertySlim<string> Result { get; private set; }
+        public ReadOnlyReactivePropertySlim<bool> IsResultEnabled { get; private set; }
+        public ReadOnlyReactivePropertySlim<bool> IsTopmost { get; private set; }
         public ReactiveProperty<double> Zoom { get; private set; }
-        public ReadOnlyReactiveProperty<string> TitleText { get; private set; }
+        public ReactiveProperty<int> ZoomIndex { get; private set; }
+        public ReadOnlyReactivePropertySlim<string> TitleText { get; private set; }
+        public ReactiveProperty<bool> IsFullScreen { get; private set; }
 
-        int zoomIndex = 1;
         readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
+        int zoomIndexBackup = 1;
+        bool topmostBackup = false;
+        double maxWidthBackup = System.Windows.SystemParameters.WorkArea.Width;
 
         Calculator calculator = Calculator.GetInstance();
 
@@ -62,17 +66,24 @@ namespace Suconbu.Dentacs
             this.DataContext = this;
 
             this.Expression = ReactiveProperty.FromObject(this.calculator, x => x.Expression);
-            this.Result = this.calculator.ObserveProperty(x => x.Result).ToReadOnlyReactiveProperty();
-            this.IsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactiveProperty();
-            this.IsTopmost = this.ObserveProperty(x => x.Topmost).ToReadOnlyReactiveProperty();
-            this.MaxWidth = System.Windows.SystemParameters.WorkArea.Width;
-            this.Zoom = new ReactiveProperty<double>(1.0);
-            this.TitleText = Observable.CombineLatest(
-                this.IsTopmost, this.Zoom, (topmost, zoom) => (topmost: topmost, zoom: zoom))
-                .Select(x => "dentacs" +
-                    (x.topmost ? " [always top]" : "") +
-                    (x.zoom != 1.0 ? $" {x.zoom * 100:#}%" : ""))
-                .ToReadOnlyReactiveProperty();
+            this.Result = this.calculator.ObserveProperty(x => x.Result).ToReadOnlyReactivePropertySlim();
+            this.IsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactivePropertySlim();
+            this.IsTopmost = this.ObserveProperty(x => x.Topmost).ToReadOnlyReactivePropertySlim();
+            this.Zoom = new ReactiveProperty<double>();
+            this.ZoomIndex = new ReactiveProperty<int>();
+            this.Zoom = this.ZoomIndex.Select(x => this.zoomTable[x]).ToReactiveProperty();
+            this.TitleText = Observable.CombineLatest(this.IsTopmost, this.Zoom, (a, b) => 0)
+                .Select(_ => this.MakeTitleText())
+                .ToReadOnlyReactivePropertySlim();
+            this.IsFullScreen = new ReactiveProperty<bool>(false);
+            this.IsFullScreen.Subscribe(x => this.SetFullScreen(x));
+        }
+
+        string MakeTitleText()
+        {
+            return "dentacs" +
+                (this.IsTopmost.Value ? " [always top]" : "") +
+                (this.Zoom.Value != 1.0 ? $" {this.Zoom.Value * 100:#}%" : "");
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -104,17 +115,46 @@ namespace Suconbu.Dentacs
         {
             base.OnPreviewKeyDown(e);
 
-            if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 if (e.Key == Key.PageUp) this.ChangeZoom(+1);
                 if (e.Key == Key.PageDown) this.ChangeZoom(-1);
+            }
+            else if (e.Key == Key.F11)
+            {
+                // Toggle full-screen
+                this.IsFullScreen.Value = !this.IsFullScreen.Value;
             }
         }
 
         void ChangeZoom(int offset)
         {
-            this.zoomIndex = Math.Clamp(this.zoomIndex + offset, 0, this.zoomTable.Length - 1);
-            this.Zoom.Value = this.zoomTable[this.zoomIndex];
+            this.ZoomIndex.Value = Math.Clamp(this.ZoomIndex.Value + offset, 0, this.zoomTable.Length - 1);
+        }
+
+        void SetFullScreen(bool enable)
+        {
+            if (enable)
+            {
+                this.zoomIndexBackup = this.ZoomIndex.Value;
+                this.ZoomIndex.Value = this.zoomTable.Length - 1;
+                this.topmostBackup = this.Topmost;
+                this.Topmost = true;
+                this.maxWidthBackup = this.MaxWidth;
+                this.MaxWidth = Double.PositiveInfinity;
+                this.SizeToContent = SizeToContent.Manual;
+                this.WindowStyle = WindowStyle.None;
+                this.WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                this.WindowStyle = WindowStyle.SingleBorderWindow;
+                this.WindowState = WindowState.Normal;
+                this.SizeToContent = SizeToContent.WidthAndHeight;
+                this.MaxWidth = this.maxWidthBackup;
+                this.Topmost = this.topmostBackup;
+                this.ZoomIndex.Value = this.zoomIndexBackup;
+            }
         }
 
         protected virtual void OnMouseDoubleClickNC(NcMouseEventArgs e)

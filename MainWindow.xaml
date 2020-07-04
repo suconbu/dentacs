@@ -7,7 +7,9 @@
         xmlns:local="clr-namespace:Suconbu.Dentacs"
         xmlns:System="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
-        Title="{Binding TitleText.Value}" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        Title="{Binding TitleText.Value}"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
         FontFamily="Consolas">
@@ -52,9 +54,9 @@
                         Executed="CopyCommand_Executed"
                         CanExecute="CopyCommand_CanExecute"/>
     </Window.CommandBindings>
-    <Grid>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
