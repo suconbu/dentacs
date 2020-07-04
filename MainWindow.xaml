@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Suconbu.Dentacs"
         xmlns:System="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
-        Title="{Binding TitleText.Value}"
+        Title="{Binding RxTitleText.Value}"
         SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
@@ -16,12 +16,12 @@
     <Window.Resources>
         <System:String x:Key="ButtonToolTip">Copy value to clipboard</System:String>
         <Style TargetType="TextBox" x:Key="InputTextBoxStyle">
-            <Setter Property="TextBox.FontSize" Value="{c:Binding 30 * Zoom.Value}"></Setter>
+            <Setter Property="TextBox.FontSize" Value="{c:Binding 30 * RxZoom.Value}"></Setter>
             <Setter Property="TextBox.Padding" Value="10,10"></Setter>
             <Setter Property="TextBox.BorderThickness" Value="0,0,0,1"></Setter>
         </Style>
         <Style TargetType="TextBox" x:Key="ResultTextBoxStyle">
-            <Setter Property="FontSize" Value="{c:Binding 16 * Zoom.Value}"></Setter>
+            <Setter Property="FontSize" Value="{c:Binding 16 * RxZoom.Value}"></Setter>
             <Setter Property="Padding" Value="3,3"></Setter>
             <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
             <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
@@ -32,16 +32,16 @@
             <Setter Property="IsReadOnly" Value="True"></Setter>
             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"></Setter>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsResultEnabled.Value, Mode=OneWay}" Value="true">
+                <DataTrigger Binding="{Binding RxIsResultEnabled.Value, Mode=OneWay}" Value="true">
                     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding IsResultEnabled.Value, Mode=OneWay}" Value="false">
+                <DataTrigger Binding="{Binding RxIsResultEnabled.Value, Mode=OneWay}" Value="false">
                     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style TargetType="Button" x:Key="ResultButtonStyle">
-            <Setter Property="FontSize" Value="{c:Binding 12 * ((3 - 1) + Zoom.Value) / 3}"></Setter>
+            <Setter Property="FontSize" Value="{c:Binding 12 * ((3 - 1) + RxZoom.Value) / 3}"></Setter>
             <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
             <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
             <Setter Property="BorderThickness" Value="0,0,0,0"></Setter>
@@ -71,9 +71,9 @@
                 <RowDefinition/>
                 <RowDefinition Height="0"/>
             </Grid.RowDefinitions>
-            <TextBox Name="DecResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
-            <TextBox Name="HexResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" Tag="16" Grid.Row="1"/>
-            <TextBox Name="BinResult" Text="{Binding Result.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" Tag="2" Grid.Row="2"/>
+            <TextBox Name="DecResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
+            <TextBox Name="HexResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" Tag="16" Grid.Row="1"/>
+            <TextBox Name="BinResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultValueConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" Tag="2" Grid.Row="2"/>
             <TextBox Name="HiddenResult" Text="0000 0000 0000 0000 0000 0000 0000 0000" Style="{StaticResource ResultTextBoxStyle}" Grid.Row="3"/>
             <Button Name="DecButton" Content="10" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{DynamicResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=DecResult}" Grid.Row="0"/>
             <Button Name="HexButton" Content="16" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{DynamicResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=HexResult}" Grid.Row="1"/>

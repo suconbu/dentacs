@@ -10,6 +10,7 @@ namespace Suconbu.Dentacs
     public class Calculator : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
         public string Expression { get { return null; } set { this.SetExpression(value); } }
         public string Result { get { return this.result; } set { this.SetProperty(ref this.result, value); } }
         public bool IsResultEnabled { get { return this.isResultEnabled; } set { this.SetProperty(ref this.isResultEnabled, value); } }
