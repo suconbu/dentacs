@@ -172,7 +172,9 @@ namespace Suconbu.Dentacs
             if (!this.IsInitialized) return;
 
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(this.InputTextBox.CaretIndex);
-            this.RxExpression.Value = this.InputTextBox.GetLineText(lineIndex);
+            var lines = this.InputTextBox.Text.Split(Environment.NewLine);
+            // GetLineText does not work in full-screen mode.
+            this.RxExpression.Value = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
         }
 
         public static RoutedCommand CopyCommand = new RoutedCommand();
