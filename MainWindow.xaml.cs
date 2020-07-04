@@ -33,7 +33,11 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactiveProperty<string> Result { get; private set; }
         public ReadOnlyReactiveProperty<bool> IsResultEnabled { get; private set; }
         public ReadOnlyReactiveProperty<bool> IsTopmost { get; private set; }
-        public ReadOnlyReactiveProperty<string> CaptionText { get; private set; }
+        public ReactiveProperty<double> Zoom { get; private set; }
+        public ReadOnlyReactiveProperty<string> TitleText { get; private set; }
+
+        int zoomIndex = 1;
+        readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
 
         Calculator calculator = Calculator.GetInstance();
 
@@ -61,8 +65,14 @@ namespace Suconbu.Dentacs
             this.Result = this.calculator.ObserveProperty(x => x.Result).ToReadOnlyReactiveProperty();
             this.IsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactiveProperty();
             this.IsTopmost = this.ObserveProperty(x => x.Topmost).ToReadOnlyReactiveProperty();
-            this.CaptionText = this.IsTopmost.Select(x => (string)this.FindResource(x ? "CaptionTopmost" : "Caption")).ToReadOnlyReactiveProperty();
-            this.MaxWidth = System.Windows.SystemParameters.WorkArea.Width * 0.9;
+            this.MaxWidth = System.Windows.SystemParameters.WorkArea.Width;
+            this.Zoom = new ReactiveProperty<double>(1.0);
+            this.TitleText = Observable.CombineLatest(
+                this.IsTopmost, this.Zoom, (topmost, zoom) => (topmost: topmost, zoom: zoom))
+                .Select(x => "dentacs" +
+                    (x.topmost ? " [always top]" : "") +
+                    (x.zoom != 1.0 ? $" {x.zoom * 100:#}%" : ""))
+                .ToReadOnlyReactiveProperty();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -78,6 +88,33 @@ namespace Suconbu.Dentacs
             base.OnContentRendered(e);
 
             this.InputTextBox.Focus();
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                this.ChangeZoom(0 < e.Delta ? +1 : -1);
+            }
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                if (e.Key == Key.PageUp) this.ChangeZoom(+1);
+                if (e.Key == Key.PageDown) this.ChangeZoom(-1);
+            }
+        }
+
+        void ChangeZoom(int offset)
+        {
+            this.zoomIndex = Math.Clamp(this.zoomIndex + offset, 0, this.zoomTable.Length - 1);
+            this.Zoom.Value = this.zoomTable[this.zoomIndex];
         }
 
         protected virtual void OnMouseDoubleClickNC(NcMouseEventArgs e)

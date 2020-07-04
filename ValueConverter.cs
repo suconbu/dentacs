@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Windows.Data;
 
@@ -9,7 +10,7 @@ namespace Suconbu.Dentacs
     {
         public static readonly string InvalidValueText = "--";
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null || parameter == null) return null;
 
@@ -24,7 +25,7 @@ namespace Suconbu.Dentacs
                 number, radix, ResultValueConvertHelper.Styles.Separator);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
