@@ -34,7 +34,7 @@ namespace test
         public void TestResultValueConverter()
         {
             var calture = System.Globalization.CultureInfo.CurrentCulture;
-            var converter = new ResultValueConverter();
+            var converter = new ResultConverter();
 
             var input = "0";
             Assert.IsTrue("0" == converter.Convert(input, typeof(string), "10", calture) as string);

@@ -6,9 +6,9 @@ using System.Windows.Data;
 
 namespace Suconbu.Dentacs
 {
-    public class ResultValueConverter : IValueConverter
+    public class ResultConverter : IValueConverter
     {
-        public static readonly string InvalidValueText = "--";
+        public static readonly string InvalidValueString = "--";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -18,11 +18,11 @@ namespace Suconbu.Dentacs
 
             if (!decimal.TryParse(value.ToString(), out var number))
             {
-                return (radix == 10) ? value.ToString() : ResultValueConverter.InvalidValueText;
+                return (radix == 10) ? value.ToString() : ResultConverter.InvalidValueString;
             }
 
-            return ResultValueConvertHelper.ToString(
-                number, radix, ResultValueConvertHelper.Styles.Separator);
+            return ResultConvertHelper.ConvertToResultString(
+                number, radix, ResultConvertHelper.Styles.Separator);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -31,7 +31,7 @@ namespace Suconbu.Dentacs
         }
     }
 
-    static class ResultValueConvertHelper
+    static class ResultConvertHelper
     {
         [Flags]
         public enum Styles
@@ -42,7 +42,7 @@ namespace Suconbu.Dentacs
 
         static readonly Dictionary<int, string> kPrefixes = new Dictionary<int, string>() { { 16, "0x" }, { 2, "0b" } };
 
-        public static string ToString(decimal value, int radix, Styles styles)
+        public static string ConvertToResultString(decimal value, int radix, Styles styles)
         {
             var result = new StringBuilder();
 

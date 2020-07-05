@@ -38,6 +38,7 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<int> RxZoomIndex { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; private set; }
         public ReactiveProperty<bool> RxIsFullScreen { get; private set; }
+        public ReactiveProperty<string> RxCurrentElement { get; private set; }
 
         readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
         int zoomIndexBackup = 1;
@@ -78,6 +79,7 @@ namespace Suconbu.Dentacs
                 .ToReadOnlyReactivePropertySlim();
             this.RxIsFullScreen = new ReactiveProperty<bool>(false);
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
+            this.RxCurrentElement = new ReactiveProperty<string>();
         }
 
         string MakeTitleText()
@@ -171,10 +173,19 @@ namespace Suconbu.Dentacs
         {
             if (!this.IsInitialized) return;
 
-            var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(this.InputTextBox.CaretIndex);
+            var caretIndex = this.InputTextBox.CaretIndex;
+            var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
+
             var lines = this.InputTextBox.Text.Split(Environment.NewLine);
-            // GetLineText does not work in full-screen mode.
-            this.RxExpression.Value = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
+            int lineStartIndex = lines.Take(lineIndex).Select(line => line.Length + Environment.NewLine.Length).Sum();
+            int charIndexOfLine = caretIndex - lineStartIndex;
+            // GetLineText does not work in fullscreen mode.
+            var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
+            var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
+            var currentElement = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
+
+            this.RxExpression.Value = currentLine;
+            this.RxCurrentElement.Value = currentElement;
         }
 
         public static RoutedCommand CopyCommand = new RoutedCommand();
@@ -201,7 +212,12 @@ namespace Suconbu.Dentacs
             if (textBox == null) return null;
             if (!int.TryParse((string)textBox.Tag, out var radix)) return null;
             if (!decimal.TryParse(this.calculator.Result, out var number)) return null;
-            return ResultValueConvertHelper.ToString(number, radix, ResultValueConvertHelper.Styles.Prefix);
+            return ResultConvertHelper.ConvertToResultString(number, radix, ResultConvertHelper.Styles.Prefix);
+        }
+
+        private void StatusBarItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Clipboard.SetText(CharInfoConvertHelper.ConvertToInfoString(this.RxCurrentElement.Value, true));
         }
     }
 
