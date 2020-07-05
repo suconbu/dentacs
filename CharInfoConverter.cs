@@ -51,9 +51,10 @@ namespace Suconbu.Dentacs
             var codePointText = string.Join(" ", codePoints);
             var utf8CodeText = string.Join(" ", utf8Codes);
             var utf16beCodeText = string.Join(" ", utf16Codes);
+            var s = CharInfoConvertHelper.ConvertToPrintable(str);
             return shorten ?
-                $"'{str}' | {codePointText} | {utf16beCodeText} | {utf8CodeText}" :
-                $"'{str}' | {codePointText} | {utf16beCodeText} (UTF-16BE) | {utf8CodeText} (UTF-8)";
+                $"'{s}' | {codePointText} | {utf16beCodeText} (16BE) | {utf8CodeText} (8)" :
+                $"'{s}' | {codePointText} | {utf16beCodeText} (UTF-16BE) | {utf8CodeText} (UTF-8)";
         }
 
         public static string ConvertToElementLengthInfoString(string str, bool shorten)
@@ -64,9 +65,10 @@ namespace Suconbu.Dentacs
             var elementCount = si.LengthInTextElements;
             var utf8Count = Encoding.UTF8.GetBytes(str).Length;
             var utf16Count = Encoding.BigEndianUnicode.GetBytes(str).Length;
+            var s = CharInfoConvertHelper.ConvertToPrintable(str);
             return shorten ?
-                $"'{str}' | {elementCount} elements | {utf16Count} bytes | {utf8Count} bytes" :
-                $"'{str}' | {elementCount} elements | {utf16Count} bytes (UTF-16BE) | {utf8Count} bytes (UTF-8)";
+                $"'{s}' | {elementCount} elements | {utf16Count} bytes (16BE) | {utf8Count} bytes (8)" :
+                $"'{s}' | {elementCount} elements | {utf16Count} bytes (UTF-16BE) | {utf8Count} bytes (UTF-8)";
         }
 
         public static string GetUnicodeElement(string str, int index)
@@ -81,6 +83,18 @@ namespace Suconbu.Dentacs
                 }
             }
             return null;
+        }
+
+        public static string ConvertToPrintable(string str)
+        {
+            return str
+                .Replace("\a", "\\a")
+                .Replace("\b", "\\b")
+                .Replace("\f", "\\f")
+                .Replace("\n", "\\n")
+                .Replace("\r", "\\r")
+                .Replace("\t", "\\t")
+                .Replace("\v", "\\v");
         }
     }
 }
