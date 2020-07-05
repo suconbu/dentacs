@@ -17,7 +17,7 @@
         <ToolTip x:Key="ButtonToolTip">Copy value to clipboard</ToolTip>
         <ToolTip x:Key="MojiStatusToolTip">
             <TextBlock>
-                Char | CodePoint | UTF-16BE | UTF-8<LineBreak/>
+                String | CodePoint | UTF-16BE | UTF-8<LineBreak/>
                 (Double click to copy to clipboard)
             </TextBlock>
         </ToolTip>
@@ -91,7 +91,14 @@
             <Button Name="BinButton" Content="02" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
         </Grid>
         <StatusBar Grid.Row="2">
-            <StatusBarItem Content="{Binding RxCurrentElement.Value, Converter={StaticResource CharInfoConverter}}" Style="{StaticResource StatusBarItemStyle}" HorizontalAlignment="Right" ToolTip="{StaticResource MojiStatusToolTip}" MouseDoubleClick="StatusBarItem_MouseDoubleClick"></StatusBarItem>
+            <StatusBarItem Style="{StaticResource StatusBarItemStyle}" HorizontalAlignment="Right" ToolTip="{StaticResource MojiStatusToolTip}" MouseDoubleClick="StatusBarItem_MouseDoubleClick">
+                <StatusBarItem.Content>
+                    <MultiBinding Converter="{StaticResource CharInfoConverter}">
+                        <Binding Path="RxCurrentText.Value"></Binding>
+                        <Binding Path="RxSelectionLength.Value"></Binding>
+                    </MultiBinding>
+                </StatusBarItem.Content>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>

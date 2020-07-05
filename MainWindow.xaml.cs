@@ -38,7 +38,8 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<int> RxZoomIndex { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; private set; }
         public ReactiveProperty<bool> RxIsFullScreen { get; private set; }
-        public ReactiveProperty<string> RxCurrentElement { get; private set; }
+        public ReactiveProperty<string> RxCurrentText { get; private set; }
+        public ReactiveProperty<int> RxSelectionLength { get; private set; }
 
         readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
         int zoomIndexBackup = 1;
@@ -79,7 +80,8 @@ namespace Suconbu.Dentacs
                 .ToReadOnlyReactivePropertySlim();
             this.RxIsFullScreen = new ReactiveProperty<bool>(false);
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
-            this.RxCurrentElement = new ReactiveProperty<string>();
+            this.RxCurrentText = new ReactiveProperty<string>();
+            this.RxSelectionLength = new ReactiveProperty<int>();
         }
 
         string MakeTitleText()
@@ -177,15 +179,21 @@ namespace Suconbu.Dentacs
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
 
             var lines = this.InputTextBox.Text.Split(Environment.NewLine);
-            int lineStartIndex = lines.Take(lineIndex).Select(line => line.Length + Environment.NewLine.Length).Sum();
-            int charIndexOfLine = caretIndex - lineStartIndex;
             // GetLineText does not work in fullscreen mode.
             var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
-            var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
-            var currentElement = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
+
+            var selectedText = this.InputTextBox.SelectedText;
+            if (selectedText.Length == 0)
+            {
+                int lineStartIndex = lines.Take(lineIndex).Select(line => line.Length + Environment.NewLine.Length).Sum();
+                int charIndexOfLine = caretIndex - lineStartIndex;
+                var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
+                selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
+            }
 
             this.RxExpression.Value = currentLine;
-            this.RxCurrentElement.Value = currentElement;
+            this.RxCurrentText.Value = selectedText;
+            this.RxSelectionLength.Value = this.InputTextBox.SelectionLength;
         }
 
         public static RoutedCommand CopyCommand = new RoutedCommand();
@@ -217,7 +225,8 @@ namespace Suconbu.Dentacs
 
         private void StatusBarItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Clipboard.SetText(CharInfoConvertHelper.ConvertToInfoString(this.RxCurrentElement.Value, true));
+            var text = CharInfoConvertHelper.ConvertToElementInfoString(this.RxCurrentText.Value, false);
+            Clipboard.SetText(text);
         }
     }
 
