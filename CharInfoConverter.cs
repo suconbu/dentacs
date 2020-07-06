@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Data;
 using System.Linq;
+using System.Windows;
 
 namespace Suconbu.Dentacs
 {
@@ -13,16 +14,12 @@ namespace Suconbu.Dentacs
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var currentText = (string)values[0];
-            var selectionLength = (int)values[1];
-            if (selectionLength == 0)
-            {
-                return CharInfoConvertHelper.ConvertToElementInfoString(currentText, true) ?? CharInfoConverter.InvalidValueString;
-            }
-            else
-            {
-                return CharInfoConvertHelper.ConvertToElementLengthInfoString(currentText, true) ?? CharInfoConverter.InvalidValueString;
-            }
+            var result = CharInfoConverter.InvalidValueString;
+            if (!(values[0] is string currentText)) return result;
+            if (!(values[1] is int selectionLength)) return result;
+            return (selectionLength == 0) ?
+                (CharInfoConvertHelper.ConvertToElementInfoString(currentText, true) ?? result) :
+                (CharInfoConvertHelper.ConvertToElementLengthInfoString(currentText, true) ?? result);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -33,7 +33,6 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<string> RxExpression { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxResult { get; private set; }
         public ReadOnlyReactivePropertySlim<bool> RxIsResultEnabled { get; private set; }
-        public ReadOnlyReactivePropertySlim<bool> RxIsTopmost { get; private set; }
         public ReactiveProperty<double> RxZoom { get; private set; }
         public ReactiveProperty<int> RxZoomIndex { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; private set; }
@@ -43,7 +42,6 @@ namespace Suconbu.Dentacs
 
         readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
         int zoomIndexBackup = 1;
-        bool topmostBackup = false;
         double maxWidthBackup = System.Windows.SystemParameters.WorkArea.Width;
 
         Calculator calculator = Calculator.GetInstance();
@@ -71,13 +69,10 @@ namespace Suconbu.Dentacs
             this.RxExpression = ReactiveProperty.FromObject(this.calculator, x => x.Expression);
             this.RxResult = this.calculator.ObserveProperty(x => x.Result).ToReadOnlyReactivePropertySlim();
             this.RxIsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactivePropertySlim();
-            this.RxIsTopmost = this.ObserveProperty(x => x.Topmost).ToReadOnlyReactivePropertySlim();
             this.RxZoom = new ReactiveProperty<double>();
             this.RxZoomIndex = new ReactiveProperty<int>();
             this.RxZoom = this.RxZoomIndex.Select(x => this.zoomTable[x]).ToReactiveProperty();
-            this.RxTitleText = Observable.CombineLatest(this.RxIsTopmost, this.RxZoom, (a, b) => 0)
-                .Select(_ => this.MakeTitleText())
-                .ToReadOnlyReactivePropertySlim();
+            this.RxTitleText = this.RxZoom.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
             this.RxIsFullScreen = new ReactiveProperty<bool>(false);
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
             this.RxCurrentText = new ReactiveProperty<string>();
@@ -87,7 +82,6 @@ namespace Suconbu.Dentacs
         string MakeTitleText()
         {
             return "dentacs" +
-                (this.RxIsTopmost.Value ? " [always top]" : "") +
                 (this.RxZoom.Value != 1.0 ? $" {this.RxZoom.Value * 100:#}%" : "");
         }
 
@@ -143,8 +137,6 @@ namespace Suconbu.Dentacs
             {
                 this.zoomIndexBackup = this.RxZoomIndex.Value;
                 this.RxZoomIndex.Value = this.zoomTable.Length - 1;
-                this.topmostBackup = this.Topmost;
-                this.Topmost = true;
                 this.maxWidthBackup = this.MaxWidth;
                 this.MaxWidth = Double.PositiveInfinity;
                 this.SizeToContent = SizeToContent.Manual;
@@ -157,7 +149,6 @@ namespace Suconbu.Dentacs
                 this.WindowState = WindowState.Normal;
                 this.SizeToContent = SizeToContent.WidthAndHeight;
                 this.MaxWidth = this.maxWidthBackup;
-                this.Topmost = this.topmostBackup;
                 this.RxZoomIndex.Value = this.zoomIndexBackup;
             }
         }
@@ -166,8 +157,7 @@ namespace Suconbu.Dentacs
         {
             if (e.HitPosition == NcMouseEventArgs.Position.HTCAPTION)
             {
-                this.Topmost = !this.Topmost;
-                this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(this.Topmost)));
+                this.RxIsFullScreen.Value = true;
             }
         }
 
@@ -227,6 +217,11 @@ namespace Suconbu.Dentacs
         {
             var text = CharInfoConvertHelper.ConvertToElementInfoString(this.RxCurrentText.Value, false);
             Clipboard.SetText(text);
+        }
+
+        private void CloseFullScreenButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.RxIsFullScreen.Value = false;
         }
     }
 
