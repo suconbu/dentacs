@@ -11,7 +11,7 @@ namespace Suconbu.Scripting.Memezo
     public enum ErrorType
     {
         NothingSource, UnexpectedToken, UnknownToken, MissingToken, UndeclaredIdentifier,
-        NotSupportedOperation, UnknownOperator, InvalidNumberOfArguments, InvalidDataType, InvalidOperation, InvalidParameter,
+        NotSupportedOperation, UnknownOperator, InvalidDataType, InvalidOperation, InvalidArgument,
         InvalidNumberFormat, InvalidStringLiteral, NumberOverflow, UnknownError
     }
     public delegate Value Function(List<Value> args);
@@ -111,7 +111,7 @@ namespace Suconbu.Scripting.Memezo
             nextIndex = -1;
             try
             {
-                if (this.lexer == null) throw new InternalErrorException(ErrorType.NothingSource);
+                if (this.lexer == null) throw new ErrorException(ErrorType.NothingSource);
                 if (stepByStep)
                 {
                     nextIndex = this.Statement() ? this.lexer.Token.Location.CharIndex : nextIndex;
@@ -140,7 +140,7 @@ namespace Suconbu.Scripting.Memezo
             var nextType = this.lexer.NextToken.Type;
             var continueToRun = true;
 
-            if (type == TokenType.Unkown) throw new InternalErrorException(ErrorType.UnknownToken, $"{this.lexer.Token}");
+            if (type == TokenType.Unkown) throw new ErrorException(ErrorType.UnknownToken, $"{this.lexer.Token}");
             else if (type == TokenType.If) this.OnIf();
             else if (type == TokenType.Elif) this.OnAfterIf();
             else if (type == TokenType.Else) this.OnAfterIf();
@@ -195,7 +195,7 @@ namespace Suconbu.Scripting.Memezo
         void OnAfterIf()
         {
             if (this.clauses.Count <= 0 || this.clauses.Peek().Token.Type != TokenType.If)
-                throw new InternalErrorException(ErrorType.UnexpectedToken, $"{this.lexer.Token}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{this.lexer.Token}");
 
             int count = 0;
             while (this.lexer.ReadToken().Type != TokenType.Eof)
@@ -219,7 +219,7 @@ namespace Suconbu.Scripting.Memezo
 
             var token = this.lexer.ReadToken();
             if (token.Type != TokenType.Assign && token.Type != TokenType.In)
-                throw new InternalErrorException(ErrorType.UnexpectedToken, $"{token}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{token}");
 
             this.lexer.ReadToken();
             var fromValue = this.Expr();
@@ -266,7 +266,7 @@ namespace Suconbu.Scripting.Memezo
             this.lexer.ReadToken();
 
             if (this.clauses.Count <= 0)
-                throw new InternalErrorException(ErrorType.UnexpectedToken, $"{TokenType.End}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{TokenType.End}");
 
             this.DebugLog($"{this.lexer.Token.Location.Line + 1}: End");
 
@@ -276,7 +276,7 @@ namespace Suconbu.Scripting.Memezo
             else if (clause.Token.IsLoop())
                 this.EndFor(clause);
             else
-                throw new InternalErrorException(ErrorType.UnexpectedToken, $"{clause.Token}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{clause.Token}");
         }
 
         void OnContinue()
@@ -291,7 +291,7 @@ namespace Suconbu.Scripting.Memezo
                 }
                 this.clauses.Pop();
             }
-            throw new InternalErrorException(ErrorType.UnexpectedToken, $"{TokenType.Continue}");
+            throw new ErrorException(ErrorType.UnexpectedToken, $"{TokenType.Continue}");
         }
 
         void OnBreak()
@@ -310,7 +310,7 @@ namespace Suconbu.Scripting.Memezo
                 this.clauses.Pop();
                 counter++;
             }
-            throw new InternalErrorException(ErrorType.UnexpectedToken, $"{TokenType.Break}");
+            throw new ErrorException(ErrorType.UnexpectedToken, $"{TokenType.Break}");
         }
 
         void FinishLoop(int initialCounter = 0)
@@ -342,13 +342,13 @@ namespace Suconbu.Scripting.Memezo
 
         void OnEof()
         {
-            if (this.clauses.Count > 0) throw new InternalErrorException(ErrorType.MissingToken, $"{TokenType.End}");
+            if (this.clauses.Count > 0) throw new ErrorException(ErrorType.MissingToken, $"{TokenType.End}");
         }
 
         void OnAssign()
         {
             var name = this.lexer.Token.Text;
-            if (this.Functions.ContainsKey(name)) throw new InternalErrorException(ErrorType.InvalidOperation, $"'{name}' is a function");
+            if (this.Functions.ContainsKey(name)) throw new ErrorException(ErrorType.InvalidOperation, $"'{name}' is a function");
             this.VerifyToken(this.lexer.ReadToken(), TokenType.Assign);
             this.lexer.ReadToken();
             var value = this.Expr();
@@ -377,7 +377,7 @@ namespace Suconbu.Scripting.Memezo
             {
                 if (lhs.Number < Int64.MinValue || Int64.MaxValue < lhs.Number)
                 {
-                    throw new InternalErrorException(ErrorType.NumberOverflow);
+                    throw new ErrorException(ErrorType.NumberOverflow);
                 }
             }
 
@@ -426,12 +426,12 @@ namespace Suconbu.Scripting.Memezo
                 }
                 else
                 {
-                    throw new InternalErrorException(ErrorType.UndeclaredIdentifier, $"'{identifier}'");
+                    throw new ErrorException(ErrorType.UndeclaredIdentifier, $"'{identifier}'");
                 }
             }
             else
             {
-                throw new InternalErrorException(ErrorType.UnexpectedToken, $"{this.lexer.Token}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{this.lexer.Token}");
             }
 
             return primary;
@@ -439,7 +439,7 @@ namespace Suconbu.Scripting.Memezo
 
         void VerifyToken(Token token, TokenType expectedType)
         {
-            if (token.Type != expectedType) throw new InternalErrorException(ErrorType.MissingToken, $"{expectedType}");
+            if (token.Type != expectedType) throw new ErrorException(ErrorType.MissingToken, $"{expectedType}");
         }
 
         List<Value> ReadArguments()
@@ -485,7 +485,7 @@ namespace Suconbu.Scripting.Memezo
 
         void HandleException(Exception ex)
         {
-            var errorType = (ex as InternalErrorException)?.ErrorType ?? ErrorType.UnknownError;
+            var errorType = (ex as ErrorException)?.ErrorType ?? ErrorType.UnknownError;
             this.LastError = new ErrorInfo(errorType, ex.Message, this.lexer?.Token.Location ?? new SourceLocation());
             this.ErrorOccurred(this, this.LastError);
             this.clauses.Clear();
@@ -569,6 +569,20 @@ namespace Suconbu.Scripting.Memezo
             this.String = n.ToString();
         }
 
+        public Value(int n) : this()
+        {
+            this.Type = DataType.Number;
+            this.Number = n;
+            this.String = n.ToString();
+        }
+
+        public Value(double n) : this()
+        {
+            this.Type = DataType.Number;
+            this.Number = (decimal)n;
+            this.String = n.ToString();
+        }
+
         public Value(string s) : this()
         {
             this.Type = DataType.String;
@@ -595,7 +609,7 @@ namespace Suconbu.Scripting.Memezo
                         new Value((new StringBuilder().Insert(0, a.String, (int)Math.Max(b.Number, 0m))).ToString()) :
                     (a.Type == DataType.Number && b.Type == DataType.String) ?
                         new Value((new StringBuilder().Insert(0, b.String, (int)Math.Max(a.Number, 0m))).ToString()) :
-                    throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
             }
 
             if (a.Type != b.Type)
@@ -605,7 +619,7 @@ namespace Suconbu.Scripting.Memezo
                 else if (a.Type == DataType.String && b.Type == DataType.Number)
                     b = new Value(b.ToString());
                 else
-                    throw new InternalErrorException(ErrorType.InvalidDataType, $"{a.Type} x {b.Type}");
+                    throw new ErrorException(ErrorType.InvalidDataType, $"{a.Type} x {b.Type}");
             }
 
             if (tokenType == TokenType.Plus)
@@ -613,25 +627,25 @@ namespace Suconbu.Scripting.Memezo
                 return
                     (a.Type == DataType.Number) ? new Value(a.Number + b.Number) :
                     (a.Type == DataType.String) ? new Value(a.String + b.String) :
-                    throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
             }
             else if (tokenType == TokenType.Equal)
             {
                 return
                     (a.Type == DataType.Number) ? new Value(a.Number == b.Number ? 1 : 0) :
                     (a.Type == DataType.String) ? new Value(a.String == b.String ? 1 : 0) :
-                    throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
             }
             else if (tokenType == TokenType.NotEqual)
             {
                 return
                     (a.Type == DataType.Number) ? new Value(a.Number != b.Number ? 1 : 0) :
                     (a.Type == DataType.String) ? new Value(a.String != b.String ? 1 : 0) :
-                    throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
             }
             else
             {
-                if (a.Type != DataType.Number) throw new InternalErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                if (a.Type != DataType.Number) throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
 
                 return
                     (tokenType == TokenType.Minus) ? new Value(a.Number - b.Number) :
@@ -645,7 +659,7 @@ namespace Suconbu.Scripting.Memezo
                     (tokenType == TokenType.GreaterEqual) ? new Value(a.Number >= b.Number ? 1 : 0) :
                     (tokenType == TokenType.And) ? new Value(a.Number != 0m && b.Number != 0m ? 1 : 0) :
                     (tokenType == TokenType.Or) ? new Value(a.Number != 0m || b.Number != 0m ? 1 : 0) :
-                    throw new InternalErrorException(ErrorType.UnknownOperator, $"{tokenType}");
+                    throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
             }
         }
     }
@@ -788,13 +802,13 @@ namespace Suconbu.Scripting.Memezo
             decimal n = 0m;
             if (radix <= 0 || 36 < radix || s.Length == 0)
             {
-                throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
             }
             else if (radix == 10)
             {
                 if (!decimal.TryParse(s, out n))
                 {
-                    throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
                 }
             }
             else
@@ -806,13 +820,13 @@ namespace Suconbu.Scripting.Memezo
                         ('0' <= d && d <= '9') ? (d - '0') :
                         ('a' <= d && d <= 'z') ? (d - 'a' + 10) :
                         int.MaxValue;
-                    if (radix <= v) throw new InternalErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    if (radix <= v) throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
                     n += v;
                 }
             }
             if(n < Int64.MinValue || Int64.MaxValue < n)
             {
-                throw new InternalErrorException(ErrorType.NumberOverflow, $"'{sb}'");
+                throw new ErrorException(ErrorType.NumberOverflow, $"'{sb}'");
             }
             return new Token(TokenType.Value, location, s, new Value(n));
         }
@@ -823,8 +837,8 @@ namespace Suconbu.Scripting.Memezo
             var sb = new StringBuilder();
             while (this.ReadChar() != enclosure)
             {
-                if (this.currentChar == (char)0) throw new InternalErrorException(ErrorType.InvalidStringLiteral, "EOF while scanning string literal");
-                if (this.currentChar == '\n') throw new InternalErrorException(ErrorType.InvalidStringLiteral, "NewLine while scanning string literal");
+                if (this.currentChar == (char)0) throw new ErrorException(ErrorType.InvalidStringLiteral, "EOF while scanning string literal");
+                if (this.currentChar == '\n') throw new ErrorException(ErrorType.InvalidStringLiteral, "NewLine while scanning string literal");
                 if (this.currentChar == '\\')
                 {
                     // Escape sequence
@@ -961,16 +975,16 @@ namespace Suconbu.Scripting.Memezo
         public override string ToString() => $"'{this.Text.Replace("\n", "\\n")}'({this.Type})";
     }
 
-    class InternalErrorException : Exception
+    public class ErrorException : Exception
     {
         public ErrorType ErrorType { get; private set; }
 
-        public InternalErrorException(ErrorType type, string message = null) : base((message != null) ? $"{type}:{message}" : $"{type}")
+        public ErrorException(ErrorType type, string message = null) : base((message != null) ? $"{type}:{message}" : $"{type}")
         {
             this.ErrorType = type;
         }
-        public InternalErrorException() : base() { }
-        public InternalErrorException(string message) : base(message) { }
-        public InternalErrorException(string message, Exception inner) : base(message, inner) { }
+        public ErrorException() : base() { }
+        public ErrorException(string message) : base(message) { }
+        public ErrorException(string message, Exception inner) : base(message, inner) { }
     }
 }

@@ -27,7 +27,7 @@ namespace Suconbu.Dentacs
 
         public Calculator()
         {
-            this.memezo.Install(new Memezo.StandardLibrary());
+            this.memezo.Install(new MathmaticsLibrary());
             this.memezo.Output += (sender, e) =>
             {
                 this.Result = e;
