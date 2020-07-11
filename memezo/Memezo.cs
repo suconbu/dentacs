@@ -566,21 +566,21 @@ namespace Suconbu.Scripting.Memezo
         {
             this.Type = DataType.Number;
             this.Number = n;
-            this.String = n.ToString();
+            this.String = this.Number.ToString();
         }
 
         public Value(int n) : this()
         {
             this.Type = DataType.Number;
             this.Number = n;
-            this.String = n.ToString();
+            this.String = this.Number.ToString();
         }
 
         public Value(double n) : this()
         {
             this.Type = DataType.Number;
             this.Number = (decimal)n;
-            this.String = n.ToString();
+            this.String = this.Number.ToString();
         }
 
         public Value(string s) : this()
