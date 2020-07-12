@@ -7,11 +7,15 @@ using System.Text;
 
 namespace Suconbu.Scripting.Memezo
 {
+    using FunctionEntry = KeyValuePair<string, Function>;
+    using ConstantEntry = KeyValuePair<string, Value>;
+
     public enum DataType { Number, String }
     public enum ErrorType
     {
         NothingSource, UnexpectedToken, UnknownToken, MissingToken, UndeclaredIdentifier,
-        NotSupportedOperation, UnknownOperator, InvalidDataType, InvalidOperation, InvalidArgument,
+        NotSupportedOperation, CannotAssignToConstant, CannotAssignToFunction, UnknownOperator,
+        InvalidDataType, InvalidOperation, InvalidArgument,
         InvalidNumberFormat, InvalidStringLiteral, NumberOverflow, UnknownError
     }
     public delegate Value Function(List<Value> args);
@@ -26,12 +30,11 @@ namespace Suconbu.Scripting.Memezo
         public static readonly string[] Keywords = Lexer.Keywords;
         public static readonly string LineCommentMarker = Lexer.LineCommentMarker;
         public static readonly char[] StringQuoteMarkers = Lexer.StringQuoteMarkers;
-        public Dictionary<string, Function> Functions { get; private set; } = new Dictionary<string, Function>();
         public Dictionary<string, Value> Vars { get; private set; } = new Dictionary<string, Value>();
         public ErrorInfo LastError { get; private set; }
         public RunStat Stat { get; private set; } = new RunStat();
-        public IEnumerable<IFunctionLibrary> InstalledLibraries { get { return this.installedLibraries; } }
-        public string Source { get => this.source; set => this.UpdateSource(value); }
+        public IEnumerable<IModule> Modules { get { return this.modules; } }
+        public string Source { get => this.source; set => this.SetSource(value); }
 
         string source;
         Lexer lexer;
@@ -49,19 +52,15 @@ namespace Suconbu.Scripting.Memezo
             { TokenType.And, 2 },
             { TokenType.Or, 1 }
         };
-        public List<IFunctionLibrary> installedLibraries = new List<IFunctionLibrary>();
+        public List<IModule> modules = new List<IModule>();
 
         public Interpreter() { }
 
-        public void Install(params IFunctionLibrary[] libraries)
+        public void Import(params IModule[] modules)
         {
-            foreach (var library in libraries)
+            foreach (var module in modules)
             {
-                foreach (var f in library.GetFunctions())
-                {
-                    this.Functions[f.Key] = f.Value;
-                }
-                this.installedLibraries.Add(library);
+                this.modules.Add(module);
             }
         }
 
@@ -164,7 +163,7 @@ namespace Suconbu.Scripting.Memezo
             this.lexer.ReadToken();
             if (statementToken.Type == TokenType.If)
                 this.clauses.Push(new Clause(statementToken, null));
-            var result = (statementToken.Type == TokenType.If || statementToken.Type == TokenType.Elif) ? this.Expr().Boolean() : true;
+            var result = (statementToken.Type == TokenType.If || statementToken.Type == TokenType.Elif) ? this.Expr().IsTrue() : true;
 
             if (this.lexer.Token.Type == TokenType.Colon) this.lexer.ReadToken();
             else if (statementToken.Type != TokenType.Else && this.lexer.Token.Type == TokenType.Then) this.lexer.ReadToken();
@@ -229,9 +228,9 @@ namespace Suconbu.Scripting.Memezo
             this.lexer.ReadToken();
             var toValue = this.Expr();
 
-            if (this.clauses.Count == 0 || this.clauses.Peek().Var != name)
+            if (this.clauses.Count == 0 || this.clauses.Peek().VarName != name)
             {
-                this.Vars[name] = fromValue;
+                this.AssignVar(name, fromValue);
                 this.clauses.Push(new Clause(statementToken, name));
             }
 
@@ -239,7 +238,7 @@ namespace Suconbu.Scripting.Memezo
 
             this.DebugLog($"{this.lexer.Token.Location.Line + 1}: For {this.Vars[name]} to {toValue}");
 
-            if (this.Vars[name].BinaryOperation(toValue, TokenType.Greater).Number == 1) this.FinishLoop();
+            if (this.Vars[name].BinaryOperation(toValue, TokenType.Greater).IsTrue()) this.FinishLoop();
         }
 
         void OnRepeat()
@@ -248,9 +247,9 @@ namespace Suconbu.Scripting.Memezo
             this.lexer.ReadToken();
             var count = this.Expr();
             var name = $"${this.statementLocation.CharIndex}";
-            if (this.clauses.Count == 0 || this.clauses.Peek().Var != name)
+            if (this.clauses.Count == 0 || this.clauses.Peek().VarName != name)
             {
-                this.Vars[name] = Value.Zero;
+                this.AssignVar(name, Value.Zero);
                 this.clauses.Push(new Clause(statementToken, name));
             }
 
@@ -258,7 +257,7 @@ namespace Suconbu.Scripting.Memezo
 
             this.DebugLog($"{this.lexer.Token.Location.Line + 1}: Repeat {count}");
 
-            if (this.Vars[name].BinaryOperation(count, TokenType.GreaterEqual).Number == 1) this.FinishLoop();
+            if (this.Vars[name].BinaryOperation(count, TokenType.GreaterEqual).IsTrue()) this.FinishLoop();
         }
 
         void OnEnd()
@@ -323,7 +322,7 @@ namespace Suconbu.Scripting.Memezo
                 this.lexer.ReadToken();
             }
             var clause = this.clauses.Pop();
-            if (clause.Var.StartsWith("$")) this.Vars.Remove(clause.Var);
+            if (clause.VarName.StartsWith("$")) this.Vars.Remove(clause.VarName);
         }
 
         void EndIf(Clause clause)
@@ -333,7 +332,7 @@ namespace Suconbu.Scripting.Memezo
 
         void EndFor(Clause clause)
         {
-            this.Vars[clause.Var] = this.Vars[clause.Var].BinaryOperation(new Value(1), TokenType.Plus);
+            this.AssignVar(clause.VarName, this.Vars[clause.VarName].BinaryOperation(new Value(1), TokenType.Plus));
             this.lexer.Move(clause.Token.Location);
             this.lexer.ReadToken();
         }
@@ -348,12 +347,11 @@ namespace Suconbu.Scripting.Memezo
         void OnAssign()
         {
             var name = this.lexer.Token.Text;
-            if (this.Functions.ContainsKey(name)) throw new ErrorException(ErrorType.InvalidOperation, $"'{name}' is a function");
             this.VerifyToken(this.lexer.ReadToken(), TokenType.Assign);
             this.lexer.ReadToken();
             var value = this.Expr();
             this.Assigning(this, new AssigningEventArgs(name, value));
-            this.Vars[name] = value;
+            this.AssignVar(name, value);
             this.DebugLog($"{this.lexer.Token.Location.Line + 1}: Assign {name}={this.Vars[name].ToString()}");
         }
 
@@ -401,7 +399,7 @@ namespace Suconbu.Scripting.Memezo
             else if (this.lexer.Token.Type == TokenType.Not)
             {
                 this.lexer.ReadToken();
-                primary = new Value(this.Primary().Boolean() ? 0m : 1m);
+                primary = new Value(this.Primary().IsTrue());
             }
             else if (this.lexer.Token.Type == TokenType.LeftParen)
             {
@@ -412,16 +410,20 @@ namespace Suconbu.Scripting.Memezo
             else if (this.lexer.Token.Type == TokenType.Identifer)
             {
                 var identifier = this.lexer.Token.Text;
-                if (this.Vars.ContainsKey(identifier))
+                if (this.Vars.TryGetValue(identifier, out var value))
                 {
-                    primary = this.Vars[identifier];
+                    primary = value;
                 }
-                else if (this.Functions.ContainsKey(identifier))
+                else if (this.TryGetConstant(identifier, out var constant))
+                {
+                    primary = constant;
+                }
+                else if (this.TryGetFunction(identifier, out var function))
                 {
                     this.VerifyToken(this.lexer.ReadToken(), TokenType.LeftParen);
                     var args = this.ReadArguments();
                     this.FunctionInvoking(this, identifier);
-                    primary = this.Functions[identifier](args);
+                    primary = function(args);
                     RunStat.Increment(this.Stat.FunctionInvokedCounts, identifier);
                 }
                 else
@@ -459,6 +461,33 @@ namespace Suconbu.Scripting.Memezo
             return args;
         }
 
+        void AssignVar(string name, Value value)
+        {
+            if (this.TryGetFunction(name, out _)) throw new ErrorException(ErrorType.CannotAssignToFunction, $"'{name}' is a function");
+            if (this.TryGetConstant(name, out _)) throw new ErrorException(ErrorType.CannotAssignToConstant, $"'{name}' is a constant");
+            this.Vars[name] = value;
+        }
+
+        bool TryGetFunction(string name, out Function function)
+        {
+            foreach (var module in this.modules)
+            {
+                if (module.GetFunctions().TryGetValue(name, out function)) return true;
+            }
+            function = null;
+            return false;
+        }
+
+        bool TryGetConstant(string name, out Value value)
+        {
+            foreach (var module in this.modules)
+            {
+                if (module.GetConstants().TryGetValue(name, out value)) return true;
+            }
+            value = null;
+            return false;
+        }
+
         Lexer PrepareLexer(string input)
         {
             if (input == null) return null;
@@ -476,7 +505,7 @@ namespace Suconbu.Scripting.Memezo
             }
         }
 
-        void UpdateSource(string source)
+        void SetSource(string source)
         {
             this.source = source;
             this.lexer = null;
@@ -496,20 +525,21 @@ namespace Suconbu.Scripting.Memezo
         struct Clause
         {
             public Token Token;
-            public string Var;
+            public string VarName;
 
             public Clause(Token token, string var)
             {
                 this.Token = token;
-                this.Var = var;
+                this.VarName = var;
             }
         }
     }
 
-    public interface IFunctionLibrary
+    public interface IModule
     {
         string Name { get; }
-        IEnumerable<KeyValuePair<string, Function>> GetFunctions();
+        abstract IReadOnlyDictionary<string, Function> GetFunctions();
+        abstract IReadOnlyDictionary<string, Value> GetConstants();
     }
 
     public class RunStat
@@ -554,7 +584,7 @@ namespace Suconbu.Scripting.Memezo
             !string.IsNullOrEmpty(this.Message) ? $"{this.Message} at {this.Location}" : string.Empty;
     }
 
-    public struct Value
+    public class Value
     {
         public static readonly Value Zero = new Value(0m);
 
@@ -583,6 +613,13 @@ namespace Suconbu.Scripting.Memezo
             this.String = this.Number.ToString();
         }
 
+        public Value(bool b) : this()
+        {
+            this.Type = DataType.Number;
+            this.Number = b ? 1m : 0m;
+            this.String = this.Number.ToString();
+        }
+
         public Value(string s) : this()
         {
             this.Type = DataType.String;
@@ -590,10 +627,12 @@ namespace Suconbu.Scripting.Memezo
             this.String = s;
         }
 
+        Value() { }
+
         public override string ToString() =>
             (this.Type == DataType.Number) ? this.String : $"'{this.String}'";
 
-        internal bool Boolean() =>
+        internal bool IsTrue() =>
             (this.Type == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
 
         internal Value BinaryOperation(Value b, TokenType tokenType)

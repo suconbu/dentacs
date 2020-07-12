@@ -4,33 +4,42 @@ using Suconbu.Scripting.Memezo;
 
 namespace Suconbu.Dentacs
 {
-    public class MathmaticsLibrary : IFunctionLibrary
+    public class MathmaticsModule : IModule
     {
-        public string Name { get { return "mathmatics"; } }
+        public string Name { get; } = "mathmatics";
 
-        public IEnumerable<KeyValuePair<string, Function>> GetFunctions()
+        public IReadOnlyDictionary<string, Value> GetConstants()
         {
-            return new Dictionary<string, Function>()
+            return new Dictionary<string, Value>()
             {
-                { "num", Number },
-                { "trunc", Truncate },
-                { "round", Round },
-                { "floor", Floor },
-                { "ceil", Ceiling },
-                { "abs", Absolute },
-                { "sign", Sign },
-                { "fact", Factorial },
-                { "sqrt", Sqrt },
-                { "pow", Power },
-                { "exp", Exponent },
-                { "log", Logarithm },
-                { "log2", Logarithm2 },
-                { "log10", Logarithm10 },
-                { "pi", Pi },
+                { "PI", this.PI },
             };
         }
 
-        public static Value Number(IReadOnlyList<Value> args)
+        public Value PI { get; } = new Value(Math.PI);
+
+        public IReadOnlyDictionary<string, Function> GetFunctions()
+        {
+            return new Dictionary<string, Function>()
+            {
+                { "num", this.Number },
+                { "trunc", this.Truncate },
+                { "round", this.Round },
+                { "floor", this.Floor },
+                { "ceil", this.Ceiling },
+                { "abs", this.Absolute },
+                { "sign", this.Sign },
+                { "fact", this.Factorial },
+                { "sqrt", this.Sqrt },
+                { "pow", this.Power },
+                { "exp", this.Exponent },
+                { "log", this.Logarithm },
+                { "log2", this.Logarithm2 },
+                { "log10", this.Logarithm10 },
+            };
+        }
+
+        public Value Number(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "x", ErrorType.InvalidArgument);
             var v = args[0];
@@ -40,43 +49,43 @@ namespace Suconbu.Dentacs
                 throw new ErrorException(ErrorType.InvalidDataType));
         }
 
-        public static Value Truncate(IReadOnlyList<Value> args)
+        public Value Truncate(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Truncate(args[0].Number));
         }
 
-        public static Value Round(IReadOnlyList<Value> args)
+        public Value Round(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Round(args[0].Number, MidpointRounding.AwayFromZero));
         }
 
-        public static Value Floor(IReadOnlyList<Value> args)
+        public Value Floor(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Floor(args[0].Number));
         }
 
-        public static Value Ceiling(IReadOnlyList<Value> args)
+        public Value Ceiling(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Ceiling(args[0].Number));
         }
 
-        public static Value Absolute(IReadOnlyList<Value> args)
+        public Value Absolute(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Abs(args[0].Number));
         }
 
-        public static Value Sign(IReadOnlyList<Value> args)
+        public Value Sign(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Sign(args[0].Number));
         }
 
-        public static Value Factorial(IReadOnlyList<Value> args)
+        public Value Factorial(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             if (args[0].Number < 0m) throw new ErrorException(ErrorType.InvalidArgument);
@@ -88,26 +97,26 @@ namespace Suconbu.Dentacs
             return new Value(f);
         }
 
-        public static Value Sqrt(IReadOnlyList<Value> args)
+        public Value Sqrt(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             if (args[0].Number < 0m) throw new ErrorException(ErrorType.InvalidArgument);
             return new Value(Math.Sqrt((double)args[0].Number));
         }
 
-        public static Value Power(IReadOnlyList<Value> args)
+        public Value Power(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "nn", ErrorType.InvalidArgument);
             return new Value(Math.Pow((double)args[0].Number, (double)args[1].Number));
         }
 
-        public static Value Exponent(IReadOnlyList<Value> args)
+        public Value Exponent(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             return new Value(Math.Exp((double)args[0].Number));
         }
 
-        public static Value Logarithm(IReadOnlyList<Value> args)
+        public Value Logarithm(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "nn?", ErrorType.InvalidArgument);
             if (args[0].Number <= 0m) throw new ErrorException(ErrorType.InvalidArgument);
@@ -118,24 +127,18 @@ namespace Suconbu.Dentacs
                 new Value(Math.Log((double)args[0].Number, (double)args[1].Number));
         }
 
-        public static Value Logarithm2(IReadOnlyList<Value> args)
+        public Value Logarithm2(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             if (args[0].Number <= 0m) throw new ErrorException(ErrorType.InvalidArgument);
             return new Value(Math.Log((double)args[0].Number, 2.0));
         }
 
-        public static Value Logarithm10(IReadOnlyList<Value> args)
+        public Value Logarithm10(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
             if (args[0].Number <= 0m) throw new ErrorException(ErrorType.InvalidArgument);
             return new Value(Math.Log((double)args[0].Number, 10.0));
-        }
-
-        public static Value Pi(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
-            return new Value(Math.PI);
         }
     }
 }

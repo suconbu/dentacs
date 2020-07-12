@@ -27,7 +27,7 @@ namespace Suconbu.Dentacs
 
         public Calculator()
         {
-            this.memezo.Install(new MathmaticsLibrary());
+            this.memezo.Import(new MathmaticsModule());
             this.memezo.Output += (sender, e) =>
             {
                 this.Result = e;
@@ -40,7 +40,9 @@ namespace Suconbu.Dentacs
             };
             this.memezo.ErrorOccurred += (sender, e) =>
             {
-                if (e.Type == Memezo.ErrorType.UndeclaredIdentifier ||
+                if (e.Type == Memezo.ErrorType.CannotAssignToFunction ||
+                    e.Type == Memezo.ErrorType.CannotAssignToConstant ||
+                    e.Type == Memezo.ErrorType.UndeclaredIdentifier ||
                     e.Type == Memezo.ErrorType.UnknownOperator ||
                     e.Type == Memezo.ErrorType.NumberOverflow ||
                     e.Type == Memezo.ErrorType.UnknownToken)
