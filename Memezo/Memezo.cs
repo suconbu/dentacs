@@ -7,9 +7,6 @@ using System.Text;
 
 namespace Suconbu.Scripting.Memezo
 {
-    using FunctionEntry = KeyValuePair<string, Function>;
-    using ConstantEntry = KeyValuePair<string, Value>;
-
     public enum DataType { Number, String }
     public enum ErrorType
     {

@@ -74,104 +74,104 @@ namespace test
         public void TestMathmaticsLibrary()
         {
             var math = new MathmaticsModule();
-            Assert.IsTrue(math.Number(new[] { new Value("0") }).Number == 0m);
-            Assert.IsTrue(math.Number(new[] { new Value("0.5") }).Number == 0.5m);
-            Assert.IsTrue(math.Number(new[] { new Value("-1") }).Number == -1m);
-            Assert.IsTrue(math.Number(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Number(new[] { new Value(0.5) }).Number == 0.5m);
-            Assert.IsTrue(math.Number(new[] { new Value(-1) }).Number == -1m);
+            Assert.AreEqual(math.Number(new[] { new Value("0") }).Number, 0m);
+            Assert.AreEqual(math.Number(new[] { new Value("0.5") }).Number, 0.5m);
+            Assert.AreEqual(math.Number(new[] { new Value("-1") }).Number, -1m);
+            Assert.AreEqual(math.Number(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Number(new[] { new Value(0.5) }).Number, 0.5m);
+            Assert.AreEqual(math.Number(new[] { new Value(-1) }).Number, -1m);
             Assert.ThrowsException<ErrorException>(() => math.Number(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Number(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Truncate(new[] { new Value(1.0) }).Number == 1m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(0.5) }).Number == 0m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(0.4) }).Number == 0m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(-0.4) }).Number == 0m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(-0.5) }).Number == 0m);
-            Assert.IsTrue(math.Truncate(new[] { new Value(-1.0) }).Number == -1m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(1.0) }).Number, 1m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(0.5) }).Number, 0m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(0.4) }).Number, 0m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(-0.4) }).Number, 0m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(-0.5) }).Number, 0m);
+            Assert.AreEqual(math.Truncate(new[] { new Value(-1.0) }).Number, -1m);
             Assert.ThrowsException<ErrorException>(() => math.Truncate(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Truncate(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Truncate(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Round(new[] { new Value(2.0) }).Number == 2m);
-            Assert.IsTrue(math.Round(new[] { new Value(1.5) }).Number == 2m);
-            Assert.IsTrue(math.Round(new[] { new Value(1.4) }).Number == 1m);
-            Assert.IsTrue(math.Round(new[] { new Value(1.0) }).Number == 1m);
-            Assert.IsTrue(math.Round(new[] { new Value(0.5) }).Number == 1m);
-            Assert.IsTrue(math.Round(new[] { new Value(0.4) }).Number == 0m);
-            Assert.IsTrue(math.Round(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Round(new[] { new Value(-0.4) }).Number == 0m);
-            Assert.IsTrue(math.Round(new[] { new Value(-0.5) }).Number == -1m);
-            Assert.IsTrue(math.Round(new[] { new Value(-1.0) }).Number == -1m);
-            Assert.IsTrue(math.Round(new[] { new Value(-1.4) }).Number == -1m);
-            Assert.IsTrue(math.Round(new[] { new Value(-1.5) }).Number == -2m);
-            Assert.IsTrue(math.Round(new[] { new Value(-2.0) }).Number == -2m);
+            Assert.AreEqual(math.Round(new[] { new Value(2.0) }).Number, 2m);
+            Assert.AreEqual(math.Round(new[] { new Value(1.5) }).Number, 2m);
+            Assert.AreEqual(math.Round(new[] { new Value(1.4) }).Number, 1m);
+            Assert.AreEqual(math.Round(new[] { new Value(1.0) }).Number, 1m);
+            Assert.AreEqual(math.Round(new[] { new Value(0.5) }).Number, 1m);
+            Assert.AreEqual(math.Round(new[] { new Value(0.4) }).Number, 0m);
+            Assert.AreEqual(math.Round(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Round(new[] { new Value(-0.4) }).Number, 0m);
+            Assert.AreEqual(math.Round(new[] { new Value(-0.5) }).Number, -1m);
+            Assert.AreEqual(math.Round(new[] { new Value(-1.0) }).Number, -1m);
+            Assert.AreEqual(math.Round(new[] { new Value(-1.4) }).Number, -1m);
+            Assert.AreEqual(math.Round(new[] { new Value(-1.5) }).Number, -2m);
+            Assert.AreEqual(math.Round(new[] { new Value(-2.0) }).Number, -2m);
             Assert.ThrowsException<ErrorException>(() => math.Round(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Round(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Round(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Floor(new[] { new Value(1.0) }).Number == 1m);
-            Assert.IsTrue(math.Floor(new[] { new Value(0.5) }).Number == 0m);
-            Assert.IsTrue(math.Floor(new[] { new Value(0.4) }).Number == 0m);
-            Assert.IsTrue(math.Floor(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Floor(new[] { new Value(-0.4) }).Number == -1m);
-            Assert.IsTrue(math.Floor(new[] { new Value(-0.5) }).Number == -1m);
-            Assert.IsTrue(math.Floor(new[] { new Value(-1.0) }).Number == -1m);
+            Assert.AreEqual(math.Floor(new[] { new Value(1.0) }).Number, 1m);
+            Assert.AreEqual(math.Floor(new[] { new Value(0.5) }).Number, 0m);
+            Assert.AreEqual(math.Floor(new[] { new Value(0.4) }).Number, 0m);
+            Assert.AreEqual(math.Floor(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Floor(new[] { new Value(-0.4) }).Number, -1m);
+            Assert.AreEqual(math.Floor(new[] { new Value(-0.5) }).Number, -1m);
+            Assert.AreEqual(math.Floor(new[] { new Value(-1.0) }).Number, -1m);
             Assert.ThrowsException<ErrorException>(() => math.Floor(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Floor(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Floor(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Ceiling(new[] { new Value(1.0) }).Number == 1m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(0.5) }).Number == 1m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(0.4) }).Number == 1m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(-0.4) }).Number == 0m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(-0.5) }).Number == 0m);
-            Assert.IsTrue(math.Ceiling(new[] { new Value(-1.0) }).Number == -1m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(1.0) }).Number, 1m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(0.5) }).Number, 1m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(0.4) }).Number, 1m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(-0.4) }).Number, 0m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(-0.5) }).Number, 0m);
+            Assert.AreEqual(math.Ceiling(new[] { new Value(-1.0) }).Number, -1m);
             Assert.ThrowsException<ErrorException>(() => math.Ceiling(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Ceiling(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Ceiling(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Absolute(new[] { new Value(1.0) }).Number == 1m);
-            Assert.IsTrue(math.Absolute(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Absolute(new[] { new Value(-1.0) }).Number == 1m);
+            Assert.AreEqual(math.Absolute(new[] { new Value(1.0) }).Number, 1m);
+            Assert.AreEqual(math.Absolute(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Absolute(new[] { new Value(-1.0) }).Number, 1m);
             Assert.ThrowsException<ErrorException>(() => math.Absolute(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Absolute(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Absolute(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Sign(new[] { new Value(9.0) }).Number == 1m);
-            Assert.IsTrue(math.Sign(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Sign(new[] { new Value(-9.0) }).Number == -1m);
+            Assert.AreEqual(math.Sign(new[] { new Value(9.0) }).Number, 1m);
+            Assert.AreEqual(math.Sign(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Sign(new[] { new Value(-9.0) }).Number, -1m);
             Assert.ThrowsException<ErrorException>(() => math.Sign(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Sign(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Sign(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Factorial(new[] { new Value(0) }).Number == 1m);
-            Assert.IsTrue(math.Factorial(new[] { new Value(1) }).Number == 1m);
-            Assert.IsTrue(math.Factorial(new[] { new Value(10) }).Number == 3628800m);
+            Assert.AreEqual(math.Factorial(new[] { new Value(0) }).Number, 1m);
+            Assert.AreEqual(math.Factorial(new[] { new Value(1) }).Number, 1m);
+            Assert.AreEqual(math.Factorial(new[] { new Value(10) }).Number, 3628800m);
             Assert.ThrowsException<ErrorException>(() => math.Factorial(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Factorial(new[] { new Value(-1) }));
             Assert.ThrowsException<ErrorException>(() => math.Factorial(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Factorial(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Sqrt(new[] { new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Sqrt(new[] { new Value(0.5) }).Number == 0.707106781186548m);
-            Assert.IsTrue(math.Sqrt(new[] { new Value(1) }).Number == 1m);
+            Assert.AreEqual(math.Sqrt(new[] { new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Sqrt(new[] { new Value(0.5) }).Number, 0.707106781186548m);
+            Assert.AreEqual(math.Sqrt(new[] { new Value(1) }).Number, 1m);
             Assert.ThrowsException<ErrorException>(() => math.Sqrt(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Sqrt(new[] { new Value(-1) }));
             Assert.ThrowsException<ErrorException>(() => math.Sqrt(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Sqrt(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Power(new[] { new Value(0), new Value(0) }).Number == 1m);
-            Assert.IsTrue(math.Power(new[] { new Value(0), new Value(1) }).Number == 0m);
-            Assert.IsTrue(math.Power(new[] { new Value(2), new Value(0) }).Number == 1m);
-            Assert.IsTrue(math.Power(new[] { new Value(2), new Value(1) }).Number == 2m);
-            Assert.IsTrue(math.Power(new[] { new Value(-2), new Value(0) }).Number == 1m);
-            Assert.IsTrue(math.Power(new[] { new Value(-2), new Value(1) }).Number == -2m);
-            Assert.IsTrue(math.Power(new[] { new Value(2), new Value(2) }).Number == 4m);
-            Assert.IsTrue(math.Power(new[] { new Value(2), new Value(-1) }).Number == 0.5m);
-            Assert.IsTrue(math.Power(new[] { new Value(2), new Value(-2) }).Number == 0.25m);
+            Assert.AreEqual(math.Power(new[] { new Value(0), new Value(0) }).Number, 1m);
+            Assert.AreEqual(math.Power(new[] { new Value(0), new Value(1) }).Number, 0m);
+            Assert.AreEqual(math.Power(new[] { new Value(2), new Value(0) }).Number, 1m);
+            Assert.AreEqual(math.Power(new[] { new Value(2), new Value(1) }).Number, 2m);
+            Assert.AreEqual(math.Power(new[] { new Value(-2), new Value(0) }).Number, 1m);
+            Assert.AreEqual(math.Power(new[] { new Value(-2), new Value(1) }).Number, -2m);
+            Assert.AreEqual(math.Power(new[] { new Value(2), new Value(2) }).Number, 4m);
+            Assert.AreEqual(math.Power(new[] { new Value(2), new Value(-1) }).Number, 0.5m);
+            Assert.AreEqual(math.Power(new[] { new Value(2), new Value(-2) }).Number, 0.25m);
             Assert.ThrowsException<ErrorException>(() => math.Power(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Power(new[] { new Value(0) }));
             Assert.ThrowsException<ErrorException>(() => math.Power(new[] { new Value(1), new Value("1") }));
@@ -179,19 +179,19 @@ namespace test
             Assert.ThrowsException<ErrorException>(() => math.Power(new[] { new Value("1"), new Value("1") }));
             Assert.ThrowsException<ErrorException>(() => math.Power(new[] { new Value(1), new Value(1), new Value(1) }));
 
-            Assert.IsTrue(math.Exponent(new[] { new Value(0) }).Number == 1m);
-            Assert.IsTrue(math.Exponent(new[] { new Value(1) }).Number == 2.71828182845904m);
-            Assert.IsTrue(math.Exponent(new[] { new Value(-1) }).Number == 0.367879441171442m);
+            Assert.AreEqual(math.Exponent(new[] { new Value(0) }).Number, 1m);
+            Assert.AreEqual(math.Exponent(new[] { new Value(1) }).Number, 2.71828182845904m);
+            Assert.AreEqual(math.Exponent(new[] { new Value(-1) }).Number, 0.367879441171442m);
             Assert.ThrowsException<ErrorException>(() => math.Exponent(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Exponent(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Exponent(new[] { new Value(0), new Value(0) }));
 
-            Assert.IsTrue(math.Logarithm(new[] { new Value(0.5) }).Number == -0.693147180559945m);
-            Assert.IsTrue(math.Logarithm(new[] { new Value(1) }).Number == 0m);
-            Assert.IsTrue(math.Logarithm(new[] { new Value(2) }).Number == 0.693147180559945m);
-            Assert.IsTrue(math.Logarithm(new[] { new Value(1), new Value(0) }).Number == 0m);
-            Assert.IsTrue(math.Logarithm(new[] { new Value(16), new Value(2) }).Number == 4m);
-            Assert.IsTrue(math.Logarithm(new[] { new Value(10000), new Value(10) }).Number == 4m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(0.5) }).Number, -0.693147180559945m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(1) }).Number, 0m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(2) }).Number, 0.693147180559945m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(1), new Value(0) }).Number, 0m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(16), new Value(2) }).Number, 4m);
+            Assert.AreEqual(math.Logarithm(new[] { new Value(10000), new Value(10) }).Number, 4m);
             Assert.ThrowsException<ErrorException>(() => math.Logarithm(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm(new[] { new Value(0) }));
@@ -200,27 +200,76 @@ namespace test
             Assert.ThrowsException<ErrorException>(() => math.Logarithm(new[] { new Value(1), new Value(1) }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm(new[] { new Value(1), new Value(2), new Value(1) }));
 
-            Assert.IsTrue(math.Logarithm2(new[] { new Value(0.5) }).Number == -1m);
-            Assert.IsTrue(math.Logarithm2(new[] { new Value(1) }).Number == 0m);
-            Assert.IsTrue(math.Logarithm2(new[] { new Value(2) }).Number == 1m);
+            Assert.AreEqual(math.Logarithm2(new[] { new Value(0.5) }).Number, -1m);
+            Assert.AreEqual(math.Logarithm2(new[] { new Value(1) }).Number, 0m);
+            Assert.AreEqual(math.Logarithm2(new[] { new Value(2) }).Number, 1m);
             Assert.ThrowsException<ErrorException>(() => math.Logarithm2(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm2(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm2(new[] { new Value(0) }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm2(new[] { new Value(-1) }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm2(new[] { new Value(1), new Value(1) }));
 
-            Assert.IsTrue(math.Logarithm10(new[] { new Value(0.1) }).Number == -1m);
-            Assert.IsTrue(math.Logarithm10(new[] { new Value(1) }).Number == 0m);
-            Assert.IsTrue(math.Logarithm10(new[] { new Value(10) }).Number == 1m);
-            Assert.IsTrue(math.Logarithm10(new[] { new Value(100) }).Number == 2m);
-            Assert.IsTrue(math.Logarithm10(new[] { new Value(1000) }).Number == 3m);
+            Assert.AreEqual(math.Logarithm10(new[] { new Value(0.1) }).Number, -1m);
+            Assert.AreEqual(math.Logarithm10(new[] { new Value(1) }).Number, 0m);
+            Assert.AreEqual(math.Logarithm10(new[] { new Value(10) }).Number, 1m);
+            Assert.AreEqual(math.Logarithm10(new[] { new Value(100) }).Number, 2m);
+            Assert.AreEqual(math.Logarithm10(new[] { new Value(1000) }).Number, 3m);
             Assert.ThrowsException<ErrorException>(() => math.Logarithm10(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm10(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm10(new[] { new Value(0) }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm10(new[] { new Value(-1) }));
             Assert.ThrowsException<ErrorException>(() => math.Logarithm10(new[] { new Value(1), new Value(1) }));
 
-            Assert.IsTrue(math.PI.Number == 3.14159265358979m);
+            Assert.AreEqual(math.Sin(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Sin(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Sin(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Sin(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Cos(new[] { new Value(0) }).Number, 1m);
+            Assert.ThrowsException<ErrorException>(() => math.Cos(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Cos(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Cos(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Tan(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Tan(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Tan(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Tan(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Sinh(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Sinh(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Sinh(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Sinh(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Cosh(new[] { new Value(0) }).Number, 1m);
+            Assert.ThrowsException<ErrorException>(() => math.Cosh(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Cosh(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Cosh(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Tanh(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Tanh(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Tanh(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Tanh(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Asin(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Asin(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Asin(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Asin(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Acos(new[] { new Value(0) }).Number, 90m);
+            Assert.ThrowsException<ErrorException>(() => math.Acos(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Acos(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Acos(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Atan(new[] { new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Atan(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Atan(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Atan(new[] { new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Atan2(new[] { new Value(0), new Value(0) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Atan2(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value(0) }));
+            Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value("0") }));
+            Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value(0), new Value(0), new Value(0) }));
         }
     }
 }
