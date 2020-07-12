@@ -270,6 +270,31 @@ namespace test
             Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value(0) }));
             Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value("0") }));
             Assert.ThrowsException<ErrorException>(() => math.Atan2(new[] { new Value(0), new Value(0), new Value(0) }));
+
+            Assert.AreEqual(math.Min(new[] { new Value(0), new Value(1), new Value(-1) }).Number, -1m);
+            Assert.AreEqual(math.Min(new[] { new Value(0), new Value(1), new Value("-1") }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Min(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Min(new[] { new Value("0") }));
+
+            Assert.AreEqual(math.Max(new[] { new Value(0), new Value(1), new Value(-1) }).Number, 1m);
+            Assert.AreEqual(math.Max(new[] { new Value(0), new Value("1"), new Value(-1) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Max(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Max(new[] { new Value("0") }));
+
+            Assert.AreEqual(math.Sum(new[] { new Value(0), new Value(2), new Value(-1) }).Number, 1m);
+            Assert.AreEqual(math.Sum(new[] { new Value(0), new Value(2), new Value("-1") }).Number, 2m);
+            Assert.ThrowsException<ErrorException>(() => math.Sum(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Sum(new[] { new Value("0") }));
+
+            Assert.AreEqual(math.Average(new[] { new Value(-1), new Value(0), new Value(1), new Value(10) }).Number, 2.5m);
+            Assert.AreEqual(math.Average(new[] { new Value(-1), new Value(0), new Value("1"), new Value(10) }).Number, 3m);
+            Assert.ThrowsException<ErrorException>(() => math.Average(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Average(new[] { new Value("0") }));
+
+            Assert.AreEqual(math.Median(new[] { new Value(-1), new Value(0), new Value(1), new Value(10) }).Number, 0.5m);
+            Assert.AreEqual(math.Median(new[] { new Value(-1), new Value(0), new Value("1"), new Value(10) }).Number, 0m);
+            Assert.ThrowsException<ErrorException>(() => math.Median(new List<Value>()));
+            Assert.ThrowsException<ErrorException>(() => math.Median(new[] { new Value("0") }));
         }
     }
 }
