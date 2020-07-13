@@ -1,25 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Diagnostics;
-using Memezo = Suconbu.Scripting.Memezo;
-using System.ComponentModel;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using System.Windows.Interop;
-using System.Reactive.Linq;
-using System.Runtime.Serialization.Json;
+using Reactive.Bindings;
 
 namespace Suconbu.Dentacs
 {
@@ -29,10 +17,11 @@ namespace Suconbu.Dentacs
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public enum ErrorState { None, NoMessage, WithMessage }
 
-        public ReactiveProperty<string> RxExpression { get; private set; }
-        public ReadOnlyReactivePropertySlim<string> RxResult { get; private set; }
-        public ReadOnlyReactivePropertySlim<bool> RxIsResultEnabled { get; private set; }
+        public ReactiveProperty<string> RxResult { get; private set; }
+        public ReactiveProperty<string> RxError { get; private set; }
+        public ReadOnlyReactivePropertySlim<ErrorState> RxErrorState { get; private set; }
         public ReactiveProperty<double> RxZoom { get; private set; }
         public ReactiveProperty<int> RxZoomIndex { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; private set; }
@@ -40,11 +29,11 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<string> RxCurrentText { get; private set; }
         public ReactiveProperty<int> RxSelectionLength { get; private set; }
 
+        readonly Calculator calculator = new Calculator();
+        int lastLineIndex = -1;
         readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
         int zoomIndexBackup = 1;
         double maxWidthBackup = System.Windows.SystemParameters.WorkArea.Width;
-
-        Calculator calculator = Calculator.GetInstance();
 
         static IntPtr WndProc(IntPtr hWnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -66,9 +55,13 @@ namespace Suconbu.Dentacs
 
             this.DataContext = this;
 
-            this.RxExpression = ReactiveProperty.FromObject(this.calculator, x => x.Expression);
-            this.RxResult = this.calculator.ObserveProperty(x => x.Result).ToReadOnlyReactivePropertySlim();
-            this.RxIsResultEnabled = this.calculator.ObserveProperty(x => x.IsResultEnabled).ToReadOnlyReactivePropertySlim();
+            this.RxResult = new ReactiveProperty<string>();
+            this.RxError = new ReactiveProperty<string>();
+            this.RxErrorState = this.RxError.Select(x =>
+                x == null ? ErrorState.None :
+                x == string.Empty ? ErrorState.NoMessage :
+                ErrorState.WithMessage)
+                .ToReadOnlyReactivePropertySlim();
             this.RxZoom = new ReactiveProperty<double>();
             this.RxZoomIndex = new ReactiveProperty<int>();
             this.RxZoom = this.RxZoomIndex.Select(x => this.zoomTable[x]).ToReactiveProperty();
@@ -161,17 +154,36 @@ namespace Suconbu.Dentacs
             }
         }
 
+        private void InputTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            this.lastLineIndex = -1;
+        }
+
         private void InputTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             if (!this.IsInitialized) return;
 
             var caretIndex = this.InputTextBox.CaretIndex;
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
-
             var lines = this.InputTextBox.Text.Split(Environment.NewLine);
             // GetLineText does not work in fullscreen mode.
-            var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
 
+            if (lineIndex != this.lastLineIndex)
+            {
+                this.calculator.Reset();
+                for(int i = 0; i <= lineIndex; i++)
+                {
+                    this.calculator.Calculate(lines[i]);
+                }
+                if (this.calculator.Error == null)
+                {
+                    this.RxResult.Value = this.calculator.Result.ToString();
+                }
+                this.RxError.Value = this.calculator.Error;
+                this.lastLineIndex = lineIndex;
+            }
+
+            var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
             var selectedText = this.InputTextBox.SelectedText;
             if (selectedText.Length == 0)
             {
@@ -180,8 +192,6 @@ namespace Suconbu.Dentacs
                 var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
                 selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
             }
-
-            this.RxExpression.Value = currentLine;
             this.RxCurrentText.Value = selectedText;
             this.RxSelectionLength.Value = this.InputTextBox.SelectionLength;
         }
@@ -209,7 +219,7 @@ namespace Suconbu.Dentacs
         {
             if (textBox == null) return null;
             if (!int.TryParse((string)textBox.Tag, out var radix)) return null;
-            if (!decimal.TryParse(this.calculator.Result, out var number)) return null;
+            if (!decimal.TryParse(this.RxResult.Value, out var number)) return null;
             return ResultConvertHelper.ConvertToResultString(number, radix, ResultConvertHelper.Styles.Prefix);
         }
 

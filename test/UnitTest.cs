@@ -16,21 +16,21 @@ namespace test
         {
             var calculator = new Calculator();
 
-            calculator.Expression = "0";
-            Assert.IsTrue("0" == calculator.Result);
-            Assert.IsTrue(calculator.IsResultEnabled);
+            calculator.Calculate("0");
+            Assert.AreEqual("0", calculator.Result.ToString());
+            Assert.IsTrue(calculator.Error == null);
 
-            calculator.Expression = "1 + (2 * 3) / 4";
-            Assert.IsTrue("2.5" == calculator.Result);
-            Assert.IsTrue(calculator.IsResultEnabled);
+            calculator.Calculate("1 + (2 * 3) / 4");
+            Assert.AreEqual("2.5", calculator.Result.ToString());
+            Assert.IsTrue(calculator.Error == null);
 
-            calculator.Expression = "1 + ";
-            Assert.IsTrue("2.5" == calculator.Result);
-            Assert.IsFalse(calculator.IsResultEnabled);
+            calculator.Calculate("1 + ");
+            Assert.AreEqual("2.5", calculator.Result.ToString());
+            Assert.IsFalse(calculator.Error == null);
 
-            calculator.Expression = "0x01234567 + 0x89aBcDeF + 0o01234567 + 0b01";
-            Assert.IsTrue("2329169102" == calculator.Result);
-            Assert.IsTrue(calculator.IsResultEnabled);
+            calculator.Calculate("0x01234567 + 0x89aBcDeF + 0o01234567 + 0b01");
+            Assert.AreEqual("2329169102", calculator.Result.ToString());
+            Assert.IsTrue(calculator.Error == null);
         }
 
         [TestMethod]

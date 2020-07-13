@@ -19,7 +19,7 @@ namespace Suconbu.Scripting.Memezo
 
     public class Interpreter
     {
-        public event EventHandler<string> Output = delegate { };
+        public event EventHandler<Value> Output = delegate { };
         public event EventHandler<ErrorInfo> ErrorOccurred = delegate { };
         public event EventHandler<string> FunctionInvoking = delegate { };
         public event EventHandler<AssigningEventArgs> Assigning = delegate { };
@@ -148,7 +148,7 @@ namespace Suconbu.Scripting.Memezo
             else if (type == TokenType.Exit) { this.OnExit(); continueToRun = false; }
             else if (type == TokenType.Eof) { this.OnEof(); continueToRun = false; }
             else if (type == TokenType.Identifer && nextType == TokenType.Assign) this.OnAssign();
-            else this.Output(this, this.Expr().ToString());
+            else this.Output(this, this.Expr());
 
             return continueToRun;
         }
@@ -554,7 +554,7 @@ namespace Suconbu.Scripting.Memezo
         public int TotalFunctionInvokedCount { get { return this.FunctionInvokedCounts.Sum(kv => kv.Value); } }
     }
 
-    public struct SourceLocation
+    public class SourceLocation
     {
         // All properties is 0 based value.
         public int CharIndex { get; set; }
@@ -564,7 +564,7 @@ namespace Suconbu.Scripting.Memezo
         public override string ToString() => $"Line:{this.Line + 1} Column:{this.Column + 1}";
     }
 
-    public struct ErrorInfo
+    public class ErrorInfo
     {
         public ErrorType Type { get; private set; }
         public string Message { get; private set; }
