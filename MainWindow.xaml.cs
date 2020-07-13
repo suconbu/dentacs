@@ -167,13 +167,19 @@ namespace Suconbu.Dentacs
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
             var lines = this.InputTextBox.Text.Split(Environment.NewLine);
             // GetLineText does not work in fullscreen mode.
+            var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
+            var selectedText = this.InputTextBox.SelectedText;
 
-            if (lineIndex != this.lastLineIndex)
+            if (lineIndex != this.lastLineIndex || 0 < selectedText.Length)
             {
                 this.calculator.Reset();
-                for(int i = 0; i <= lineIndex; i++)
+                for (int i = 0; i <= lineIndex; i++)
                 {
                     this.calculator.Calculate(lines[i]);
+                }
+                if (0 < selectedText.Length)
+                {
+                    this.calculator.Calculate(selectedText);
                 }
                 if (this.calculator.Error == null)
                 {
@@ -183,8 +189,6 @@ namespace Suconbu.Dentacs
                 this.lastLineIndex = lineIndex;
             }
 
-            var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
-            var selectedText = this.InputTextBox.SelectedText;
             if (selectedText.Length == 0)
             {
                 int lineStartIndex = lines.Take(lineIndex).Select(line => line.Length + Environment.NewLine.Length).Sum();
