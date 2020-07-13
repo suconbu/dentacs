@@ -170,7 +170,7 @@ namespace Suconbu.Dentacs
             var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
             var selectedText = this.InputTextBox.SelectedText;
 
-            if (lineIndex != this.lastLineIndex || 0 < selectedText.Length)
+            if (lineIndex != this.lastLineIndex || this.RxSelectionLength.Value != selectedText.Length)
             {
                 this.calculator.Reset();
                 for (int i = 0; i <= lineIndex; i++)

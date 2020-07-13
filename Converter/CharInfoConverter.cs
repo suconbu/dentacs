@@ -49,6 +49,7 @@ namespace Suconbu.Dentacs
             var utf8CodeText = string.Join(" ", utf8Codes);
             var utf16beCodeText = string.Join(" ", utf16Codes);
             var s = CharInfoConvertHelper.ConvertToPrintable(str);
+            s = CharInfoConvertHelper.Ellipsize(s, 20);
             return shorten ?
                 $"'{s}' | {codePointText} | {utf16beCodeText} (16BE) | {utf8CodeText} (8)" :
                 $"'{s}' | {codePointText} | {utf16beCodeText} (UTF-16BE) | {utf8CodeText} (UTF-8)";
@@ -63,6 +64,7 @@ namespace Suconbu.Dentacs
             var utf8Count = Encoding.UTF8.GetBytes(str).Length;
             var utf16Count = Encoding.BigEndianUnicode.GetBytes(str).Length;
             var s = CharInfoConvertHelper.ConvertToPrintable(str);
+            s = CharInfoConvertHelper.Ellipsize(s, 20);
             return shorten ?
                 $"'{s}' | {elementCount} elements | {utf16Count} bytes (16BE) | {utf8Count} bytes (8)" :
                 $"'{s}' | {elementCount} elements | {utf16Count} bytes (UTF-16BE) | {utf8Count} bytes (UTF-8)";
@@ -92,6 +94,14 @@ namespace Suconbu.Dentacs
                 .Replace("\r", "\\r")
                 .Replace("\t", "\\t")
                 .Replace("\v", "\\v");
+        }
+
+        public static string Ellipsize(string str, int elementCount)
+        {
+            var si = new StringInfo(str);
+            var ellipsis = (elementCount < si.LengthInTextElements) ? "..." : string.Empty;
+            var count = Math.Min(si.LengthInTextElements, elementCount);
+            return si.SubstringByTextElements(0, count) + ellipsis;
         }
     }
 }
