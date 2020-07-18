@@ -16,21 +16,71 @@ namespace test
         {
             var calculator = new Calculator();
 
-            calculator.Calculate("0");
+            Assert.IsTrue(calculator.Calculate("0"));
             Assert.AreEqual("0", calculator.Result.ToString());
-            Assert.IsTrue(calculator.Error == null);
 
-            calculator.Calculate("1 + (2 * 3) / 4");
+            Assert.IsTrue(calculator.Calculate("1 + (2 * 3) / 4"));
             Assert.AreEqual("2.5", calculator.Result.ToString());
-            Assert.IsTrue(calculator.Error == null);
 
-            calculator.Calculate("1 + ");
-            Assert.AreEqual("2.5", calculator.Result.ToString());
-            Assert.IsFalse(calculator.Error == null);
+            Assert.IsFalse(calculator.Calculate("1 + "));
+            Assert.AreEqual("", calculator.Result.ToString());
 
-            calculator.Calculate("0x01234567 + 0x89aBcDeF + 0o01234567 + 0b01");
+            Assert.IsTrue(calculator.Calculate("0x01234567 + 0x89aBcDeF + 0o01234567 + 0b01"));
             Assert.AreEqual("2329169102", calculator.Result.ToString());
-            Assert.IsTrue(calculator.Error == null);
+
+            //Assert.IsTrue(calculator.Calculate("0x8000000000000000"));
+            //Assert.AreEqual("-9223372036854775808", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("~0"));
+            Assert.AreEqual("-1", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("~-1"));
+            Assert.AreEqual("0", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("0xFFF0 & 0x0FFF"));
+            Assert.AreEqual($"{0x0FF0}", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("0xFFF0 | 0x0FFF"));
+            Assert.AreEqual($"{0xFFFF}", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("0xFFF0 ^ 0x0FFF"));
+            Assert.AreEqual($"{0xF00F}", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("1 << 0"));
+            Assert.AreEqual("1", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("1 << 1"));
+            Assert.AreEqual("2", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("1 << 62"));
+            Assert.AreEqual("4611686018427387904", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("1 << 63"));
+            Assert.AreEqual("-9223372036854775808", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("1 << 64"));
+            Assert.AreEqual("0", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("4294967296 >> 0"));
+            Assert.AreEqual("4294967296", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("4294967296 >> 1"));
+            Assert.AreEqual("2147483648", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("4294967296 >> 32"));
+            Assert.AreEqual("1", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("4294967296 >> 33"));
+            Assert.AreEqual("0", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-4294967296 >> 1"));
+            Assert.AreEqual("-2147483648", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-4294967296 >> 32"));
+            Assert.AreEqual("-1", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-4294967296 >> 33"));
+            Assert.AreEqual("-1", calculator.Result.ToString());
         }
 
         [TestMethod]

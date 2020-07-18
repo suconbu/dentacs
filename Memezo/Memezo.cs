@@ -41,9 +41,14 @@ namespace Suconbu.Scripting.Memezo
         readonly Stack<Clause> clauses = new Stack<Clause>();
         readonly Dictionary<TokenType, int> operatorPrecs = new Dictionary<TokenType, int>()
         {
-            { TokenType.Exponent, 7 },
-            { TokenType.Multiply, 6 }, {TokenType.Division, 6 }, {TokenType.FloorDivision, 6 }, {TokenType.Remainder, 6 },
-            { TokenType.Plus, 5 }, { TokenType.Minus, 5 },
+            { TokenType.Exponent, 12 },
+            { TokenType.BitwiseNot, 11 },
+            { TokenType.Multiply, 10 }, {TokenType.Division, 10 }, {TokenType.FloorDivision, 10 }, {TokenType.Remainder, 10 },
+            { TokenType.Plus, 9 }, { TokenType.Minus, 9 },
+            { TokenType.BitwiseLeftShift, 8 }, { TokenType.BitwiseRightShift, 8 },
+            { TokenType.BitwiseAnd, 7 },
+            { TokenType.BitwiseXor, 6 },
+            { TokenType.BitwiseOr, 5 },
             { TokenType.Equal, 4 }, { TokenType.NotEqual, 4 }, { TokenType.Less, 4 }, { TokenType.Greater, 4 }, { TokenType.LessEqual, 4 },  { TokenType.GreaterEqual, 4 },
             { TokenType.Not, 3 },
             { TokenType.And, 2 },
@@ -370,7 +375,7 @@ namespace Suconbu.Scripting.Memezo
             }
             if (lhs.Type == DataType.Number)
             {
-                if (lhs.Number < Int64.MinValue || Int64.MaxValue < lhs.Number)
+                if (lhs.Number < long.MinValue || long.MaxValue < lhs.Number)
                 {
                     throw new ErrorException(ErrorType.NumberOverflow);
                 }
@@ -397,6 +402,16 @@ namespace Suconbu.Scripting.Memezo
             {
                 this.lexer.ReadToken();
                 primary = new Value(this.Primary().IsTrue());
+            }
+            else if (this.lexer.Token.Type == TokenType.BitwiseNot)
+            {
+                this.lexer.ReadToken();
+                primary = this.Primary();
+                if (!primary.TryToInteger(out var ip))
+                {
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {primary.Type}");
+                }
+                primary = new Value(~ip);
             }
             else if (this.lexer.Token.Type == TokenType.LeftParen)
             {
@@ -596,26 +611,9 @@ namespace Suconbu.Scripting.Memezo
             this.String = this.Number.ToString();
         }
 
-        public Value(int n) : this()
-        {
-            this.Type = DataType.Number;
-            this.Number = n;
-            this.String = this.Number.ToString();
-        }
-
-        public Value(double n) : this()
-        {
-            this.Type = DataType.Number;
-            this.Number = (decimal)n;
-            this.String = this.Number.ToString();
-        }
-
-        public Value(bool b) : this()
-        {
-            this.Type = DataType.Number;
-            this.Number = b ? 1m : 0m;
-            this.String = this.Number.ToString();
-        }
+        public Value(long n) : this((decimal)n) { }
+        public Value(double n) : this((decimal)n) { }
+        public Value(bool b) : this(b ? 1m : 0m) { }
 
         public Value(string s) : this()
         {
@@ -628,6 +626,21 @@ namespace Suconbu.Scripting.Memezo
 
         public override string ToString() =>
             (this.Type == DataType.Number) ? this.String : $"'{this.String}'";
+
+        public bool TryToInteger(out long integer)
+        {
+            if (this.Number == decimal.Truncate(this.Number) &&
+                long.MinValue <= this.Number && this.Number <= long.MaxValue)
+            {
+                integer = (long)this.Number;
+                return true;
+            }
+            else
+            {
+                integer = 0;
+                return false;
+            }
+        }
 
         internal bool IsTrue() =>
             (this.Type == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
@@ -682,6 +695,35 @@ namespace Suconbu.Scripting.Memezo
             else
             {
                 if (a.Type != DataType.Number) throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+
+                if (Token.IsBitwiseOperator(tokenType))
+                {
+                    if (!a.TryToInteger(out var ia) || !b.TryToInteger(out var ib))
+                    {
+                        throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {tokenType}");
+                    }
+
+                    if (tokenType == TokenType.BitwiseLeftShift || tokenType == TokenType.BitwiseRightShift)
+                    {
+                        if (ib < 0 || int.MaxValue <= ib)
+                        {
+                            throw new ErrorException(ErrorType.NotSupportedOperation, $"Invalid shift count");
+                        }
+                        if (sizeof(long) * 8 <= ib)
+                        {
+                            return new Value((0 <= ia) ? 0 : -1);
+                        }
+                        return (tokenType == TokenType.BitwiseLeftShift) ? new Value(ia << (int)ib) : new Value(ia >> (int)ib);
+                    }
+                    else
+                    {
+                        return
+                            (tokenType == TokenType.BitwiseAnd) ? new Value(ia & ib) :
+                            (tokenType == TokenType.BitwiseOr) ? new Value(ia | ib) :
+                            (tokenType == TokenType.BitwiseXor) ? new Value(ia ^ ib) :
+                            throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
+                    }
+                }
 
                 return
                     (tokenType == TokenType.Minus) ? new Value(a.Number - b.Number) :
@@ -849,18 +891,19 @@ namespace Suconbu.Scripting.Memezo
             }
             else
             {
+                long n64 = 0;
                 foreach (char d in s)
                 {
-                    n *= radix;
+                    n64 *= radix;
                     int v =
                         ('0' <= d && d <= '9') ? (d - '0') :
                         ('a' <= d && d <= 'z') ? (d - 'a' + 10) :
-                        int.MaxValue;
-                    if (radix <= v) throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
-                    n += v;
+                        throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    n64 += v;
                 }
+                n = n64;
             }
-            if(n < Int64.MinValue || Int64.MaxValue < n)
+            if(n < long.MinValue || long.MaxValue < n)
             {
                 throw new ErrorException(ErrorType.NumberOverflow, $"'{sb}'");
             }
@@ -917,9 +960,15 @@ namespace Suconbu.Scripting.Memezo
             else if (this.currentChar == '(') type = TokenType.LeftParen;
             else if (this.currentChar == ')') type = TokenType.RightParen;
             else if (this.currentChar == '<' && this.nextChar == '=') { type = TokenType.LessEqual; this.ReadChar(); }
+            else if (this.currentChar == '<' && this.nextChar == '<') { type = TokenType.BitwiseLeftShift; this.ReadChar(); }
             else if (this.currentChar == '<') type = TokenType.Less;
             else if (this.currentChar == '>' && this.nextChar == '=') { type = TokenType.GreaterEqual; this.ReadChar(); }
+            else if (this.currentChar == '>' && this.nextChar == '>') { type = TokenType.BitwiseRightShift; this.ReadChar(); }
             else if (this.currentChar == '>') type = TokenType.Greater;
+            else if (this.currentChar == '&') type = TokenType.BitwiseAnd;
+            else if (this.currentChar == '|') type = TokenType.BitwiseOr;
+            else if (this.currentChar == '^') type = TokenType.BitwiseXor;
+            else if (this.currentChar == '~') type = TokenType.BitwiseNot;
             else type = TokenType.Unkown;
             this.ReadChar();
             return new Token(type, location, this.source.Substring(index, this.currentLocation.CharIndex - index));
@@ -969,10 +1018,15 @@ namespace Suconbu.Scripting.Memezo
         // Symbol
         NewLine, Colon, Comma, Assign, LeftParen, RightParen,
 
-        OperatorsBegin,
+        OperatorBegin,
 
         // Arithmetic operator
         Plus, Minus, Multiply, Division, FloorDivision, Remainder, Exponent,
+
+        // Bitwise operator
+        BitwiseOperatorBegin,
+        BitwiseAnd, BitwiseOr, BitwiseXor, BitwiseNot, BitwiseLeftShift, BitwiseRightShift,
+        BitwiseOperatorEnd,
 
         // Comparison operator
         Equal, Less, Greater, NotEqual, LessEqual, GreaterEqual,
@@ -980,7 +1034,7 @@ namespace Suconbu.Scripting.Memezo
         // Logical operator
         Or, And, Not,
 
-        OperatorsEnd,
+        OperatorEnd,
 
         Eof = -1
     }
@@ -1006,7 +1060,8 @@ namespace Suconbu.Scripting.Memezo
 
         public bool IsCompoundStatement() { return this.Type == TokenType.If || this.IsLoop(); }
         public bool IsLoop() { return this.Type == TokenType.For || this.Type == TokenType.Repeat; }
-        public bool IsOperator() { return TokenType.OperatorsBegin < this.Type && this.Type < TokenType.OperatorsEnd; }
+        public bool IsOperator() { return TokenType.OperatorBegin < this.Type && this.Type < TokenType.OperatorEnd; }
+        public static bool IsBitwiseOperator(TokenType type) { return TokenType.BitwiseOperatorBegin < type && type < TokenType.BitwiseOperatorEnd; }
 
         public override string ToString() => $"'{this.Text.Replace("\n", "\\n")}'({this.Type})";
     }

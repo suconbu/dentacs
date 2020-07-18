@@ -45,7 +45,7 @@ namespace Suconbu.Dentacs
             this.ClearResult();
             this.memezo.Source = expression;
             this.memezo.Run();
-            return this.Error != null;
+            return this.Error == null;
         }
 
         void ClearResult()
