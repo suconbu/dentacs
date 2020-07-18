@@ -729,19 +729,26 @@ namespace Suconbu.Scripting.Memezo
                     }
                 }
 
-                return
-                    (tokenType == TokenType.Minus) ? new Value(a.Number - b.Number) :
-                    (tokenType == TokenType.Division) ? new Value(a.Number / b.Number) :
-                    (tokenType == TokenType.FloorDivision) ? new Value(Math.Floor(a.Number / b.Number)) :
-                    (tokenType == TokenType.Remainder) ? new Value(a.Number % b.Number) :
-                    (tokenType == TokenType.Exponent) ? new Value((decimal)Math.Pow((double)a.Number, (double)b.Number)) :
-                    (tokenType == TokenType.Less) ? new Value(a.Number < b.Number ? 1 : 0) :
-                    (tokenType == TokenType.Greater) ? new Value(a.Number > b.Number ? 1 : 0) :
-                    (tokenType == TokenType.LessEqual) ? new Value(a.Number <= b.Number ? 1 : 0) :
-                    (tokenType == TokenType.GreaterEqual) ? new Value(a.Number >= b.Number ? 1 : 0) :
-                    (tokenType == TokenType.And) ? new Value(a.Number != 0m && b.Number != 0m ? 1 : 0) :
-                    (tokenType == TokenType.Or) ? new Value(a.Number != 0m || b.Number != 0m ? 1 : 0) :
-                    throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
+                try
+                {
+                    return
+                        (tokenType == TokenType.Minus) ? new Value(a.Number - b.Number) :
+                        (tokenType == TokenType.Division) ? new Value(a.Number / b.Number) :
+                        (tokenType == TokenType.FloorDivision) ? new Value(Math.Floor(a.Number / b.Number)) :
+                        (tokenType == TokenType.Remainder) ? new Value(a.Number % b.Number) :
+                        (tokenType == TokenType.Exponent) ? new Value((decimal)Math.Pow((double)a.Number, (double)b.Number)) :
+                        (tokenType == TokenType.Less) ? new Value(a.Number < b.Number ? 1 : 0) :
+                        (tokenType == TokenType.Greater) ? new Value(a.Number > b.Number ? 1 : 0) :
+                        (tokenType == TokenType.LessEqual) ? new Value(a.Number <= b.Number ? 1 : 0) :
+                        (tokenType == TokenType.GreaterEqual) ? new Value(a.Number >= b.Number ? 1 : 0) :
+                        (tokenType == TokenType.And) ? new Value(a.Number != 0m && b.Number != 0m ? 1 : 0) :
+                        (tokenType == TokenType.Or) ? new Value(a.Number != 0m || b.Number != 0m ? 1 : 0) :
+                        throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
+                }
+                catch (OverflowException)
+                {
+                    throw new ErrorException(ErrorType.NumberOverflow);
+                }
             }
         }
     }
