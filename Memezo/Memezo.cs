@@ -216,7 +216,7 @@ namespace Suconbu.Scripting.Memezo
         {
             var statementToken = this.lexer.Token;
             this.VerifyToken(this.lexer.ReadToken(), TokenType.Identifer);
-            var name = this.lexer.Token.Text;
+            var name = this.lexer.Token.String;
 
             var token = this.lexer.ReadToken();
             if (token.Type != TokenType.Assign && token.Type != TokenType.In)
@@ -348,7 +348,7 @@ namespace Suconbu.Scripting.Memezo
 
         void OnAssign()
         {
-            var name = this.lexer.Token.Text;
+            var name = this.lexer.Token.String;
             this.VerifyToken(this.lexer.ReadToken(), TokenType.Assign);
             this.lexer.ReadToken();
             var value = this.Expr();
@@ -388,9 +388,13 @@ namespace Suconbu.Scripting.Memezo
         {
             var primary = Value.Zero;
 
-            if (this.lexer.Token.Type == TokenType.Value)
+            if (this.lexer.Token.Type == TokenType.String)
             {
-                primary = this.lexer.Token.Value;
+                primary = new Value(this.lexer.Token.String);
+            }
+            else if (this.lexer.Token.Type == TokenType.Number)
+            {
+                primary = new Value(this.lexer.Token.Number);
             }
             else if (this.lexer.Token.Type == TokenType.Plus || this.lexer.Token.Type == TokenType.Minus)
             {
@@ -421,7 +425,7 @@ namespace Suconbu.Scripting.Memezo
             }
             else if (this.lexer.Token.Type == TokenType.Identifer)
             {
-                var identifier = this.lexer.Token.Text;
+                var identifier = this.lexer.Token.String;
                 if (this.Vars.TryGetValue(identifier, out var value))
                 {
                     primary = value;
@@ -903,11 +907,7 @@ namespace Suconbu.Scripting.Memezo
                 }
                 n = n64;
             }
-            if(n < long.MinValue || long.MaxValue < n)
-            {
-                throw new ErrorException(ErrorType.NumberOverflow, $"'{sb}'");
-            }
-            return new Token(TokenType.Value, location, s, new Value(n));
+            return new Token(TokenType.Number, location, s, n);
         }
 
         Token ReadString(char enclosure)
@@ -936,7 +936,7 @@ namespace Suconbu.Scripting.Memezo
             }
             this.ReadChar();
             var s = sb.ToString();
-            return new Token(TokenType.Value, location, s, new Value(s));
+            return new Token(TokenType.String, location, s);
         }
 
         Token ReadOperator()
@@ -1010,7 +1010,7 @@ namespace Suconbu.Scripting.Memezo
     {
         None, Unkown,
 
-        Identifer, Value,
+        Identifer, String, Number,
 
         // Statement keyword
         If, Elif, Else, Then, For, In, To, Repeat, Do, End, Continue, Break, Exit,
@@ -1041,21 +1041,21 @@ namespace Suconbu.Scripting.Memezo
 
     struct Token
     {
-        public static Token None = new Token() { Type = TokenType.None, Text = string.Empty };
+        public static Token None = new Token() { Type = TokenType.None, String = string.Empty };
 
         public TokenType Type { get; private set; }
         public SourceLocation Location { get; private set; }
-        public string Text { get; private set; }
-        public Value Value { get; private set; }
+        public string String { get; private set; }
+        public decimal Number { get; private set; }
 
-        public Token(TokenType type, SourceLocation location) : this(type, location, string.Empty, Value.Zero) { }
-        public Token(TokenType type, SourceLocation location, string text) : this(type, location, text, Value.Zero) { }
-        public Token(TokenType type, SourceLocation location, string text, Value value) : this()
+        public Token(TokenType type, SourceLocation location) : this(type, location, string.Empty, 0m) { }
+        public Token(TokenType type, SourceLocation location, string str) : this(type, location, str, 0m) { }
+        public Token(TokenType type, SourceLocation location, string str, decimal number) : this()
         {
             this.Type = type;
             this.Location = location;
-            this.Text = text;
-            this.Value = value;
+            this.String = str;
+            this.Number = number;
         }
 
         public bool IsCompoundStatement() { return this.Type == TokenType.If || this.IsLoop(); }
@@ -1063,7 +1063,7 @@ namespace Suconbu.Scripting.Memezo
         public bool IsOperator() { return TokenType.OperatorBegin < this.Type && this.Type < TokenType.OperatorEnd; }
         public static bool IsBitwiseOperator(TokenType type) { return TokenType.BitwiseOperatorBegin < type && type < TokenType.BitwiseOperatorEnd; }
 
-        public override string ToString() => $"'{this.Text.Replace("\n", "\\n")}'({this.Type})";
+        public override string ToString() => $"'{this.String.Replace("\n", "\\n")}'({this.Type})";
     }
 
     public class ErrorException : Exception

@@ -28,8 +28,8 @@ namespace test
             Assert.IsTrue(calculator.Calculate("0x01234567 + 0x89aBcDeF + 0o01234567 + 0b01"));
             Assert.AreEqual("2329169102", calculator.Result.ToString());
 
-            //Assert.IsTrue(calculator.Calculate("0x8000000000000000"));
-            //Assert.AreEqual("-9223372036854775808", calculator.Result.ToString());
+            Assert.IsTrue(calculator.Calculate("0x8000000000000000"));
+            Assert.AreEqual("-9223372036854775808", calculator.Result.ToString());
 
             Assert.IsTrue(calculator.Calculate("~0"));
             Assert.AreEqual("-1", calculator.Result.ToString());
