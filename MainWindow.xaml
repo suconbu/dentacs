@@ -98,7 +98,7 @@
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Hidden"></Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding RxErrorState.Value}" Value="WithMessage">
+                                <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>

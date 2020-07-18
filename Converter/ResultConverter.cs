@@ -8,7 +8,7 @@ namespace Suconbu.Dentacs
 {
     public class ResultConverter : IValueConverter
     {
-        public static readonly string InvalidValueString = "--";
+        public static readonly string InvalidValueString = string.Empty;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

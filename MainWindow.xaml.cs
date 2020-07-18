@@ -17,7 +17,7 @@ namespace Suconbu.Dentacs
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public enum ErrorState { None, NoMessage, WithMessage }
+        public enum ErrorState { None, ErrorWithoutMessage, ErrorWithMessage }
 
         public ReactiveProperty<string> RxResult { get; private set; }
         public ReactiveProperty<string> RxError { get; private set; }
@@ -59,8 +59,8 @@ namespace Suconbu.Dentacs
             this.RxError = new ReactiveProperty<string>();
             this.RxErrorState = this.RxError.Select(x =>
                 x == null ? ErrorState.None :
-                x == string.Empty ? ErrorState.NoMessage :
-                ErrorState.WithMessage)
+                x == string.Empty ? ErrorState.ErrorWithoutMessage :
+                ErrorState.ErrorWithMessage)
                 .ToReadOnlyReactivePropertySlim();
             this.RxZoom = new ReactiveProperty<double>();
             this.RxZoomIndex = new ReactiveProperty<int>();

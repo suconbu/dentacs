@@ -10,7 +10,7 @@ namespace Suconbu.Dentacs
 {
     public class CharInfoConverter : IMultiValueConverter
     {
-        public static readonly string InvalidValueString = "-";
+        public static readonly string InvalidValueString = string.Empty;
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
