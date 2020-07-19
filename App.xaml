@@ -4,5 +4,11 @@
              xmlns:local="clr-namespace:Suconbu.Dentacs"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resource/Resource.xaml"/>
+                <ResourceDictionary Source="/Resource/ControlStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

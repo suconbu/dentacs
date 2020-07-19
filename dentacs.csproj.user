@@ -12,7 +12,13 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Resource\ControlStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resource\Resource.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

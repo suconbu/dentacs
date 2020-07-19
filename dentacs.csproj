@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>Suconbu.Dentacs</RootNamespace>
-    <ApplicationIcon>dentacs.ico</ApplicationIcon>
+    <ApplicationIcon>Resource\dentacs.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,8 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resource\dentacs.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="ReactiveProperty" Version="7.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resource\dentacs.ico" />
   </ItemGroup>
 
 </Project>

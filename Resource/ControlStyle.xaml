@@ -1,0 +1,317 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--キャプション関係-->
+
+    <Style x:Key="CaptionStyle" TargetType="{x:Type StackPanel}">
+        <Setter Property="TextBlock.FontFamily" Value="{x:Static SystemFonts.CaptionFontFamily}"/>
+        <Setter Property="TextBlock.FontSize" Value="16"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Background" Value="{StaticResource CaptionBackBrush}"/>
+        <Setter Property="TextBlock.Foreground" Value="{StaticResource CaptionForeBrush}"/>
+    </Style>
+
+    <Style x:Key="CaptionIconStyle" TargetType="{x:Type Image}">
+        <Setter Property="Source" Value="/Resource/dentacs.ico"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="White" ShadowDepth="0" Opacity="0.5" BlurRadius="8"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CaptionButtonBaseStyle" TargetType="{x:Type Button}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontFamily" Value="Marlett"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="12,12" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+    </Style>
+
+    <Style x:Key="CaptionButtonStyle" BasedOn="{StaticResource CaptionButtonBaseStyle}" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource CaptionButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CaptionButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource CaptionButtonTemplate}"/>
+    </Style>
+
+    <Style x:Key="CaptionCloseButtonStyle" BasedOn="{StaticResource CaptionButtonBaseStyle}" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource CaptionCloseButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CaptionCloseButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
+    </Style>
+    
+    <!--本体で使うもの-->
+
+    <Style TargetType="TextBox" x:Key="InputTextBoxStyle">
+        <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
+        <Setter Property="FontSize" Value="{c:Binding 24 * RxZoomRatio.Value}"/>
+        <Setter Property="Padding" Value="10,10,20,10"/>    <!--右側はちょっと余裕を持たせる-->
+        <Setter Property="Background" Value="{StaticResource InputTextBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource InputTextForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
+    </Style>
+
+    <Style TargetType="TextBox" x:Key="OutputTextBoxStyle">
+        <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
+        <Setter Property="FontSize" Value="{c:Binding 16 * RxMildZoomRatio.Value}"/>
+        <Setter Property="Padding" Value="5,5"/>
+        <Setter Property="BorderThickness" Value="0,0,0,0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="MaxLines" Value="2"/>
+        <Setter Property="Background" Value="{StaticResource OutputTextBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OutputTextForeBrush:Disable}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RxErrorState.Value}" Value="None">
+                <Setter Property="Foreground" Value="{StaticResource OutputTextForeBrush}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button" x:Key="ResultButtonStyle">
+        <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+        <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+        <Setter Property="Padding" Value="10,0"></Setter>
+        <Setter Property="Background" Value="{StaticResource ButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource ButtonTemplate}"/>
+    </Style>
+    
+    <!--ステータスバー関係-->
+
+    <Style TargetType="StatusBar" x:Key="StatusBarStyle">
+        <Setter Property="Background" Value="{StaticResource WindowBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
+        <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
+    </Style>
+
+    <Style TargetType="StatusBarItem" x:Key="StatusErrorStyle">
+        <Setter Property="Background" Value="{StaticResource ErrorBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ErrorForeBrush}"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="Visibility" Value="Hidden"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
+                <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--テンプレート-->
+
+    <!--テキスト入力-->
+    <ControlTemplate x:Key="InputTextTemplate" TargetType="{x:Type TextBoxBase}">
+        <Border
+            Background="{TemplateBinding Background}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            BorderBrush="{TemplateBinding BorderBrush}">
+            <ScrollViewer Margin="0" x:Name="PART_ContentHost" />
+        </Border>
+    </ControlTemplate>
+
+    <!--ボタン-->
+    <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type Button}">
+        <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{StaticResource ButtonBackColor}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{StaticResource ButtonForeColor}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonBackColor:Hover}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonForeColor:Hover}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonBackColor:Press}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonForeColor:Press}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonBackColor:Disable}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource ButtonForeColor:Disable}"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Border>
+    </ControlTemplate>
+
+    <!--キャプションの閉じる以外のボタン-->
+    <ControlTemplate x:Key="CaptionButtonTemplate" TargetType="{x:Type Button}">
+        <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeOutDuration}"
+                                To="{StaticResource CaptionButtonBackColor}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeOutDuration}"
+                                To="{StaticResource CaptionButtonForeColor}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonBackColor:Hover}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonForeColor:Hover}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonBackColor:Press}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonForeColor:Press}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonBackColor:Disable}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionButtonForeColor:Disable}"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Border>
+    </ControlTemplate>
+
+    <!--キャプションの閉じるボタン-->
+    <ControlTemplate x:Key="CaptionCloseButtonTemplate" TargetType="{x:Type Button}">
+        <Grid x:Name="Grid" SnapsToDevicePixels="True" Background="{StaticResource CaptionCloseButtonBackBrush}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeOutDuration}"
+                                To="{StaticResource CaptionCloseButtonBackColor}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeOutDuration}"
+                                To="{StaticResource CaptionCloseButtonForeColor}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonBackColor:Hover}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonForeColor:Hover}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonBackColor:Press}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonForeColor:Press}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonBackColor:Disable}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource CaptionButtonFadeInDuration}"
+                                To="{StaticResource CaptionCloseButtonForeColor:Disable}"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter
+                x:Name="ContentPresenter"
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Grid>
+    </ControlTemplate>
+</ResourceDictionary>

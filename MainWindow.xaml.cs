@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using Reactive.Bindings;
 
 namespace Suconbu.Dentacs
@@ -22,32 +23,24 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<string> RxResult { get; private set; }
         public ReactiveProperty<string> RxError { get; private set; }
         public ReadOnlyReactivePropertySlim<ErrorState> RxErrorState { get; private set; }
-        public ReactiveProperty<double> RxZoom { get; private set; }
+        public ReactiveProperty<double> RxZoomRatio { get; private set; }
+        public ReadOnlyReactivePropertySlim<double> RxMildZoomRatio { get; private set; }
         public ReactiveProperty<int> RxZoomIndex { get; private set; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; private set; }
         public ReactiveProperty<bool> RxIsFullScreen { get; private set; }
         public ReactiveProperty<string> RxCurrentText { get; private set; }
         public ReactiveProperty<int> RxSelectionLength { get; private set; }
+        public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator();
         int lastLineIndex = -1;
-        readonly double[] zoomTable = new []{ 0.5, 1.0, 1.5, 2.0, 3.0 };
-        int zoomIndexBackup = 1;
-        double maxWidthBackup = System.Windows.SystemParameters.WorkArea.Width;
+        int zoomIndexBackup = 0;
+        int fullScreenZoomIndexBackup = 3;
+        double maxWidthBackup = SystemParameters.WorkArea.Width;
 
-        static IntPtr WndProc(IntPtr hWnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (message == 0x00A3/*WM_NCLBUTTONDBLCLK*/)
-            {
-                var window = HwndSource.FromHwnd(hWnd).RootVisual as MainWindow;
-                if (window != null)
-                {
-                    window.OnMouseDoubleClickNC(new NcMouseEventArgs(wParam, lParam, MouseButton.Left));
-                    handled = true;
-                }
-            }
-            return IntPtr.Zero;
-        }
+        static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0 };
+        static readonly SolidColorBrush kTransparentBrush = new SolidColorBrush();
+        static readonly int kCopyFlashInterval = 100;
 
         public MainWindow()
         {
@@ -62,10 +55,10 @@ namespace Suconbu.Dentacs
                 x == string.Empty ? ErrorState.ErrorWithoutMessage :
                 ErrorState.ErrorWithMessage)
                 .ToReadOnlyReactivePropertySlim();
-            this.RxZoom = new ReactiveProperty<double>();
             this.RxZoomIndex = new ReactiveProperty<int>();
-            this.RxZoom = this.RxZoomIndex.Select(x => this.zoomTable[x]).ToReactiveProperty();
-            this.RxTitleText = this.RxZoom.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
+            this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReactiveProperty();
+            this.RxMildZoomRatio = this.RxZoomRatio.Select(x => ((3 - 1) + x) / 3).ToReadOnlyReactivePropertySlim();
+            this.RxTitleText = this.RxZoomRatio.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
             this.RxIsFullScreen = new ReactiveProperty<bool>(false);
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
             this.RxCurrentText = new ReactiveProperty<string>();
@@ -75,15 +68,7 @@ namespace Suconbu.Dentacs
         string MakeTitleText()
         {
             return "dentacs" +
-                (this.RxZoom.Value != 1.0 ? $" {this.RxZoom.Value * 100:#}%" : "");
-        }
-
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-
-            var hs = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
-            hs.AddHook(new HwndSourceHook(WndProc));
+                (this.RxZoomRatio.Value != 1.0 ? $" {this.RxZoomRatio.Value * 100:#}%" : "");
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -121,7 +106,7 @@ namespace Suconbu.Dentacs
 
         void ChangeZoom(int offset)
         {
-            this.RxZoomIndex.Value = Math.Clamp(this.RxZoomIndex.Value + offset, 0, this.zoomTable.Length - 1);
+            this.RxZoomIndex.Value = Math.Clamp(this.RxZoomIndex.Value + offset, 0, kZoomTable.Length - 1);
         }
 
         void SetFullScreen(bool enable)
@@ -129,28 +114,34 @@ namespace Suconbu.Dentacs
             if (enable)
             {
                 this.zoomIndexBackup = this.RxZoomIndex.Value;
-                this.RxZoomIndex.Value = this.zoomTable.Length - 1;
+                this.RxZoomIndex.Value = this.fullScreenZoomIndexBackup;
                 this.maxWidthBackup = this.MaxWidth;
                 this.MaxWidth = Double.PositiveInfinity;
+                this.CaptionRow.Visibility = Visibility.Collapsed;
+                this.StatusRow.Visibility = Visibility.Collapsed;
+                this.FullScreenCloseButton.Visibility = Visibility.Visible;
+                this.WindowBorder.BorderThickness = new Thickness(0);
                 this.SizeToContent = SizeToContent.Manual;
-                this.WindowStyle = WindowStyle.None;
+                //this.WindowStyle = WindowStyle.None;
                 this.WindowState = WindowState.Maximized;
+                this.Topmost = false;
             }
             else
             {
-                this.WindowStyle = WindowStyle.SingleBorderWindow;
+                if (this.IsLoaded)
+                {
+                    this.fullScreenZoomIndexBackup = this.RxZoomIndex.Value;
+                }
+                //this.WindowStyle = WindowStyle.SingleBorderWindow;
                 this.WindowState = WindowState.Normal;
                 this.SizeToContent = SizeToContent.WidthAndHeight;
+                this.Topmost = true;
                 this.MaxWidth = this.maxWidthBackup;
+                this.CaptionRow.Visibility = Visibility.Visible;
+                this.StatusRow.Visibility = Visibility.Visible;
+                this.FullScreenCloseButton.Visibility = Visibility.Collapsed;
+                this.WindowBorder.BorderThickness = new Thickness(1);
                 this.RxZoomIndex.Value = this.zoomIndexBackup;
-            }
-        }
-
-        protected virtual void OnMouseDoubleClickNC(NcMouseEventArgs e)
-        {
-            if (e.HitPosition == NcMouseEventArgs.Position.HTCAPTION)
-            {
-                this.RxIsFullScreen.Value = true;
             }
         }
 
@@ -208,10 +199,10 @@ namespace Suconbu.Dentacs
             var textBox = e.Parameter as TextBox;
             var copyText = this.GetResultTextForCopy(textBox);
             if (copyText == null) return;
-            textBox.Focus();
-            textBox.SelectAll();
             Clipboard.SetText(copyText);
-            Task.Delay(100).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.SelectionLength = 0; }); });
+            var foregroundBackup = textBox.Foreground;
+            textBox.Foreground = kTransparentBrush;
+            Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.Foreground = foregroundBackup; }); });
         }
 
         void CopyCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -231,58 +222,34 @@ namespace Suconbu.Dentacs
         {
             var text = CharInfoConvertHelper.ConvertToElementInfoString(this.RxCurrentText.Value, false);
             Clipboard.SetText(text);
+            var item = sender as Control;
+            item.Visibility = Visibility.Hidden;
+            Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { item.Visibility = Visibility.Visible; }); });
         }
 
-        private void CloseFullScreenButton_Click(object sender, RoutedEventArgs e)
+        private void FullScreenCloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.RxIsFullScreen.Value = false;
         }
-    }
 
-    public class NcMouseEventArgs : EventArgs
-    {
-        // https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-nchittest
-        public enum Position
+        private void Caption_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            HTERROR = -2,       // On the screen background or on a dividing line between windows (same as HTNOWHERE, except that the DefWindowProc function produces a system beep to indicate an error).
-            HTTRANSPARENT = -1, // In a window currently covered by another window in the same thread (the message will be sent to underlying windows in the same thread until one of them returns a code that is not HTTRANSPARENT).
-            HTNOWHERE = 0,      // On the screen background or on a dividing line between windows.
-            HTCLIENT = 1,       // In a client area.
-            HTCAPTION = 2,      // In a title bar.
-            HTSYSMENU = 3,      // In a window menu or in a Close button in a child window.
-            HTSIZE = 4,         // In a size box (same as HTGROWBOX).
-            HTGROWBOX = 4,      // In a size box (same as HTSIZE).
-            HTMENU = 5,         // In a menu.
-            HTHSCROLL = 6,      // In a horizontal scroll bar.
-            HTREDUCE = 8,       // In a Minimize button.
-            HTMINBUTTON = 8,    // In a Minimize button.
-            HTZOOM = 9,         // In a Maximize button. 
-            HTMAXBUTTON = 9,    // In a Maximize button.
-            HTLEFT = 10,        // In the left border of a resizable window (the user can click the mouse to resize the window horizontally).
-            HTRIGHT = 11,       // In the right border of a resizable window (the user can click the mouse to resize the window horizontally).
-            HTTOP = 12,         // In the upper-horizontal border of a window.
-            HTTOPLEFT = 13,     // In the upper-left corner of a window border.
-            HTTOPRIGHT = 14,    // In the upper-right corner of a window border.
-            HTVSCROLL = 7,      // In the vertical scroll bar.
-            HTBOTTOM = 15,      // In the lower-horizontal border of a resizable window (the user can click the mouse to resize the window vertically).
-            HTBOTTOMLEFT = 16,  // In the lower-left corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
-            HTBOTTOMRIGHT = 17, // In the lower-right corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
-            HTBORDER = 18,      // In the border of a window that does not have a sizing border.
-            HTCLOSE = 20,       // In a Close button.
-            HTHELP = 21,        // In a Help button.
+            this.DragMove();
         }
-        public NcMouseEventArgs(IntPtr wParam, IntPtr lParam, MouseButton button)
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
-            this.HitPosition = (NcMouseEventArgs.Position)wParam;
-            this.Location = new Point((lParam.ToInt32() & 0xFFFF0000 >> 16), lParam.ToInt32() & 0xFFFF);
-            this.Button = button;
-            this.Timestamp = Environment.TickCount;
+            this.WindowState = WindowState.Minimized;
         }
-        public Position HitPosition { get; private set; }
-        public Point Location { get; private set; }
-        public double X { get { return this.Location.X; } }
-        public double Y { get { return this.Location.Y; } }
-        public MouseButton Button { get; private set; }
-        public int Timestamp { get; set; }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.RxIsFullScreen.Value = true;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -9,113 +9,94 @@
         mc:Ignorable="d"
         Title="{Binding RxTitleText.Value}"
         SizeToContent="WidthAndHeight"
+        WindowStyle="None"
+        AllowsTransparency="True"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
-        Topmost="True"
-        FontFamily="Consolas">
+        UseLayoutRounding="True"
+        Topmost="True">
+
     <Window.Resources>
         <ToolTip x:Key="ButtonToolTip">Copy value to clipboard</ToolTip>
         <ToolTip x:Key="MojiStatusToolTip">
             <TextBlock>
-                String | Unicode CodePoint | UTF-16BE | UTF-8<LineBreak/>
-                (Double click to copy to clipboard)
+            String | Unicode CodePoint | UTF-16BE | UTF-8<LineBreak/>
+            (Double click to copy to clipboard)
             </TextBlock>
         </ToolTip>
-        <Style TargetType="TextBox" x:Key="InputTextBoxStyle">
-            <Setter Property="TextBox.FontSize" Value="{c:Binding 30 * RxZoom.Value}"></Setter>
-            <Setter Property="TextBox.Padding" Value="10,10"></Setter>
-            <Setter Property="TextBox.BorderThickness" Value="0,0,0,1"></Setter>
-        </Style>
-        <Style TargetType="TextBox" x:Key="ResultTextBoxStyle">
-            <Setter Property="FontSize" Value="{c:Binding 16 * RxZoom.Value}"></Setter>
-            <Setter Property="Padding" Value="3,3"></Setter>
-            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-            <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
-            <Setter Property="HorizontalContentAlignment" Value="Right"></Setter>
-            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-            <Setter Property="TextWrapping" Value="NoWrap"></Setter>
-            <Setter Property="IsReadOnly" Value="True"></Setter>
-            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"></Setter>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RxErrorState.Value}" Value="None">
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="Button" x:Key="ResultButtonStyle">
-            <Setter Property="FontSize" Value="{c:Binding 12 * ((3 - 1) + RxZoom.Value) / 3}"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-            <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
-            <Setter Property="BorderThickness" Value="1,0,0,1"></Setter>
-            <Setter Property="Padding" Value="10,0"></Setter>
-        </Style>
-        <Style TargetType="StatusBarItem" x:Key="StatusTextStyle">
-            <Setter Property="FontSize" Value="{c:Binding 12 * ((3 - 1) + RxZoom.Value) / 3}"></Setter>
-        </Style>
         <local:ResultConverter x:Key="ResultConverter"/>
         <local:CharInfoConverter x:Key="CharInfoConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
+
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static local:MainWindow.CopyCommand}"
                         Executed="CopyCommand_Executed"
                         CanExecute="CopyCommand_CanExecute"/>
     </Window.CommandBindings>
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
-        <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
-        <Button x:Name="CloseFullScreenButton" Content="×" FontSize="32" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="12,0" BorderThickness="1,0,0,1" Visibility="{Binding RxIsFullScreen.Value, Converter={StaticResource BooleanToVisibilityConverter}}" Click="CloseFullScreenButton_Click"></Button>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
+
+    <Border Name="WindowBorder" BorderBrush="{x:Static SystemParameters.WindowGlassBrush}" BorderThickness="1">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowBackBrush}">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition Height="0"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBox Name="DecResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
-            <TextBox Name="HexResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" Tag="16" Grid.Row="1"/>
-            <TextBox Name="BinResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" Tag="2" Grid.Row="2"/>
-            <TextBox Name="HiddenResult" Text="0000 0000 0000 0000 0000 0000 0000 0000" Style="{StaticResource ResultTextBoxStyle}" Grid.Row="3"/>
-            <Button Name="DecButton" Content="10" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=DecResult}" Grid.Row="0"/>
-            <Button Name="HexButton" Content="16" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=HexResult}" Grid.Row="1"/>
-            <Button Name="BinButton" Content="02" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
-        </Grid>
-        <StatusBar Grid.Row="2">
-            <StatusBarItem Style="{StaticResource StatusTextStyle}" HorizontalAlignment="Left">
-                <TextBlock Text="{c:Binding (\'😟\' + RxError.Value)}">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Hidden"></Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </StatusBarItem>
-            <StatusBarItem Style="{StaticResource StatusTextStyle}" HorizontalAlignment="Right" ToolTip="{StaticResource MojiStatusToolTip}" MouseDoubleClick="StatusBarItem_MouseDoubleClick">
-                <TextBlock>
-                    <TextBlock.Text>
+            <Grid Name="CaptionRow" Grid.Row="0" Height="{StaticResource CaptionHeight}">
+                <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionStyle}"
+                            PreviewMouseLeftButtonDown="Caption_PreviewMouseLeftButtonDown">
+                    <Image Style="{StaticResource CaptionIconStyle}"/>
+                    <TextBlock Text="{Binding RxTitleText.Value}" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="0" Style="{StaticResource CaptionButtonStyle}" Click="MinimizeButton_Click"/>
+                    <Button Content="1" Style="{StaticResource CaptionButtonStyle}" Click="MaximizeButton_Click"/>
+                    <Button Content="r" Style="{StaticResource CaptionCloseButtonStyle}" Click="CloseButton_Click"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid>
+                    <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
+                    <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Top"/>
+                    <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Bottom"/>
+                </Grid>
+                <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Click="FullScreenCloseButton_Click"/>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="0"/>
+                </Grid.RowDefinitions>
+                <TextBox Name="DecResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource OutputTextBoxStyle}" Tag="10" Grid.Row="0"/>
+                <TextBox Name="HexResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=16}" Style="{StaticResource OutputTextBoxStyle}" Tag="16" Grid.Row="1"/>
+                <TextBox Name="BinResult" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=2}" Style="{StaticResource OutputTextBoxStyle}" Tag="2" Grid.Row="2"/>
+                <TextBox Name="HiddenResult" Text="0000 0000 0000 0000 0000 0000 0000 0000" Style="{StaticResource OutputTextBoxStyle}" Grid.Row="3"/>
+                <Button Name="DecButton" Content="DEC" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=DecResult}" Grid.Row="0"/>
+                <Button Name="HexButton" Content="HEX" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=HexResult}" Grid.Row="1"/>
+                <Button Name="BinButton" Content="BIN" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
+            </Grid>
+            <StatusBar Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}">
+                <StatusBarItem Content="{c:Binding (\'😟\' + RxError.Value)}" Style="{StaticResource StatusErrorStyle}"/>
+                <StatusBarItem HorizontalAlignment="Right" ToolTip="{StaticResource MojiStatusToolTip}" MouseDoubleClick="StatusBarItem_MouseDoubleClick">
+                    <StatusBarItem.Content>
                         <MultiBinding Converter="{StaticResource CharInfoConverter}">
                             <Binding Path="RxCurrentText.Value"></Binding>
                             <Binding Path="RxSelectionLength.Value"></Binding>
                         </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-            </StatusBarItem>
-        </StatusBar>
-    </Grid>
+                    </StatusBarItem.Content>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+    </Border>
 </Window>
