@@ -22,7 +22,7 @@
         <ToolTip x:Key="MojiStatusToolTip">
             <TextBlock>
             String | Unicode CodePoint | UTF-16BE | UTF-8<LineBreak/>
-            (Double click to copy to clipboard)
+            (Click to copy to clipboard)
             </TextBlock>
         </ToolTip>
         <local:ResultConverter x:Key="ResultConverter"/>
@@ -37,13 +37,14 @@
     </Window.CommandBindings>
 
     <Border Name="WindowBorder" BorderBrush="{x:Static SystemParameters.WindowGlassBrush}" BorderThickness="1">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowBackBrush}">
+        <Grid Background="{StaticResource WindowBackBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
+
             <Grid Name="CaptionRow" Grid.Row="0" Height="{StaticResource CaptionHeight}">
                 <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionStyle}"
                             PreviewMouseLeftButtonDown="Caption_PreviewMouseLeftButtonDown">
@@ -56,6 +57,7 @@
                     <Button Content="r" Style="{StaticResource CaptionCloseButtonStyle}" Click="CloseButton_Click"/>
                 </StackPanel>
             </Grid>
+
             <Grid Grid.Row="1">
                 <Grid>
                     <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
@@ -67,6 +69,7 @@
                         VerticalAlignment="Top"
                         Click="FullScreenCloseButton_Click"/>
             </Grid>
+
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -86,17 +89,24 @@
                 <Button Name="HexButton" Content="HEX" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=HexResult}" Grid.Row="1"/>
                 <Button Name="BinButton" Content="BIN" Grid.Column="1" Style="{StaticResource ResultButtonStyle}" ToolTip="{StaticResource ButtonToolTip}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
             </Grid>
-            <StatusBar Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}">
-                <StatusBarItem Content="{c:Binding (\'😟\' + RxError.Value)}" Style="{StaticResource StatusErrorStyle}"/>
-                <StatusBarItem HorizontalAlignment="Right" ToolTip="{StaticResource MojiStatusToolTip}" MouseDoubleClick="StatusBarItem_MouseDoubleClick">
-                    <StatusBarItem.Content>
-                        <MultiBinding Converter="{StaticResource CharInfoConverter}">
-                            <Binding Path="RxCurrentText.Value"></Binding>
-                            <Binding Path="RxSelectionLength.Value"></Binding>
-                        </MultiBinding>
-                    </StatusBarItem.Content>
-                </StatusBarItem>
-            </StatusBar>
+
+            <Grid Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="{c:Binding (\'😟\' + RxError.Value)}" Style="{StaticResource StatusErrorTextStyle}"/>
+                    <ToggleButton Content="FUNC PAD" Style="{StaticResource StatusFuncButtonStyle}"></ToggleButton>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button HorizontalAlignment="Right" Style="{StaticResource StatusButtonStyle}" ToolTip="{StaticResource MojiStatusToolTip}" Click="CharInfo_Click">
+                        <Button.Content>
+                            <MultiBinding Converter="{StaticResource CharInfoConverter}">
+                                <Binding Path="RxCurrentText.Value"></Binding>
+                                <Binding Path="RxSelectionLength.Value"></Binding>
+                            </MultiBinding>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
         </Grid>
     </Border>
 </Window>

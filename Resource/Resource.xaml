@@ -44,6 +44,19 @@
     <SolidColorBrush x:Key="ButtonBackBrush" Color="{StaticResource ButtonBackColor}"/>
     <SolidColorBrush x:Key="ButtonForeBrush" Color="{StaticResource ButtonForeColor}"/>
 
+    <Color x:Key="StatusButtonBackColor">#00000000</Color>
+    <Color x:Key="StatusButtonForeColor">#FFB2B2B2</Color>
+    <Color x:Key="StatusButtonBackColor:Hover">#00000000</Color>
+    <Color x:Key="StatusButtonForeColor:Hover">#FFFFFFFF</Color>
+    <Color x:Key="StatusButtonBackColor:Press">#FF4D4D4D</Color>
+    <Color x:Key="StatusButtonForeColor:Press">#FFFFFFFF</Color>
+    <Color x:Key="StatusButtonBackColor:Checked">#FFB2B2B2</Color>
+    <Color x:Key="StatusButtonForeColor:Checked">#FF000000</Color>
+    <Color x:Key="StatusButtonBackColor:Disable">#00000000</Color>
+    <Color x:Key="StatusButtonForeColor:Disable">#FF5F5F5F</Color>
+    <SolidColorBrush x:Key="StatusButtonBackBrush" Color="{StaticResource StatusButtonBackColor}"/>
+    <SolidColorBrush x:Key="StatusButtonForeBrush" Color="{StaticResource StatusButtonForeColor}"/>
+
     <Duration x:Key="ButtonFadeInDuration">00:00:00</Duration>
     <Duration x:Key="ButtonFadeOutDuration">00:00:00</Duration>
 

@@ -218,7 +218,7 @@ namespace Suconbu.Dentacs
             return ResultConvertHelper.ConvertToResultString(number, radix, ResultConvertHelper.Styles.Prefix);
         }
 
-        private void StatusBarItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void CharInfo_Click(object sender, RoutedEventArgs e)
         {
             var text = CharInfoConvertHelper.ConvertToElementInfoString(this.RxCurrentText.Value, false);
             Clipboard.SetText(text);

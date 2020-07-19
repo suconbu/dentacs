@@ -27,7 +27,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CaptionButtonBaseStyle" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionButtonStyleBase" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontFamily" Value="Marlett"/>
@@ -39,13 +39,13 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
 
-    <Style x:Key="CaptionButtonStyle" BasedOn="{StaticResource CaptionButtonBaseStyle}" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionButtonStyle" BasedOn="{StaticResource CaptionButtonStyleBase}" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="{StaticResource CaptionButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource CaptionButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource CaptionButtonTemplate}"/>
     </Style>
 
-    <Style x:Key="CaptionCloseButtonStyle" BasedOn="{StaticResource CaptionButtonBaseStyle}" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionCloseButtonStyle" BasedOn="{StaticResource CaptionButtonStyleBase}" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="{StaticResource CaptionCloseButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource CaptionCloseButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
@@ -65,6 +65,7 @@
     <Style TargetType="TextBox" x:Key="OutputTextBoxStyle">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
         <Setter Property="FontSize" Value="{c:Binding 16 * RxMildZoomRatio.Value}"/>
+        <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Padding" Value="5,5"/>
         <Setter Property="BorderThickness" Value="0,0,0,0"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -95,17 +96,35 @@
     
     <!--ステータスバー関係-->
 
-    <Style TargetType="StatusBar" x:Key="StatusBarStyle">
-        <Setter Property="Background" Value="{StaticResource WindowBackBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
-        <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
+    <Style TargetType="Grid" x:Key="StatusBarStyle">
+        <Setter Property="Button.FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
     </Style>
 
-    <Style TargetType="StatusBarItem" x:Key="StatusErrorStyle">
+    <Style TargetType="Button" x:Key="StatusTextStyle">
+        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Template" Value="{DynamicResource StatusTextTemplate}"/>
+    </Style>
+
+    <Style TargetType="Button" x:Key="StatusButtonStyle">
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
+        <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
+        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
+    </Style>
+
+    <Style TargetType="ToggleButton" x:Key="StatusToggleStyle">
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Background" Value="{StaticResource StatusButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource StatusButtonForeBrush}"/>
+    </Style>
+
+    <Style TargetType="Button" x:Key="StatusErrorTextStyle" BasedOn="{StaticResource StatusTextStyle}">
         <Setter Property="Background" Value="{StaticResource ErrorBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ErrorForeBrush}"/>
         <Setter Property="Margin" Value="0,0,10,0"/>
-        <Setter Property="Visibility" Value="Hidden"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
                 <Setter Property="Visibility" Value="Visible"/>
@@ -113,6 +132,16 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="ToggleButton" x:Key="StatusFuncButtonStyle" BasedOn="{StaticResource StatusToggleStyle}">
+        <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
+        <Setter Property="Visibility" Value="Visible"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
     <!--テンプレート-->
 
     <!--テキスト入力-->
@@ -122,6 +151,169 @@
             BorderThickness="{TemplateBinding BorderThickness}"
             BorderBrush="{TemplateBinding BorderBrush}">
             <ScrollViewer Margin="0" x:Name="PART_ContentHost" />
+        </Border>
+    </ControlTemplate>
+
+    <!--ステータスバー用の押せるテキスト-->
+    <ControlTemplate x:Key="StatusTextTemplate" TargetType="{x:Type Button}">
+        <TextBlock
+            Background="{TemplateBinding Background}"
+            Foreground="{TemplateBinding Foreground}">
+            <ContentPresenter
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </TextBlock>
+    </ControlTemplate>
+
+    <!--ステータスバー用のボタン-->
+    <ControlTemplate x:Key="StatusButtonTemplate" TargetType="{x:Type Button}">
+        <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{TemplateBinding Background}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{TemplateBinding TextBlock.Foreground}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Hover}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Hover}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Press}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Press}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Checked">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Checked}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Checked}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Disable}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Disable}"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Border>
+    </ControlTemplate>
+
+    <!--ステータスバー用のトグルボタン-->
+    <ControlTemplate x:Key="StatusToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
+        <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{TemplateBinding Background}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeOutDuration}"
+                                To="{TemplateBinding TextBlock.Foreground}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Hover}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Hover}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Press}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Press}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Checked">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Checked}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Checked}"/>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonBackColor:Disable}"/>
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                Duration="{StaticResource ButtonFadeInDuration}"
+                                To="{StaticResource StatusButtonForeColor:Disable}"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <ContentPresenter
+                Focusable="False"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
         </Border>
     </ControlTemplate>
 
@@ -135,11 +327,11 @@
                             <ColorAnimation
                                 Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
                                 Duration="{StaticResource ButtonFadeOutDuration}"
-                                To="{StaticResource ButtonBackColor}"/>
+                                To="{TemplateBinding Background}"/>
                             <ColorAnimation
                                 Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
                                 Duration="{StaticResource ButtonFadeOutDuration}"
-                                To="{StaticResource ButtonForeColor}"/>
+                                To="{TemplateBinding TextBlock.Foreground}"/>
                         </Storyboard>
                     </VisualState>
                     <VisualState x:Name="MouseOver">
