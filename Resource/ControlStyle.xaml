@@ -53,7 +53,7 @@
     
     <!--本体で使うもの-->
 
-    <Style TargetType="TextBox" x:Key="InputTextBoxStyle">
+    <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
         <Setter Property="FontSize" Value="{c:Binding 24 * RxZoomRatio.Value}"/>
         <Setter Property="Padding" Value="10,10,20,10"/>    <!--右側はちょっと余裕を持たせる-->
@@ -62,7 +62,7 @@
         <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
     </Style>
 
-    <Style TargetType="TextBox" x:Key="OutputTextBoxStyle">
+    <Style x:Key="OutputTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
         <Setter Property="FontSize" Value="{c:Binding 16 * RxMildZoomRatio.Value}"/>
         <Setter Property="IsTabStop" Value="False"/>
@@ -84,7 +84,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="Button" x:Key="ResultButtonStyle">
+    <Style x:Key="ResultButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
         <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
         <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
@@ -96,16 +96,18 @@
     
     <!--ステータスバー関係-->
 
-    <Style TargetType="Grid" x:Key="StatusBarStyle">
+    <Style x:Key="StatusBarStyle" TargetType="Grid">
         <Setter Property="Button.FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
     </Style>
 
-    <Style TargetType="Button" x:Key="StatusTextStyle">
+    <Style x:Key="StatusTextStyle" TargetType="Button">
+        <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
+        <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
         <Setter Property="Padding" Value="5,5"></Setter>
         <Setter Property="Template" Value="{DynamicResource StatusTextTemplate}"/>
     </Style>
 
-    <Style TargetType="Button" x:Key="StatusButtonStyle">
+    <Style x:Key="StatusButtonStyle" TargetType="Button">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
@@ -113,14 +115,14 @@
         <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
     </Style>
 
-    <Style TargetType="ToggleButton" x:Key="StatusToggleStyle">
+    <Style x:Key="StatusToggleStyle" TargetType="ToggleButton">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Padding" Value="5,5"></Setter>
         <Setter Property="Background" Value="{StaticResource StatusButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource StatusButtonForeBrush}"/>
     </Style>
 
-    <Style TargetType="Button" x:Key="StatusErrorTextStyle" BasedOn="{StaticResource StatusTextStyle}">
+    <Style x:Key="StatusErrorTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
         <Setter Property="Background" Value="{StaticResource ErrorBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ErrorForeBrush}"/>
         <Setter Property="Margin" Value="0,0,10,0"/>
@@ -132,7 +134,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="ToggleButton" x:Key="StatusFuncButtonStyle" BasedOn="{StaticResource StatusToggleStyle}">
+    <Style x:Key="StatusFuncButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleStyle}">
         <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
         <Setter Property="Visibility" Value="Visible"/>
         <Style.Triggers>
