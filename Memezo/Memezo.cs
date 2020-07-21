@@ -54,7 +54,7 @@ namespace Suconbu.Scripting.Memezo
             { TokenType.And, 2 },
             { TokenType.Or, 1 }
         };
-        public List<IModule> modules = new List<IModule>();
+        List<IModule> modules = new List<IModule>();
 
         public Interpreter() { }
 

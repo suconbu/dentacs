@@ -30,6 +30,7 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<bool> RxIsFullScreen { get; private set; }
         public ReactiveProperty<string> RxCurrentText { get; private set; }
         public ReactiveProperty<int> RxSelectionLength { get; private set; }
+        public ReactiveProperty<bool> RxFuncPanelVisible { get; private set; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator();
@@ -63,6 +64,7 @@ namespace Suconbu.Dentacs
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
             this.RxCurrentText = new ReactiveProperty<string>();
             this.RxSelectionLength = new ReactiveProperty<int>();
+            this.RxFuncPanelVisible = new ReactiveProperty<bool>();
         }
 
         string MakeTitleText()
@@ -75,6 +77,7 @@ namespace Suconbu.Dentacs
         {
             base.OnContentRendered(e);
 
+            this.SetupFuncButtons();
             this.InputTextBox.Focus();
         }
 
@@ -107,6 +110,27 @@ namespace Suconbu.Dentacs
         void ChangeZoom(int offset)
         {
             this.RxZoomIndex.Value = Math.Clamp(this.RxZoomIndex.Value + offset, 0, kZoomTable.Length - 1);
+        }
+
+        void SetupFuncButtons()
+        {
+            foreach (var f in this.calculator.GetFunctionNames())
+            {
+                var name = f.ToUpper();
+                var button = new Button()
+                {
+                    Content = name,
+                    Style = this.FindResource("FuncButtonStyle") as Style
+                };
+                button.Click += (s, e) =>
+                {
+                    var index = this.InputTextBox.CaretIndex;
+                    this.InputTextBox.Focus();
+                    this.InputTextBox.Text = this.InputTextBox.Text.Insert(index, name);
+                    this.InputTextBox.CaretIndex = index + name.Length;
+                };
+                this.FuncPanel.Children.Add(button);
+            }
         }
 
         void SetFullScreen(bool enable)

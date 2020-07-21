@@ -48,6 +48,19 @@ namespace Suconbu.Dentacs
             return this.Error == null;
         }
 
+        public IEnumerable<string> GetFunctionNames()
+        {
+            var names = new List<string>();
+            foreach(var module in this.memezo.Modules)
+            {
+                foreach(var function in module.GetFunctions())
+                {
+                    names.Add(function.Key);
+                }
+            }
+            return names;
+        }
+
         void ClearResult()
         {
             this.Result = string.Empty;

@@ -84,16 +84,31 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ResultButtonStyle" TargetType="Button">
+    <Style x:Key="ButtonStyle" TargetType="Button">
         <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
         <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
         <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
-        <Setter Property="Padding" Value="10,0"></Setter>
+        <Setter Property="Padding" Value="10,5"></Setter>
         <Setter Property="Background" Value="{StaticResource ButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource ButtonTemplate}"/>
     </Style>
-    
+
+    <Style x:Key="FuncPanelBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="2.5,2.5"/>
+        <Setter Property="Background" Value="{StaticResource FuncPanelBackBrush}"/>
+    </Style>
+
+    <Style x:Key="FuncPanelStyle" TargetType="Panel">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="MaxWidth" Value="{Binding ElementName=WindowBorder, Path=ActualWidth}"/>
+    </Style>
+
+    <Style x:Key="FuncButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+        <Setter Property="Margin" Value="2.5,2.5"/>
+    </Style>
+
     <!--ステータスバー関係-->
 
     <Style x:Key="StatusBarStyle" TargetType="Grid">
@@ -115,7 +130,7 @@
         <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
     </Style>
 
-    <Style x:Key="StatusToggleStyle" TargetType="ToggleButton">
+    <Style x:Key="StatusToggleButtonStyle" TargetType="ToggleButton">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Padding" Value="5,5"></Setter>
         <Setter Property="Background" Value="{StaticResource StatusButtonBackBrush}"/>
@@ -134,7 +149,8 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="StatusFuncButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleStyle}">
+    <Style x:Key="StatusFuncPanelToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleButtonStyle}">
+        <Setter Property="Padding" Value="10,0"/>
         <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
         <Setter Property="Visibility" Value="Visible"/>
         <Style.Triggers>
@@ -143,7 +159,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <!--テンプレート-->
 
     <!--テキスト入力-->
