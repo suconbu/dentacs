@@ -91,12 +91,16 @@
             </Grid>
 
             <Grid Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ToggleButton x:Name="KeypadToggleButton" Content=": : :" Style="{StaticResource StatusKeypadToggleButtonStyle}"
+                                  IsChecked="{Binding RxKeypadVisible.Value}"/>
                     <Button Content="{c:Binding (\'😟\' + RxError.Value)}" Style="{StaticResource StatusErrorTextStyle}"/>
-                    <ToggleButton x:Name="FuncPanelToggleButton" Content=": : :" Style="{StaticResource StatusFuncPanelToggleButtonStyle}"
-                                  IsChecked="{Binding RxFuncPanelVisible.Value}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button HorizontalAlignment="Right" Style="{StaticResource StatusButtonStyle}" ToolTip="{StaticResource StatusCharInfoToolTip}" Click="CharInfo_Click">
                         <Button.Content>
                             <MultiBinding Converter="{StaticResource CharInfoConverter}">
@@ -108,12 +112,13 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Name="FuncPanelRow" Grid.Row="4"
-                  Visibility="{Binding RxFuncPanelVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Border Style="{StaticResource FuncPanelBorderStyle}"
-                        Visibility="{Binding ElementName=FuncButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <WrapPanel Name="FuncPanel" Orientation="Horizontal" Style="{StaticResource FuncPanelStyle}">
-                    </WrapPanel>
+            <Grid Name="KeypadRow" Grid.Row="4"
+                  Visibility="{Binding RxKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Style="{StaticResource KeypadBorderStyle}"
+                        Visibility="{Binding ElementName=KeypadToggleButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid Name="KeypadContainer" Style="{StaticResource KeypadContainerStyle}">
+                        <!--Generate elements here in code behind-->
+                    </Grid>
                 </Border>
             </Grid>
 

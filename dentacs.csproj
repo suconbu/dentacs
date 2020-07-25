@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>Suconbu.Dentacs</RootNamespace>
     <ApplicationIcon>Resource\dentacs.ico</ApplicationIcon>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

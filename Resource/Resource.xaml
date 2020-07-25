@@ -28,10 +28,10 @@
     <SolidColorBrush x:Key="OutputTextBackBrush:Disable" Color="{StaticResource OutputTextBackColor:Disable}"/>
     <SolidColorBrush x:Key="OutputTextForeBrush:Disable" Color="{StaticResource OutputTextForeColor:Disable}"/>
 
-    <Color x:Key="FuncPanelBackColor">#FF383838</Color>
-    <Color x:Key="FuncPanelForeColor">#FFB2B2B2</Color>
-    <SolidColorBrush x:Key="FuncPanelBackBrush" Color="{StaticResource FuncPanelBackColor}"/>
-    <SolidColorBrush x:Key="FuncPanelForeBrush" Color="{StaticResource FuncPanelForeColor}"/>
+    <Color x:Key="KeypadBackColor">#FF383838</Color>
+    <Color x:Key="KeypadForeColor">#FFB2B2B2</Color>
+    <SolidColorBrush x:Key="KeypadBackBrush" Color="{StaticResource KeypadBackColor}"/>
+    <SolidColorBrush x:Key="KeypadForeBrush" Color="{StaticResource KeypadForeColor}"/>
 
     <Color x:Key="ErrorBackColor">#FFCCCC00</Color>
     <Color x:Key="ErrorForeColor">#FF000000</Color>

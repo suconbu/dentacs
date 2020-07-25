@@ -94,19 +94,20 @@
         <Setter Property="Template" Value="{DynamicResource ButtonTemplate}"/>
     </Style>
 
-    <Style x:Key="FuncPanelBorderStyle" TargetType="Border">
+    <Style x:Key="KeypadBorderStyle" TargetType="Border">
         <Setter Property="Padding" Value="2.5,2.5"/>
-        <Setter Property="Background" Value="{StaticResource FuncPanelBackBrush}"/>
+        <Setter Property="Background" Value="{StaticResource KeypadBackBrush}"/>
     </Style>
 
-    <Style x:Key="FuncPanelStyle" TargetType="Panel">
+    <Style x:Key="KeypadContainerStyle" TargetType="Panel">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="MaxWidth" Value="{Binding ElementName=WindowBorder, Path=ActualWidth}"/>
     </Style>
 
-    <Style x:Key="FuncButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+    <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
         <Setter Property="Margin" Value="2.5,2.5"/>
+        <Setter Property="MinWidth" Value="40"/>
     </Style>
 
     <!--ステータスバー関係-->
@@ -149,7 +150,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="StatusFuncPanelToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleButtonStyle}">
+    <Style x:Key="StatusKeypadToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleButtonStyle}">
         <Setter Property="Padding" Value="10,0"/>
         <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
         <Setter Property="Visibility" Value="Visible"/>

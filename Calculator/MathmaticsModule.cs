@@ -9,21 +9,23 @@ namespace Suconbu.Dentacs
     {
         public string Name { get; } = "mathmatics";
 
-        public IReadOnlyDictionary<string, Value> GetConstants()
-        {
-            return new Dictionary<string, Value>()
-            {
-                { "PI", PI },
-            };
-        }
+        public IReadOnlyList<string> GetFunctionNames() => this.functions.Keys.ToList();
+        public IReadOnlyList<string> GetConstantNames() => this.constants.Keys.ToList();
 
-        public static Value PI { get; } = new Value(Math.PI);
+        public Function GetFunction(string name) =>
+            this.functions.TryGetValue(name.ToLower(), out var function) ? function : null;
+        public Value GetConstant(string name) =>
+            this.constants.TryGetValue(name.ToLower(), out var constant) ? constant : null;
 
-        public IReadOnlyDictionary<string, Function> GetFunctions()
+        static Value PI { get; } = new Value(Math.PI);
+
+        readonly Dictionary<string, Function> functions;
+        readonly Dictionary<string, Value> constants;
+
+        public MathmaticsModule()
         {
-            return new Dictionary<string, Function>()
+            this.functions = new Dictionary<string, Function>()
             {
-                { "num", this.Number },
                 { "trunc", this.Truncate },
                 { "round", this.Round },
                 { "floor", this.Floor },
@@ -58,16 +60,10 @@ namespace Suconbu.Dentacs
                 { "avg", this.Average },
                 { "med", this.Median },
             };
-        }
-
-        public Value Number(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "x", ErrorType.InvalidArgument);
-            var v = args[0];
-            return new Value(
-                (v.Type == DataType.String) ? (decimal.TryParse(v.String, out var n) ? n : throw new ErrorException(ErrorType.InvalidArgument)) :
-                (v.Type == DataType.Number) ? v.Number :
-                throw new ErrorException(ErrorType.InvalidDataType));
+            this.constants = new Dictionary<string, Value>()
+            {
+                { "pi", PI }
+            };
         }
 
         public Value Truncate(IReadOnlyList<Value> args)

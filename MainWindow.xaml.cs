@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+//using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -30,7 +32,7 @@ namespace Suconbu.Dentacs
         public ReactiveProperty<bool> RxIsFullScreen { get; private set; }
         public ReactiveProperty<string> RxCurrentText { get; private set; }
         public ReactiveProperty<int> RxSelectionLength { get; private set; }
-        public ReactiveProperty<bool> RxFuncPanelVisible { get; private set; }
+        public ReactiveProperty<bool> RxKeypadVisible { get; private set; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator();
@@ -39,9 +41,80 @@ namespace Suconbu.Dentacs
         int fullScreenZoomIndexBackup = 3;
         double maxWidthBackup = SystemParameters.WorkArea.Width;
 
+        struct KeypadItem
+        {
+            public string Label { get; }
+            public string Value { get; }
+
+            public KeypadItem(string label, string value = null)
+            {
+                this.Label = label;
+                this.Value = value ?? label;
+            }
+        }
+
         static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0 };
         static readonly SolidColorBrush kTransparentBrush = new SolidColorBrush();
         static readonly int kCopyFlashInterval = 100;
+        static readonly KeypadItem[] kKeypadItems = new []
+        {
+            new KeypadItem("7"),
+            new KeypadItem("4"),
+            new KeypadItem("1"),
+            new KeypadItem("BS", "{BACKSPACE}"),
+            
+            new KeypadItem("8"),
+            new KeypadItem("5"),
+            new KeypadItem("2"),
+            new KeypadItem("0"),
+            
+            new KeypadItem("9"),
+            new KeypadItem("6"),
+            new KeypadItem("3"),
+            new KeypadItem("."),
+            
+            new KeypadItem("/"),
+            new KeypadItem("*"),
+            new KeypadItem("-"),
+            new KeypadItem("+"),
+            
+            new KeypadItem("//"),
+            new KeypadItem("**"),
+            new KeypadItem("0x"),
+            new KeypadItem("0b"),
+            
+            new KeypadItem("%"),
+            new KeypadItem("( )", "()"),
+            new KeypadItem("("),
+            new KeypadItem(")"),
+            
+            new KeypadItem("^"),
+            new KeypadItem("~"),
+            new KeypadItem("<<"),
+            new KeypadItem(">>"),
+            
+            new KeypadItem("TRUNC", "TRUNC()"),
+            new KeypadItem("FLOOR", "FLOOR()"),
+            new KeypadItem("CEIL", "CEIL()"),
+            new KeypadItem("ROUND", "ROUND()"),
+            
+            new KeypadItem("SIN", "SIN()"),
+            new KeypadItem("COS", "COS()"),
+            new KeypadItem("TAN", "TAN()"),
+            new KeypadItem("PI"),
+            
+            new KeypadItem("ASIN", "ASIN()"),
+            new KeypadItem("ACOS", "ACOS()"),
+            new KeypadItem("ATAN", "ATAN()"),
+            new KeypadItem("ATAN2", "ATAN2()"),
+            
+            new KeypadItem("LOG10", "LOG10()"),
+            new KeypadItem("LOG2", "LOG2()"),
+            new KeypadItem("LOG", "LOG()"),
+            new KeypadItem("EXP", "EXP()"),
+        };
+        static readonly int kKeypadRowCount = 4;
+        static readonly int kKeypadColumnCount = kKeypadItems.Length / kKeypadRowCount;
 
         public MainWindow()
         {
@@ -64,7 +137,8 @@ namespace Suconbu.Dentacs
             this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
             this.RxCurrentText = new ReactiveProperty<string>();
             this.RxSelectionLength = new ReactiveProperty<int>();
-            this.RxFuncPanelVisible = new ReactiveProperty<bool>();
+            this.RxKeypadVisible = new ReactiveProperty<bool>();
+            this.RxKeypadVisible.Subscribe(x => this.InputTextBox.Focus());
         }
 
         string MakeTitleText()
@@ -77,7 +151,7 @@ namespace Suconbu.Dentacs
         {
             base.OnContentRendered(e);
 
-            this.SetupFuncButtons();
+            this.SetupKeypad();
             this.InputTextBox.Focus();
         }
 
@@ -107,29 +181,57 @@ namespace Suconbu.Dentacs
             }
         }
 
+        protected override void OnChildDesiredSizeChanged(UIElement child)
+        {
+            base.OnChildDesiredSizeChanged(child);
+            Debug.WriteLine(child.GetType());
+        }
+
         void ChangeZoom(int offset)
         {
             this.RxZoomIndex.Value = Math.Clamp(this.RxZoomIndex.Value + offset, 0, kZoomTable.Length - 1);
         }
 
-        void SetupFuncButtons()
+        void SetupKeypad()
         {
-            foreach (var f in this.calculator.GetFunctionNames())
+            for (int i = 0; i < kKeypadRowCount; i++)
             {
-                var name = f.ToUpper();
+                var row = new RowDefinition() { Height = new GridLength(0.0, GridUnitType.Star) };
+                this.KeypadContainer.RowDefinitions.Add(row);
+            }
+            for (int i = 0; i < kKeypadColumnCount; i++)
+            {
+                var column = new ColumnDefinition() { Width = GridLength.Auto };
+                this.KeypadContainer.ColumnDefinitions.Add(column);
+            }
+            for (int i = 0; i < kKeypadItems.Length; i++)
+            {
+                var item = kKeypadItems[i];
                 var button = new Button()
                 {
-                    Content = name,
-                    Style = this.FindResource("FuncButtonStyle") as Style
+                    Content = item.Label,
+                    Style = this.FindResource("KeypadButtonStyle") as Style
                 };
-                button.Click += (s, e) =>
-                {
-                    var index = this.InputTextBox.CaretIndex;
-                    this.InputTextBox.Focus();
-                    this.InputTextBox.Text = this.InputTextBox.Text.Insert(index, name);
-                    this.InputTextBox.CaretIndex = index + name.Length;
-                };
-                this.FuncPanel.Children.Add(button);
+                button.Click += (s, e) => this.KeypadButtonClick(item, this.InputTextBox);
+                Grid.SetRow(button, i % kKeypadRowCount);
+                Grid.SetColumn(button, i / kKeypadRowCount);
+                this.KeypadContainer.Children.Add(button);
+            }
+        }
+
+        void KeypadButtonClick(KeypadItem item, TextBox target)
+        {
+            var value = item.Value;
+            target.Focus();
+            if (value.StartsWith("{") && value.EndsWith("}"))
+            {
+                System.Windows.Forms.SendKeys.SendWait(value);
+            }
+            else
+            {
+                target.SelectedText = value;
+                target.SelectionLength = 0;
+                target.SelectionStart += value.Length;
             }
         }
 

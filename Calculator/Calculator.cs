@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using Memezo = Suconbu.Scripting.Memezo;
 
@@ -46,19 +47,6 @@ namespace Suconbu.Dentacs
             this.memezo.Source = expression;
             this.memezo.Run();
             return this.Error == null;
-        }
-
-        public IEnumerable<string> GetFunctionNames()
-        {
-            var names = new List<string>();
-            foreach(var module in this.memezo.Modules)
-            {
-                foreach(var function in module.GetFunctions())
-                {
-                    names.Add(function.Key);
-                }
-            }
-            return names;
         }
 
         void ClearResult()
