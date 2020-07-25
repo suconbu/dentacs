@@ -229,9 +229,31 @@ namespace Suconbu.Dentacs
             }
             else
             {
-                target.SelectedText = value;
-                target.SelectionLength = 0;
-                target.SelectionStart += value.Length;
+                if (value.EndsWith("()"))
+                {
+                    var name = value.Substring(0, value.Length - 2);
+                    var prevSelectedLength = target.SelectedText.Length;
+                    var selectionEnd = target.SelectionStart + target.SelectionLength;
+                    if (0 < name.Length &&
+                        selectionEnd < target.Text.Length &&
+                        target.Text[selectionEnd] == '(')
+                    {
+                        target.SelectedText = name;
+                        target.SelectionLength = 0;
+                    }
+                    else
+                    {
+                        target.SelectedText = $"{name}({target.SelectedText})";
+                        target.SelectionLength = prevSelectedLength;
+                    }
+                    target.SelectionStart += name.Length + 1;
+                }
+                else
+                {
+                    target.SelectedText = value;
+                    target.SelectionLength = 0;
+                    target.SelectionStart += value.Length;
+                }
             }
         }
 
