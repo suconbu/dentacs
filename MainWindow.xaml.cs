@@ -112,6 +112,11 @@ namespace Suconbu.Dentacs
                 // Toggle full-screen
                 this.RxIsFullScreen.Value = !this.RxIsFullScreen.Value;
             }
+            else if (e.Key == Key.Tab)
+            {
+                // Toggle keypad
+                this.RxKeypadVisible.Value = !this.RxKeypadVisible.Value;
+            }
         }
 
         void ChangeZoom(int offset)

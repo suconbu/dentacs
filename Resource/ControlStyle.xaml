@@ -118,7 +118,8 @@
     <Style x:Key="StatusTextStyle" TargetType="Button">
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
-        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Padding" Value="5,5"/>
+        <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Template" Value="{DynamicResource StatusTextTemplate}"/>
     </Style>
 
