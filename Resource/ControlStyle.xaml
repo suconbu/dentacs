@@ -99,10 +99,9 @@
         <Setter Property="Background" Value="{StaticResource KeypadBackBrush}"/>
     </Style>
 
-    <Style x:Key="KeypadContainerStyle" TargetType="Panel">
+    <Style x:Key="KeypadPanelStyle" TargetType="Panel">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="MaxWidth" Value="{Binding ElementName=WindowBorder, Path=ActualWidth}"/>
     </Style>
 
     <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
@@ -141,24 +140,14 @@
     <Style x:Key="StatusErrorTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
         <Setter Property="Background" Value="{StaticResource ErrorBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ErrorForeBrush}"/>
-        <Setter Property="Margin" Value="0,0,10,0"/>
-        <Setter Property="Visibility" Value="Collapsed"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="StatusUsageTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
     </Style>
 
     <Style x:Key="StatusKeypadToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleButtonStyle}">
         <Setter Property="Padding" Value="10,0"/>
         <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
-        <Setter Property="Visibility" Value="Visible"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RxErrorState.Value}" Value="ErrorWithMessage">
-                <Setter Property="Visibility" Value="Collapsed"/>
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
 
     <!--テンプレート-->
