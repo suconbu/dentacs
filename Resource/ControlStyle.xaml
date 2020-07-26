@@ -106,7 +106,7 @@
 
     <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
         <Setter Property="Margin" Value="2.5,2.5"/>
-        <Setter Property="MinWidth" Value="40"/>
+        <Setter Property="MinWidth" Value="{c:Binding 40 * RxMildZoomRatio.Value}"/>
     </Style>
 
     <!--ステータスバー関係-->
@@ -127,15 +127,16 @@
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
-        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Padding" Value="10,5"></Setter>
         <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
     </Style>
 
     <Style x:Key="StatusToggleButtonStyle" TargetType="ToggleButton">
         <Setter Property="IsTabStop" Value="False"/>
-        <Setter Property="Padding" Value="5,5"></Setter>
+        <Setter Property="Padding" Value="10,5"></Setter>
         <Setter Property="Background" Value="{StaticResource StatusButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource StatusButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
     </Style>
 
     <Style x:Key="StatusErrorTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
@@ -144,11 +145,7 @@
     </Style>
 
     <Style x:Key="StatusUsageTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
-    </Style>
-
-    <Style x:Key="StatusKeypadToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource StatusToggleButtonStyle}">
-        <Setter Property="Padding" Value="10,0"/>
-        <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
+        <Setter Property="Button.FontSize" Value="{c:Binding 11.5 * RxMildZoomRatio.Value}"></Setter>
     </Style>
 
     <!--テンプレート-->

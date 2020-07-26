@@ -24,6 +24,7 @@
             (Click to copy to clipboard)
             </TextBlock>
         </ToolTip>
+        <ToolTip x:Key="KeypadSwitchButtonTooltip" Content="Open/Close Keypad (Tab)"/>
         <local:ResultConverter x:Key="ResultConverter"/>
         <local:CharInfoConverter x:Key="CharInfoConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -46,7 +47,7 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Name="CaptionRow" Grid.Row="0" Height="{StaticResource CaptionHeight}"
+            <Grid Grid.Row="0" Height="{StaticResource CaptionHeight}"
                   Visibility="{Binding RxCaptionVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionStyle}"
                             PreviewMouseLeftButtonDown="Caption_PreviewMouseLeftButtonDown">
@@ -69,7 +70,7 @@
                 <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
-                        Visibility="{Binding RxFullScreenEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Visibility="{Binding RxFullScreenEnabled.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Click="FullScreenCloseButton_Click"/>
             </Grid>
 
@@ -93,15 +94,16 @@
                 <Button Name="BinButton" Content="BIN" Grid.Column="1" Style="{StaticResource ButtonStyle}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
             </Grid>
 
-            <Grid Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}"
+            <Grid Grid.Row="3" Style="{StaticResource StatusBarStyle}"
                   Visibility="{Binding RxStatusVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,10,0">
-                    <ToggleButton x:Name="KeypadToggleButton" Content=": : :" Style="{StaticResource StatusKeypadToggleButtonStyle}"
-                                  IsChecked="{Binding RxKeypadEnabled.Value}"/>
+                    <ToggleButton Content=": : :" Style="{StaticResource StatusToggleButtonStyle}"
+                                  IsChecked="{Binding RxKeypadEnabled.Value}"
+                                  ToolTip="{StaticResource KeypadSwitchButtonTooltip}"/>
                     <Grid>
                         <Button Content="{Binding RxUsageText.Value}" Style="{StaticResource StatusUsageTextStyle}"
                                 Visibility="{Binding RxUsageText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>
@@ -123,8 +125,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Name="KeypadRow" Grid.Row="4"
-                  Visibility="{Binding RxKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid Grid.Row="4" Visibility="{Binding RxKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <local:KeypadPanel x:Name="KeypadPanel"/>
             </Grid>
 

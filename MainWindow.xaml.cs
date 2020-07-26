@@ -69,6 +69,7 @@ namespace Suconbu.Dentacs
             this.RxFullScreenEnabled = new ReactiveProperty<bool>(false);
             this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
             this.RxKeypadEnabled = new ReactiveProperty<bool>();
+            this.RxKeypadEnabled.Subscribe(x => this.InputTextBox.Focus());
             this.RxCurrentText = new ReactiveProperty<string>();
             this.RxSelectionLength = new ReactiveProperty<int>();
 
@@ -78,7 +79,6 @@ namespace Suconbu.Dentacs
             this.RxKeypadVisible = Observable.CombineLatest(
                 this.RxFullScreenEnabled, this.RxKeypadEnabled, (f, k) => !f && k)
                 .ToReadOnlyReactivePropertySlim();
-            this.RxKeypadVisible.Subscribe(x => this.InputTextBox.Focus());
 
             this.KeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
             this.KeypadPanel.ItemMouseLeave += (s, item) => { this.RxUsageText.Value = null; };
@@ -112,10 +112,16 @@ namespace Suconbu.Dentacs
         {
             base.OnPreviewKeyDown(e);
 
-            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            var handled = true;
+            var control = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+
+            if (control && e.Key == Key.PageUp)
             {
-                if (e.Key == Key.PageUp) this.ChangeZoom(+1);
-                if (e.Key == Key.PageDown) this.ChangeZoom(-1);
+                this.ChangeZoom(+1);
+            }
+            else if (control && e.Key == Key.PageDown)
+            {
+                this.ChangeZoom(-1);
             }
             else if (e.Key == Key.F11)
             {
@@ -127,6 +133,12 @@ namespace Suconbu.Dentacs
                 // Toggle keypad
                 this.RxKeypadEnabled.Value = !this.RxKeypadEnabled.Value;
             }
+            else
+            {
+                handled = false;
+            }
+
+            e.Handled = handled;
         }
 
         void ChangeZoom(int offset)
