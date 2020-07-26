@@ -46,7 +46,8 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Name="CaptionRow" Grid.Row="0" Height="{StaticResource CaptionHeight}">
+            <Grid Name="CaptionRow" Grid.Row="0" Height="{StaticResource CaptionHeight}"
+                  Visibility="{Binding RxCaptionVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionStyle}"
                             PreviewMouseLeftButtonDown="Caption_PreviewMouseLeftButtonDown">
                     <Image Style="{StaticResource CaptionIconStyle}"/>
@@ -68,6 +69,7 @@
                 <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
+                        Visibility="{Binding RxFullScreenEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Click="FullScreenCloseButton_Click"/>
             </Grid>
 
@@ -91,14 +93,15 @@
                 <Button Name="BinButton" Content="BIN" Grid.Column="1" Style="{StaticResource ButtonStyle}" Command="{x:Static local:MainWindow.CopyCommand}" CommandParameter="{Binding ElementName=BinResult}" Grid.Row="2"/>
             </Grid>
 
-            <Grid Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}">
+            <Grid Name="StatusRow" Grid.Row="3" Style="{StaticResource StatusBarStyle}"
+                  Visibility="{Binding RxStatusVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,10,0">
                     <ToggleButton x:Name="KeypadToggleButton" Content=": : :" Style="{StaticResource StatusKeypadToggleButtonStyle}"
-                                  IsChecked="{Binding RxKeypadVisible.Value}"/>
+                                  IsChecked="{Binding RxKeypadEnabled.Value}"/>
                     <Grid>
                         <Button Content="{Binding RxUsageText.Value}" Style="{StaticResource StatusUsageTextStyle}"
                                 Visibility="{Binding RxUsageText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>

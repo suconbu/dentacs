@@ -29,10 +29,13 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<double> RxMildZoomRatio { get; }
         public ReactiveProperty<int> RxZoomIndex { get; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; }
-        public ReactiveProperty<bool> RxIsFullScreen { get; }
+        public ReactiveProperty<bool> RxFullScreenEnabled { get; }
+        public ReactiveProperty<bool> RxKeypadEnabled { get; }
         public ReactiveProperty<string> RxCurrentText { get; }
         public ReactiveProperty<int> RxSelectionLength { get; }
-        public ReactiveProperty<bool> RxKeypadVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxCaptionVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxStatusVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxKeypadVisible { get; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator();
@@ -63,11 +66,18 @@ namespace Suconbu.Dentacs
             this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReactiveProperty();
             this.RxMildZoomRatio = this.RxZoomRatio.Select(x => ((3 - 1) + x) / 3).ToReadOnlyReactivePropertySlim();
             this.RxTitleText = this.RxZoomRatio.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
-            this.RxIsFullScreen = new ReactiveProperty<bool>(false);
-            this.RxIsFullScreen.Subscribe(x => this.SetFullScreen(x));
+            this.RxFullScreenEnabled = new ReactiveProperty<bool>(false);
+            this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
+            this.RxKeypadEnabled = new ReactiveProperty<bool>();
             this.RxCurrentText = new ReactiveProperty<string>();
             this.RxSelectionLength = new ReactiveProperty<int>();
-            this.RxKeypadVisible = new ReactiveProperty<bool>();
+
+            this.RxCaptionVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
+            this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
+            this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
+            this.RxKeypadVisible = Observable.CombineLatest(
+                this.RxFullScreenEnabled, this.RxKeypadEnabled, (f, k) => !f && k)
+                .ToReadOnlyReactivePropertySlim();
             this.RxKeypadVisible.Subscribe(x => this.InputTextBox.Focus());
 
             this.KeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
@@ -110,12 +120,12 @@ namespace Suconbu.Dentacs
             else if (e.Key == Key.F11)
             {
                 // Toggle full-screen
-                this.RxIsFullScreen.Value = !this.RxIsFullScreen.Value;
+                this.RxFullScreenEnabled.Value = !this.RxFullScreenEnabled.Value;
             }
             else if (e.Key == Key.Tab)
             {
                 // Toggle keypad
-                this.RxKeypadVisible.Value = !this.RxKeypadVisible.Value;
+                this.RxKeypadEnabled.Value = !this.RxKeypadEnabled.Value;
             }
         }
 
@@ -163,7 +173,7 @@ namespace Suconbu.Dentacs
             }
         }
 
-        void SetFullScreen(bool enable)
+        void IsFullScreenChanged(bool enable)
         {
             if (enable)
             {
@@ -171,9 +181,6 @@ namespace Suconbu.Dentacs
                 this.RxZoomIndex.Value = this.fullScreenZoomIndexBackup;
                 this.maxWidthBackup = this.MaxWidth;
                 this.MaxWidth = Double.PositiveInfinity;
-                this.CaptionRow.Visibility = Visibility.Collapsed;
-                this.StatusRow.Visibility = Visibility.Collapsed;
-                this.FullScreenCloseButton.Visibility = Visibility.Visible;
                 this.WindowBorder.BorderThickness = new Thickness(0);
                 this.SizeToContent = SizeToContent.Manual;
                 //this.WindowStyle = WindowStyle.None;
@@ -191,9 +198,6 @@ namespace Suconbu.Dentacs
                 this.SizeToContent = SizeToContent.WidthAndHeight;
                 this.Topmost = true;
                 this.MaxWidth = this.maxWidthBackup;
-                this.CaptionRow.Visibility = Visibility.Visible;
-                this.StatusRow.Visibility = Visibility.Visible;
-                this.FullScreenCloseButton.Visibility = Visibility.Collapsed;
                 this.WindowBorder.BorderThickness = new Thickness(1);
                 this.RxZoomIndex.Value = this.zoomIndexBackup;
             }
@@ -283,7 +287,7 @@ namespace Suconbu.Dentacs
 
         private void FullScreenCloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.RxIsFullScreen.Value = false;
+            this.RxFullScreenEnabled.Value = false;
         }
 
         private void Caption_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -298,7 +302,7 @@ namespace Suconbu.Dentacs
 
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
-            this.RxIsFullScreen.Value = true;
+            this.RxFullScreenEnabled.Value = true;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
