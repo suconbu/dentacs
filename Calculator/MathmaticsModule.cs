@@ -9,21 +9,13 @@ namespace Suconbu.Dentacs
     {
         public string Name { get; } = "mathmatics";
 
-        public IReadOnlyDictionary<string, Value> GetConstants()
-        {
-            return new Dictionary<string, Value>()
-            {
-                { "PI", PI },
-            };
-        }
+        public IReadOnlyDictionary<string, Function> Functions { get; }
+        public IReadOnlyDictionary<string, Value> Constants { get; }
 
-        public static Value PI { get; } = new Value(Math.PI);
-
-        public IReadOnlyDictionary<string, Function> GetFunctions()
+        public MathmaticsModule()
         {
-            return new Dictionary<string, Function>()
+            this.Functions = new Dictionary<string, Function>()
             {
-                { "num", this.Number },
                 { "trunc", this.Truncate },
                 { "round", this.Round },
                 { "floor", this.Floor },
@@ -58,16 +50,11 @@ namespace Suconbu.Dentacs
                 { "avg", this.Average },
                 { "med", this.Median },
             };
-        }
-
-        public Value Number(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "x", ErrorType.InvalidArgument);
-            var v = args[0];
-            return new Value(
-                (v.Type == DataType.String) ? (decimal.TryParse(v.String, out var n) ? n : throw new ErrorException(ErrorType.InvalidArgument)) :
-                (v.Type == DataType.Number) ? v.Number :
-                throw new ErrorException(ErrorType.InvalidDataType));
+            this.Constants = new Dictionary<string, Value>()
+            {
+                { "PI", new Value(Math.PI) },
+                { "E", new Value(Math.E) }
+            };
         }
 
         public Value Truncate(IReadOnlyList<Value> args)

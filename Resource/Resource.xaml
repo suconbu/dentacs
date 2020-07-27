@@ -21,28 +21,51 @@
 
     <Color x:Key="OutputTextBackColor">#FF383838</Color>
     <Color x:Key="OutputTextForeColor">#FFB2B2B2</Color>
-    <Color x:Key="OutputTextBackColor:Disable">#FF333333</Color>
-    <Color x:Key="OutputTextForeColor:Disable">#FF5F5F5F</Color>
+    <Color x:Key="OutputTextBackColor:Disable">#FF383838</Color>
+    <Color x:Key="OutputTextForeColor:Disable">#FF5C5C5C</Color>
     <SolidColorBrush x:Key="OutputTextBackBrush" Color="{StaticResource OutputTextBackColor}"/>
     <SolidColorBrush x:Key="OutputTextForeBrush" Color="{StaticResource OutputTextForeColor}"/>
     <SolidColorBrush x:Key="OutputTextBackBrush:Disable" Color="{StaticResource OutputTextBackColor:Disable}"/>
     <SolidColorBrush x:Key="OutputTextForeBrush:Disable" Color="{StaticResource OutputTextForeColor:Disable}"/>
+
+    <Color x:Key="KeypadBackColor">#FF383838</Color>
+    <Color x:Key="KeypadForeColor">#FFB2B2B2</Color>
+    <SolidColorBrush x:Key="KeypadBackBrush" Color="{StaticResource KeypadBackColor}"/>
+    <SolidColorBrush x:Key="KeypadForeBrush" Color="{StaticResource KeypadForeColor}"/>
 
     <Color x:Key="ErrorBackColor">#FFCCCC00</Color>
     <Color x:Key="ErrorForeColor">#FF000000</Color>
     <SolidColorBrush x:Key="ErrorBackBrush" Color="{StaticResource ErrorBackColor}"/>
     <SolidColorBrush x:Key="ErrorForeBrush" Color="{StaticResource ErrorForeColor}"/>
 
-    <Color x:Key="ButtonBackColor">#FF4D4D4D</Color>
+    <Color x:Key="ButtonBackColor">#FF292929</Color>
     <Color x:Key="ButtonForeColor">#FFB2B2B2</Color>
-    <Color x:Key="ButtonBackColor:Hover">#FF5C5C5C</Color>
+    <Color x:Key="ButtonBackColor:Hover">#FF333333</Color>
     <Color x:Key="ButtonForeColor:Hover">#FFFFFFFF</Color>
-    <Color x:Key="ButtonBackColor:Press">#FF858585</Color>
+    <Color x:Key="ButtonBackColor:Press">#FF5C5C5C</Color>
     <Color x:Key="ButtonForeColor:Press">#FFFFFFFF</Color>
     <Color x:Key="ButtonBackColor:Disable">#FF292929</Color>
-    <Color x:Key="ButtonForeColor:Disable">#FF5F5F5F</Color>
+    <Color x:Key="ButtonForeColor:Disable">#FF5C5C5C</Color>
     <SolidColorBrush x:Key="ButtonBackBrush" Color="{StaticResource ButtonBackColor}"/>
     <SolidColorBrush x:Key="ButtonForeBrush" Color="{StaticResource ButtonForeColor}"/>
+
+    <Color x:Key="StatusButtonBackColor">#00000000</Color>
+    <Color x:Key="StatusButtonForeColor">#FFB2B2B2</Color>
+    <Color x:Key="StatusButtonBackColor:Hover">#0CFFFFFF</Color>
+    <Color x:Key="StatusButtonForeColor:Hover">#FFFFFFFF</Color>
+    <Color x:Key="StatusButtonBackColor:Press">#FF5C5C5C</Color>
+    <Color x:Key="StatusButtonForeColor:Press">#FFFFFFFF</Color>
+    <Color x:Key="StatusButtonBackColor:Checked">#FF5C5C5C</Color>
+    <Color x:Key="StatusButtonForeColor:Checked">#FFFFFFFF</Color>
+    <Color x:Key="StatusButtonBackColor:Disable">#00000000</Color>
+    <Color x:Key="StatusButtonForeColor:Disable">#FF5C5C5C</Color>
+    <SolidColorBrush x:Key="StatusButtonBackBrush" Color="{StaticResource StatusButtonBackColor}"/>
+    <SolidColorBrush x:Key="StatusButtonForeBrush" Color="{StaticResource StatusButtonForeColor}"/>
+
+    <Color x:Key="ClearButtonBackColor">#992D3A</Color>
+    <Color x:Key="ClearButtonForeColor">#FFB2B2B2</Color>
+    <SolidColorBrush x:Key="ClearButtonBackBrush" Color="{StaticResource ClearButtonBackColor}"/>
+    <SolidColorBrush x:Key="ClearButtonForeBrush" Color="{StaticResource ClearButtonForeColor}"/>
 
     <Duration x:Key="ButtonFadeInDuration">00:00:00</Duration>
     <Duration x:Key="ButtonFadeOutDuration">00:00:00</Duration>
@@ -59,7 +82,7 @@
     <Color x:Key="CaptionButtonBackColor:Press">#FF858585</Color>
     <Color x:Key="CaptionButtonForeColor:Press">#FFFFFFFF</Color>
     <Color x:Key="CaptionButtonBackColor:Disable">#FF292929</Color>
-    <Color x:Key="CaptionButtonForeColor:Disable">#FF5F5F5F</Color>
+    <Color x:Key="CaptionButtonForeColor:Disable">#FF5C5C5C</Color>
     <SolidColorBrush x:Key="CaptionButtonBackBrush" Color="{StaticResource CaptionButtonBackColor}"/>
     <SolidColorBrush x:Key="CaptionButtonForeBrush" Color="{StaticResource CaptionButtonForeColor}"/>
 
@@ -70,7 +93,7 @@
     <Color x:Key="CaptionCloseButtonBackColor:Press">#FFF1707A</Color>
     <Color x:Key="CaptionCloseButtonForeColor:Press">#FF000000</Color>
     <Color x:Key="CaptionCloseButtonBackColor:Disable">#FF292929</Color>
-    <Color x:Key="CaptionCloseButtonForeColor:Disable">#FF5F5F5F</Color>
+    <Color x:Key="CaptionCloseButtonForeColor:Disable">#FF5C5C5C</Color>
     <SolidColorBrush x:Key="CaptionCloseButtonBackBrush" Color="{StaticResource CaptionCloseButtonBackColor}"/>
     <SolidColorBrush x:Key="CaptionCloseButtonForeBrush" Color="{StaticResource CaptionCloseButtonForeColor}"/>
 

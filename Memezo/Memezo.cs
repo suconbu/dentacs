@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace Suconbu.Scripting.Memezo
@@ -54,7 +55,7 @@ namespace Suconbu.Scripting.Memezo
             { TokenType.And, 2 },
             { TokenType.Or, 1 }
         };
-        public List<IModule> modules = new List<IModule>();
+        List<IModule> modules = new List<IModule>();
 
         public Interpreter() { }
 
@@ -488,7 +489,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if (module.GetFunctions().TryGetValue(name, out function)) return true;
+                if (module.Functions.TryGetValue(name, out function)) return true;
             }
             function = null;
             return false;
@@ -498,7 +499,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if (module.GetConstants().TryGetValue(name, out value)) return true;
+                if (module.Constants.TryGetValue(name, out value)) return true;
             }
             value = null;
             return false;
@@ -553,9 +554,9 @@ namespace Suconbu.Scripting.Memezo
 
     public interface IModule
     {
-        string Name { get; }
-        abstract IReadOnlyDictionary<string, Function> GetFunctions();
-        abstract IReadOnlyDictionary<string, Value> GetConstants();
+        public string Name { get; }
+        public IReadOnlyDictionary<string, Function> Functions { get; }
+        public IReadOnlyDictionary<string, Value> Constants { get; }
     }
 
     public class RunStat
@@ -604,9 +605,9 @@ namespace Suconbu.Scripting.Memezo
     {
         public static readonly Value Zero = new Value(0m);
 
-        public DataType Type { get; private set; }
-        public decimal Number { get; private set; }
-        public string String { get; private set; }
+        public DataType Type { get; }
+        public decimal Number { get; }
+        public string String { get; }
 
         public Value(decimal n) : this()
         {

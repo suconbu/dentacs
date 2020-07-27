@@ -12,6 +12,14 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="KeypadPanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="KeypadPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Resource\ControlStyle.xaml">
       <SubType>Designer</SubType>
     </Page>
