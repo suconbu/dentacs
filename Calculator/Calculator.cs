@@ -26,7 +26,7 @@ namespace Suconbu.Dentacs
                     e.Type == Memezo.ErrorType.MissingToken ||
                     e.Type == Memezo.ErrorType.UnknownError)
                 {
-                    this.Error = string.Empty;
+                    this.Error = this.Error ?? string.Empty;
                 }
                 else
                 {
