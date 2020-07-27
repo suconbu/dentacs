@@ -104,9 +104,20 @@
         <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
 
+    <Style x:Key="KeypadButtonBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="2.5,2.5"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
     <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
-        <Setter Property="Margin" Value="2.5,2.5"/>
+        <!--<Setter Property="Padding" Value="2.5,2.5"/>-->
         <Setter Property="MinWidth" Value="{c:Binding 40 * RxMildZoomRatio.Value}"/>
+    </Style>
+
+    <Style x:Key="KeypadClearButtonStyle" TargetType="Button" BasedOn="{StaticResource KeypadButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource ClearButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ClearButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
     </Style>
 
     <!--ステータスバー関係-->
@@ -451,7 +462,7 @@
 
     <!--キャプションの閉じるボタン-->
     <ControlTemplate x:Key="CaptionCloseButtonTemplate" TargetType="{x:Type Button}">
-        <Grid x:Name="Grid" SnapsToDevicePixels="True" Background="{StaticResource CaptionCloseButtonBackBrush}">
+        <Grid x:Name="Grid" SnapsToDevicePixels="True" Background="{TemplateBinding Background}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">
                     <VisualState x:Name="Normal">
@@ -459,11 +470,11 @@
                             <ColorAnimation
                                 Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
                                 Duration="{StaticResource CaptionButtonFadeOutDuration}"
-                                To="{StaticResource CaptionCloseButtonBackColor}"/>
+                                To="{TemplateBinding Background}"/>
                             <ColorAnimation
                                 Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
                                 Duration="{StaticResource CaptionButtonFadeOutDuration}"
-                                To="{StaticResource CaptionCloseButtonForeColor}"/>
+                                To="{TemplateBinding Foreground}"/>
                         </Storyboard>
                     </VisualState>
                     <VisualState x:Name="MouseOver">

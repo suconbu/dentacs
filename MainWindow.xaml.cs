@@ -36,15 +36,17 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<bool> RxCaptionVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxStatusVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxKeypadVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxErrorTextVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxCharInfoVisible { get; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator();
         int lastLineIndex = -1;
         int zoomIndexBackup = 0;
-        int fullScreenZoomIndexBackup = 3;
+        int fullScreenZoomIndexBackup = 4;
         double maxWidthBackup = SystemParameters.WorkArea.Width;
 
-        static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0 };
+        static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0, 4.0 };
         static readonly SolidColorBrush kTransparentBrush = new SolidColorBrush();
         static readonly int kCopyFlashInterval = 100;
 
@@ -75,9 +77,12 @@ namespace Suconbu.Dentacs
 
             this.RxCaptionVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
             this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
-            this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
+            this.RxCharInfoVisible = this.RxUsageText.Select(x => string.IsNullOrEmpty(x)).ToReadOnlyReactivePropertySlim();
             this.RxKeypadVisible = Observable.CombineLatest(
                 this.RxFullScreenEnabled, this.RxKeypadEnabled, (f, k) => !f && k)
+                .ToReadOnlyReactivePropertySlim();
+            this.RxErrorTextVisible = Observable.CombineLatest(
+                this.RxErrorText, this.RxUsageText, (e, u) => !string.IsNullOrEmpty(e) && string.IsNullOrEmpty(u))
                 .ToReadOnlyReactivePropertySlim();
 
             this.KeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
@@ -151,9 +156,21 @@ namespace Suconbu.Dentacs
             var target = this.InputTextBox;
             var data = item.Data;
             target.Focus();
-            if (item.DataType == KeypadPanel.Item.Type.Key)
+            if (item.Command == KeypadPanel.Command.BackSpace)
             {
-                System.Windows.Forms.SendKeys.SendWait(data);
+                System.Windows.Forms.SendKeys.SendWait("{BACKSPACE}");
+            }
+            else if (item.Command == KeypadPanel.Command.Undo)
+            {
+                target.Undo();
+            }
+            else if (item.Command == KeypadPanel.Command.Redo)
+            {
+                target.Redo();
+            }
+            else if (item.Command == KeypadPanel.Command.Clear)
+            {
+                target.Clear();
             }
             else
             {

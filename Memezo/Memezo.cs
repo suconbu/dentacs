@@ -489,7 +489,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if ((function = module.GetFunction(name)) != null) return true;
+                if (module.Functions.TryGetValue(name, out function)) return true;
             }
             function = null;
             return false;
@@ -499,7 +499,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if ((value = module.GetConstant(name)) != null) return true;
+                if (module.Constants.TryGetValue(name, out value)) return true;
             }
             value = null;
             return false;
@@ -555,10 +555,8 @@ namespace Suconbu.Scripting.Memezo
     public interface IModule
     {
         public string Name { get; }
-        public IReadOnlyList<string> GetFunctionNames();
-        public IReadOnlyList<string> GetConstantNames();
-        public Function GetFunction(string name);
-        public Value GetConstant(string name);
+        public IReadOnlyDictionary<string, Function> Functions { get; }
+        public IReadOnlyDictionary<string, Value> Constants { get; }
     }
 
     public class RunStat

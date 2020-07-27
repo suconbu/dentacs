@@ -9,22 +9,12 @@ namespace Suconbu.Dentacs
     {
         public string Name { get; } = "mathmatics";
 
-        public IReadOnlyList<string> GetFunctionNames() => this.functions.Keys.ToList();
-        public IReadOnlyList<string> GetConstantNames() => this.constants.Keys.ToList();
-
-        public Function GetFunction(string name) =>
-            this.functions.TryGetValue(name.ToLower(), out var function) ? function : null;
-        public Value GetConstant(string name) =>
-            this.constants.TryGetValue(name.ToLower(), out var constant) ? constant : null;
-
-        static Value PI { get; } = new Value(Math.PI);
-
-        readonly Dictionary<string, Function> functions;
-        readonly Dictionary<string, Value> constants;
+        public IReadOnlyDictionary<string, Function> Functions { get; }
+        public IReadOnlyDictionary<string, Value> Constants { get; }
 
         public MathmaticsModule()
         {
-            this.functions = new Dictionary<string, Function>()
+            this.Functions = new Dictionary<string, Function>()
             {
                 { "trunc", this.Truncate },
                 { "round", this.Round },
@@ -60,9 +50,10 @@ namespace Suconbu.Dentacs
                 { "avg", this.Average },
                 { "med", this.Median },
             };
-            this.constants = new Dictionary<string, Value>()
+            this.Constants = new Dictionary<string, Value>()
             {
-                { "pi", PI }
+                { "PI", new Value(Math.PI) },
+                { "E", new Value(Math.E) }
             };
         }
 

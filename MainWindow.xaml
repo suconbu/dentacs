@@ -109,11 +109,12 @@
                                 Visibility="{Binding RxUsageText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <StackPanel Orientation="Horizontal">
                             <Button Content="{c:Binding (\'😟\' + RxErrorText.Value)}" Style="{StaticResource StatusErrorTextStyle}"
-                                    Visibility="{Binding RxErrorText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                    Visibility="{Binding RxErrorTextVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                            Visibility="{Binding RxCharInfoVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Button HorizontalAlignment="Right" Style="{StaticResource StatusButtonStyle}" ToolTip="{StaticResource StatusCharInfoToolTip}" Click="CharInfo_Click">
                         <Button.Content>
                             <MultiBinding Converter="{StaticResource CharInfoConverter}">
