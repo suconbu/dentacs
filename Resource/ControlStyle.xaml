@@ -2,14 +2,19 @@
                     xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!--キャプション関係-->
+    <!--Caption row-->
 
-    <Style x:Key="CaptionStyle" TargetType="{x:Type StackPanel}">
+    <Style x:Key="CaptionRowStyle" TargetType="Grid">
         <Setter Property="TextBlock.FontFamily" Value="{x:Static SystemFonts.CaptionFontFamily}"/>
         <Setter Property="TextBlock.FontSize" Value="16"/>
+        <Setter Property="Height" Value="{StaticResource CaptionHeight}"/>
+        <Setter Property="Background" Value="{StaticResource CaptionBackBrush}"/>
+    </Style>
+
+    <Style x:Key="CaptionPanelStyle" TargetType="StackPanel">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="Background" Value="{StaticResource CaptionBackBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="TextBlock.Foreground" Value="{StaticResource CaptionForeBrush}"/>
     </Style>
 
@@ -50,8 +55,11 @@
         <Setter Property="Foreground" Value="{StaticResource CaptionCloseButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
     </Style>
-    
-    <!--本体で使うもの-->
+
+    <!--Input row-->
+
+    <Style x:Key="InputRowStyle" TargetType="Grid">
+    </Style>
 
     <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
@@ -62,8 +70,10 @@
         <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
     </Style>
 
+    <!--Result row-->
+
     <Style x:Key="ResultRowStyle" TargetType="Grid">
-        <Setter Property="Background" Value="{StaticResource ResultRowBackBrush}"/>
+        <Setter Property="Background" Value="{StaticResource ResultTextBackBrush}"/>
     </Style>
 
     <Style x:Key="ResultTextBoxStyle" TargetType="TextBox">
@@ -79,7 +89,7 @@
         <Setter Property="TextWrapping" Value="NoWrap"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="MaxLines" Value="2"/>
-        <Setter Property="Background" Value="{StaticResource ResultTextBackBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource ResultTextForeBrush:Disable}"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RxErrorState.Value}" Value="None">
@@ -98,33 +108,7 @@
         <Setter Property="Template" Value="{DynamicResource ButtonTemplate}"/>
     </Style>
 
-    <Style x:Key="KeypadBorderStyle" TargetType="Border">
-        <Setter Property="Padding" Value="2.5,2.5"/>
-        <Setter Property="Background" Value="{StaticResource KeypadBackBrush}"/>
-    </Style>
-
-    <Style x:Key="KeypadPanelStyle" TargetType="Panel">
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-    </Style>
-
-    <Style x:Key="KeypadButtonBorderStyle" TargetType="Border">
-        <Setter Property="Padding" Value="2.5,2.5"/>
-        <Setter Property="Background" Value="Transparent"/>
-    </Style>
-
-    <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
-        <!--<Setter Property="Padding" Value="2.5,2.5"/>-->
-        <Setter Property="MinWidth" Value="{c:Binding 40 * RxMildZoomRatio.Value}"/>
-    </Style>
-
-    <Style x:Key="KeypadClearButtonStyle" TargetType="Button" BasedOn="{StaticResource KeypadButtonStyle}">
-        <Setter Property="Background" Value="{StaticResource ClearButtonBackBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource ClearButtonForeBrush}"/>
-        <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
-    </Style>
-
-    <!--ステータスバー関係-->
+    <!--Status row-->
 
     <Style x:Key="StatusRowStyle" TargetType="Grid">
         <Setter Property="Button.FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
@@ -163,9 +147,38 @@
         <Setter Property="Button.FontSize" Value="{c:Binding 11.5 * RxMildZoomRatio.Value}"></Setter>
     </Style>
 
-    <!--テンプレート-->
+    <!--Keypad row-->
 
-    <!--テキスト入力-->
+    <Style x:Key="KeypadRowStyle" TargetType="Grid">
+    </Style>
+
+    <Style x:Key="KeypadBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="2.5,2.5"/>
+        <Setter Property="Background" Value="{StaticResource KeypadBackBrush}"/>
+    </Style>
+
+    <Style x:Key="KeypadPanelStyle" TargetType="Panel">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+
+    <Style x:Key="KeypadButtonBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="2.5,2.5"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+        <Setter Property="MinWidth" Value="{c:Binding 40 * RxMildZoomRatio.Value}"/>
+    </Style>
+
+    <Style x:Key="KeypadClearButtonStyle" TargetType="Button" BasedOn="{StaticResource KeypadButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource ClearButtonBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ClearButtonForeBrush}"/>
+        <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
+    </Style>
+
+    <!--Templates-->
+
     <ControlTemplate x:Key="InputTextTemplate" TargetType="{x:Type TextBoxBase}">
         <Border
             Background="{TemplateBinding Background}"
@@ -175,7 +188,6 @@
         </Border>
     </ControlTemplate>
 
-    <!--ステータスバー用の押せるテキスト-->
     <ControlTemplate x:Key="StatusTextTemplate" TargetType="{x:Type Button}">
         <TextBlock
             Background="{TemplateBinding Background}"
@@ -188,7 +200,6 @@
         </TextBlock>
     </ControlTemplate>
 
-    <!--ステータスバー用のボタン-->
     <ControlTemplate x:Key="StatusButtonTemplate" TargetType="{x:Type Button}">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
@@ -263,7 +274,6 @@
         </Border>
     </ControlTemplate>
 
-    <!--ステータスバー用のトグルボタン-->
     <ControlTemplate x:Key="StatusToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
@@ -338,7 +348,6 @@
         </Border>
     </ControlTemplate>
 
-    <!--ボタン-->
     <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type Button}">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
@@ -401,7 +410,6 @@
         </Border>
     </ControlTemplate>
 
-    <!--キャプションの閉じる以外のボタン-->
     <ControlTemplate x:Key="CaptionButtonTemplate" TargetType="{x:Type Button}">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
@@ -464,7 +472,6 @@
         </Border>
     </ControlTemplate>
 
-    <!--キャプションの閉じるボタン-->
     <ControlTemplate x:Key="CaptionCloseButtonTemplate" TargetType="{x:Type Button}">
         <Grid x:Name="Grid" SnapsToDevicePixels="True" Background="{TemplateBinding Background}">
             <VisualStateManager.VisualStateGroups>

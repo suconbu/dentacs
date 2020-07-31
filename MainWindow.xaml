@@ -43,10 +43,10 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Height="{StaticResource CaptionHeight}"
-                  Visibility="{Binding RxCaptionVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionStyle}"
-                            PreviewMouseLeftButtonDown="Caption_PreviewMouseLeftButtonDown">
+            <Grid Grid.Row="0" Style="{StaticResource CaptionRowStyle}"
+                  Visibility="{Binding RxCaptionVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  MouseLeftButtonDown="Caption_MouseLeftButtonDown">
+                <StackPanel Orientation="Horizontal" Style="{StaticResource CaptionPanelStyle}">
                     <Image Style="{StaticResource CaptionIconStyle}"/>
                     <TextBlock Text="{Binding RxTitleText.Value}" VerticalAlignment="Center"></TextBlock>
                 </StackPanel>
@@ -57,12 +57,10 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1">
-                <Grid>
-                    <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
-                    <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Top"/>
-                    <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Bottom"/>
-                </Grid>
+            <Grid Grid.Row="1" Style="{StaticResource InputRowStyle}">
+                <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
+                <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Top"/>
+                <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Bottom"/>
                 <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
@@ -122,7 +120,8 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="4" Visibility="{Binding RxKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid Grid.Row="4" Style="{StaticResource KeypadRowStyle}"
+                  Visibility="{Binding RxKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <local:KeypadPanel x:Name="KeypadPanel"/>
             </Grid>
 

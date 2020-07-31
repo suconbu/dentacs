@@ -320,7 +320,7 @@ namespace Suconbu.Dentacs
             this.RxFullScreenEnabled.Value = false;
         }
 
-        private void Caption_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Caption_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
         }
