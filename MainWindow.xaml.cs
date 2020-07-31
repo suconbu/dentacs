@@ -29,6 +29,7 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<ErrorState> RxErrorState { get; }
         public ReactiveProperty<double> RxZoomRatio { get; }
         public ReadOnlyReactivePropertySlim<double> RxMildZoomRatio { get; }
+        public ReadOnlyReactivePropertySlim<double> RxMildMildZoomRatio { get; }
         public ReactiveProperty<int> RxZoomIndex { get; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; }
         public ReactiveProperty<bool> RxFullScreenEnabled { get; }
@@ -38,6 +39,7 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<bool> RxCaptionVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxStatusVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxKeypadVisible { get; }
+        public ReadOnlyReactivePropertySlim<bool> RxFullScreenKeypadVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxErrorTextVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxCharInfoVisible { get; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
@@ -68,6 +70,7 @@ namespace Suconbu.Dentacs
             this.RxZoomIndex = new ReactiveProperty<int>();
             this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReactiveProperty();
             this.RxMildZoomRatio = this.RxZoomRatio.Select(x => ((3 - 1) + x) / 3).ToReadOnlyReactivePropertySlim();
+            this.RxMildMildZoomRatio = this.RxZoomRatio.Select(x => ((5 - 1) + x) / 5).ToReadOnlyReactivePropertySlim();
             this.RxTitleText = this.RxZoomRatio.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
             this.RxFullScreenEnabled = new ReactiveProperty<bool>(false);
             this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
@@ -82,6 +85,9 @@ namespace Suconbu.Dentacs
             this.RxKeypadVisible = Observable.CombineLatest(
                 this.RxFullScreenEnabled, this.RxKeypadEnabled, (f, k) => !f && k)
                 .ToReadOnlyReactivePropertySlim();
+            this.RxFullScreenKeypadVisible = Observable.CombineLatest(
+                this.RxFullScreenEnabled, this.RxKeypadEnabled, (f, k) => f && k)
+                .ToReadOnlyReactivePropertySlim();
             this.RxErrorTextVisible = Observable.CombineLatest(
                 this.RxErrorText, this.RxUsageText, (e, u) => !string.IsNullOrEmpty(e) && string.IsNullOrEmpty(u))
                 .ToReadOnlyReactivePropertySlim();
@@ -89,6 +95,10 @@ namespace Suconbu.Dentacs
             this.KeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
             this.KeypadPanel.ItemMouseLeave += (s, item) => { this.RxUsageText.Value = null; };
             this.KeypadPanel.ItemClick += (s, item) => this.KeypadPanel_ItemClick(item);
+
+            this.FullScreenKeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
+            this.FullScreenKeypadPanel.ItemMouseLeave += (s, item) => { this.RxUsageText.Value = null; };
+            this.FullScreenKeypadPanel.ItemClick += (s, item) => this.KeypadPanel_ItemClick(item);
         }
 
         string MakeTitleText()
