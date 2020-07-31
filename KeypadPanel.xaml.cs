@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,18 +28,18 @@ namespace Suconbu.Dentacs
             public string Usage { get; }
             public string Data { get; }
 
-            public Item(string label, string usage, string data = null)
+            public Item(string label, string usageKey, string data = null)
             {
                 this.Label = label;
-                this.Usage = usage;
+                this.Usage = Application.Current.TryFindResource(usageKey) as string;
                 this.Data = data ?? label;
                 this.Command = Command.None;
             }
 
-            public Item(string label, string usage, Command command)
+            public Item(string label, string usageKey, Command command)
             {
                 this.Label = label;
-                this.Usage = usage;
+                this.Usage = Application.Current.TryFindResource(usageKey) as string;
                 this.Data = string.Empty;
                 this.Command = command;
             }
@@ -48,61 +49,26 @@ namespace Suconbu.Dentacs
         public event EventHandler<Item> ItemMouseLeave = delegate { };
         public event EventHandler<Item> ItemClick = delegate { };
 
-        readonly Item[] keypadItems;
-        readonly int keypadRowCount;
-        readonly int keypadColumnCount;
+        Item[] keypadItems;
+        int keypadRowCount;
+        int keypadColumnCount;
 
         public KeypadPanel()
         {
             InitializeComponent();
 
-            this.keypadItems = new[]
-            {
-                new Item("/", "除算 : 5 / 2 -> 2.5"),
-                new Item("*", "乗算 : 5 * 2 -> 10"),
-                new Item("-", "減算 : 5 - 2 -> 3"),
-                new Item("+", "加算 : 5 + 2 -> 7"),
+            this.SetupPanel();
+        }
 
-                new Item("//", "整数除算 : 5 // 2 -> 2"),
-                new Item("**", "べき乗 : 5 ** 2 -> 25"),
-                new Item("0x", "16進数数値 : 0xA (0xa) -> 10"),
-                new Item("0b", "2進数数値 : 0b1010 -> 10"),
+        public void Rebuild()
+        {
+            this.Container.Children.Clear();
+            this.SetupPanel();
+        }
 
-                new Item("%", "剰余 : 5 % 2 -> 1"),
-                new Item("( )", "選択中の文字列の両端に括弧を追加", "()"),
-                new Item("<<", "算術左シフト : 0b0011 << 1 -> 0b0110"),
-                new Item(">>", "算術右シフト : 0b1100 >> 1 -> 0b1110"),
-
-                new Item("&", "論理積 : 0b0011 & 0b0110 -> 0b0010"),
-                new Item("|", "論理和 : 0b0011 | 0b0110 -> 0b0111"),
-                new Item("^", "排他的論理和 : 0b0110 ^ 0b0011 -> 0b0101"),
-                new Item("~", "ビット反転 : ~0b0011 -> 0b1100"),
-
-                new Item("trunc", "0に近づく方向へ小数部切り捨て : trunc(1.5) -> 1, trunc(-1.5) -> -1", "trunc()"),
-                new Item("floor", "値の小さい方向へ小数部切り捨て : floor(-1.5) -> -2", "floor()"),
-                new Item("ceil", "値の大きい方向へ小数部切り上げ : ceil(1.5) -> 2, ceil(-1.5) -> -1", "ceil()"),
-                new Item("round", "小数部を四捨五入 : round(1.4) -> 1, round(1.5) -> 2", "round()"),
-
-                new Item("sin", "正弦 (度) : sin(30) -> 0.5", "sin()"),
-                new Item("cos", "余弦 (度) : cos(30) -> 0.866...", "cos()"),
-                new Item("tan", "正接 (度) : tan(30) -> 0.577...", "tan()"),
-                new Item("PI", "円周率 (3.141...)"),
-
-                new Item("asin", "逆正弦 (度) : asin(0.5) -> 30", "asin()"),
-                new Item("acos", "逆余弦 (度) : acos(0.5) -> 60", "acos()"),
-                new Item("atan", "逆正接 (度) : atan(0.5) -> 26.565...", "atan()"),
-                new Item("atan2", "逆正接 (度) : atan2(5, 10) -> 26.565...", "atan2()"),
-
-                new Item("log10", "10を底とする対数 : log10(1000) -> 3", "log10()"),
-                new Item("log2", "2を底とする対数 : log2(16) -> 4", "log2()"),
-                new Item("log", "第2引数の数値を底とする対数 : log(9, 3) -> 2", "log()"),
-                new Item("E", "自然対数の底 (2.718...)"),
-
-                new Item("CLR", "式を消去", Command.Clear),
-                new Item("↪", "元に戻す (Ctrl+Z)", Command.Undo),
-                new Item("↩", "やり直し (Ctrl+Y)", Command.Redo),
-                new Item("BS", "1文字削除 (BackSpace)", Command.BackSpace),
-            };
+        private void SetupPanel()
+        {
+            this.keypadItems = this.CreateItems();
             this.keypadRowCount = 4;
             this.keypadColumnCount = this.keypadItems.Length / this.keypadRowCount;
 
@@ -139,6 +105,57 @@ namespace Suconbu.Dentacs
                 Grid.SetColumn(border, i / this.keypadRowCount);
                 this.Container.Children.Add(border);
             }
+        }
+
+        private Item[] CreateItems()
+        {
+            return new[]
+            {
+                new Item("/", "Keypad.Division"),
+                new Item("*", "Keypad.Multiplication"),
+                new Item("-", "Keypad.Subtraction"),
+                new Item("+", "Keypad.Addition"),
+
+                new Item("//", "Keypad.IntegerDivision"),
+                new Item("**", "Keypad.Exponentiation"),
+                new Item("0x", "Keypad.HexPrefix"),
+                new Item("0b", "Keypad.BinPrefix"),
+
+                new Item("%", "Keypad.Reminder"),
+                new Item("( )", "Keypad.Parentheses", "()"),
+                new Item("<<", "Keypad.BitwiseLeftShift"),
+                new Item(">>", "Keypad.BitwiseRightShift"),
+
+                new Item("&", "Keypad.BitwiseAnd"),
+                new Item("|", "Keypad.BitwiseOr"),
+                new Item("^", "Keypad.BitwiseXor"),
+                new Item("~", "Keypad.BitwiseNot"),
+
+                new Item("trunc", "Keypad.Trunc", "trunc()"),
+                new Item("floor", "Keypad.Floor", "floor()"),
+                new Item("ceil", "Keypad.Ceil", "ceil()"),
+                new Item("round", "Keypad.Round", "round()"),
+
+                new Item("sin", "Keypad.Sin", "sin()"),
+                new Item("cos", "Keypad.Cos", "cos()"),
+                new Item("tan", "Keypad.Tan", "tan()"),
+                new Item("PI", "Keypad.PI"),
+
+                new Item("asin", "Keypad.Asin", "asin()"),
+                new Item("acos", "Keypad.Acos", "acos()"),
+                new Item("atan", "Keypad.Atan", "atan()"),
+                new Item("atan2", "Keypad.Atan2", "atan2()"),
+
+                new Item("log10", "Keypad.Log10", "log10()"),
+                new Item("log2", "Keypad.Log2", "log2()"),
+                new Item("log", "Keypad.Log", "log()"),
+                new Item("E", "Keypad.E"),
+
+                new Item("CLR", "Keypad.Clear", Command.Clear),
+                new Item("↪", "Keypad.Undo", Command.Undo),
+                new Item("↩", "Keypad.Redo", Command.Redo),
+                new Item("BS", "Keypad.BackSpace", Command.BackSpace),
+            };
         }
     }
 }

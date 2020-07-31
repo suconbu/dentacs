@@ -876,9 +876,15 @@ namespace Suconbu.Scripting.Memezo
             if (this.currentChar == '0')
             {
                 var type = this.nextChar;
-                radix = (type == 'x') ? 16 : (type == 'o') ? 8 : (type == 'b') ? 2 : radix;
+                radix =
+                    (type == 'x') ? 16 :
+                    (type == 'o') ? 8 :
+                    (type == 'b') ? 2 :
+                    10;
                 if (radix != 10)
                 {
+                    sb.Append(this.currentChar);
+                    sb.Append(this.nextChar);
                     this.ReadChar();
                     this.ReadChar();
                 }
@@ -888,8 +894,8 @@ namespace Suconbu.Scripting.Memezo
                 sb.Append(this.currentChar);
                 this.ReadChar();
             }
-            var s = sb.ToString().ToLower();
-            decimal n = 0m;
+            var s = sb.ToString();
+            decimal n;
             if (radix <= 0 || 36 < radix || s.Length == 0)
             {
                 throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
@@ -904,13 +910,17 @@ namespace Suconbu.Scripting.Memezo
             else
             {
                 long n64 = 0;
-                foreach (char d in s)
+                foreach (char d in s.Substring(2).ToLower())
                 {
                     n64 *= radix;
                     int v =
                         ('0' <= d && d <= '9') ? (d - '0') :
                         ('a' <= d && d <= 'z') ? (d - 'a' + 10) :
                         throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    if (radix <= v)
+                    {
+                        throw new ErrorException(ErrorType.InvalidNumberFormat, $"'{sb}'");
+                    }
                     n64 += v;
                 }
                 n = n64;
