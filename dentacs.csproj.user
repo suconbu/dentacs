@@ -26,7 +26,13 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Resource\Resource.xaml">
+    <Page Update="Resource\Color.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resource\String.en.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resource\String.ja.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

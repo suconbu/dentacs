@@ -23,8 +23,7 @@ namespace Suconbu.Dentacs
             {
                 if (e.Type == Memezo.ErrorType.UnexpectedToken ||
                     e.Type == Memezo.ErrorType.NothingSource ||
-                    e.Type == Memezo.ErrorType.MissingToken ||
-                    e.Type == Memezo.ErrorType.UnknownError)
+                    e.Type == Memezo.ErrorType.MissingToken)
                 {
                     this.Error = this.Error ?? string.Empty;
                 }

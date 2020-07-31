@@ -18,17 +18,13 @@
         Topmost="True">
 
     <Window.Resources>
-        <ToolTip x:Key="StatusCharInfoToolTip">
-            <TextBlock>
-            String | Unicode CodePoint | UTF-16BE | UTF-8<LineBreak/>
-            (Click to copy to clipboard)
-            </TextBlock>
-        </ToolTip>
-        <ToolTip x:Key="KeypadSwitchButtonTooltip" Content="Open/Close Keypad (Tab)"/>
+        <ToolTip x:Key="StatusCharInfoToolTip" Content="{DynamicResource Status.CharInfoToolTip}"/>
+        <ToolTip x:Key="KeypadSwitchButtonTooltip" Content="{DynamicResource Status.KeypadSwitch}"/>
         <local:ResultConverter x:Key="ResultConverter"/>
         <local:CharInfoConverter x:Key="CharInfoConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <local:ErrorTextConverter x:Key="ErrorTextConverter"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -108,7 +104,7 @@
                         <Button Content="{Binding RxUsageText.Value}" Style="{StaticResource StatusUsageTextStyle}"
                                 Visibility="{Binding RxUsageText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="{c:Binding (\'😟\' + RxErrorText.Value)}" Style="{StaticResource StatusErrorTextStyle}"
+                            <Button Content="{Binding RxErrorText.Value, Converter={StaticResource ErrorTextConverter}}" Style="{StaticResource StatusErrorTextStyle}"
                                     Visibility="{Binding RxErrorTextVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </StackPanel>
                     </Grid>
