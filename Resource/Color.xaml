@@ -19,14 +19,17 @@
     <Color x:Key="InputTextShadowColor">#18000000</Color>
     <SolidColorBrush x:Key="InputTextShadowBrush" Color="{StaticResource InputTextShadowColor}"/>
 
-    <Color x:Key="OutputTextBackColor">#FF383838</Color>
-    <Color x:Key="OutputTextForeColor">#FFB2B2B2</Color>
-    <Color x:Key="OutputTextBackColor:Disable">#FF383838</Color>
-    <Color x:Key="OutputTextForeColor:Disable">#FF5C5C5C</Color>
-    <SolidColorBrush x:Key="OutputTextBackBrush" Color="{StaticResource OutputTextBackColor}"/>
-    <SolidColorBrush x:Key="OutputTextForeBrush" Color="{StaticResource OutputTextForeColor}"/>
-    <SolidColorBrush x:Key="OutputTextBackBrush:Disable" Color="{StaticResource OutputTextBackColor:Disable}"/>
-    <SolidColorBrush x:Key="OutputTextForeBrush:Disable" Color="{StaticResource OutputTextForeColor:Disable}"/>
+    <Color x:Key="ResultRowBackColor">#FF383838</Color>
+    <SolidColorBrush x:Key="ResultRowBackBrush" Color="{StaticResource ResultRowBackColor}"/>
+
+    <Color x:Key="ResultTextBackColor">#00000000</Color>
+    <Color x:Key="ResultTextForeColor">#FFB2B2B2</Color>
+    <Color x:Key="ResultTextBackColor:Disable">#00000000</Color>
+    <Color x:Key="ResultTextForeColor:Disable">#FF5C5C5C</Color>
+    <SolidColorBrush x:Key="ResultTextBackBrush" Color="{StaticResource ResultTextBackColor}"/>
+    <SolidColorBrush x:Key="ResultTextForeBrush" Color="{StaticResource ResultTextForeColor}"/>
+    <SolidColorBrush x:Key="ResultTextBackBrush:Disable" Color="{StaticResource ResultTextBackColor:Disable}"/>
+    <SolidColorBrush x:Key="ResultTextForeBrush:Disable" Color="{StaticResource ResultTextForeColor:Disable}"/>
 
     <Color x:Key="KeypadBackColor">#FF383838</Color>
     <Color x:Key="KeypadForeColor">#FFB2B2B2</Color>

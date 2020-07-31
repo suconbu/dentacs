@@ -49,7 +49,6 @@ namespace Suconbu.Dentacs
         double maxWidthBackup = SystemParameters.WorkArea.Width;
 
         static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0, 4.0 };
-        static readonly SolidColorBrush kTransparentBrush = new SolidColorBrush();
         static readonly int kCopyFlashInterval = 100;
 
         public MainWindow()
@@ -289,9 +288,9 @@ namespace Suconbu.Dentacs
             var copyText = this.GetResultTextForCopy(textBox);
             if (copyText == null) return;
             Clipboard.SetText(copyText);
-            var foregroundBackup = textBox.Foreground;
-            textBox.Foreground = kTransparentBrush;
-            Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.Foreground = foregroundBackup; }); });
+            var visibilityBackup = textBox.Visibility;
+            textBox.Visibility = Visibility.Hidden;
+            Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { textBox.Visibility = visibilityBackup; }); });
         }
 
         void CopyCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)

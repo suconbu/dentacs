@@ -62,7 +62,11 @@
         <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
     </Style>
 
-    <Style x:Key="OutputTextBoxStyle" TargetType="TextBox">
+    <Style x:Key="ResultRowStyle" TargetType="Grid">
+        <Setter Property="Background" Value="{StaticResource ResultRowBackBrush}"/>
+    </Style>
+
+    <Style x:Key="ResultTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
         <Setter Property="FontSize" Value="{c:Binding 16 * RxMildZoomRatio.Value}"/>
         <Setter Property="IsTabStop" Value="False"/>
@@ -75,11 +79,11 @@
         <Setter Property="TextWrapping" Value="NoWrap"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="MaxLines" Value="2"/>
-        <Setter Property="Background" Value="{StaticResource OutputTextBackBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource OutputTextForeBrush:Disable}"/>
+        <Setter Property="Background" Value="{StaticResource ResultTextBackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ResultTextForeBrush:Disable}"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RxErrorState.Value}" Value="None">
-                <Setter Property="Foreground" Value="{StaticResource OutputTextForeBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource ResultTextForeBrush}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -122,7 +126,7 @@
 
     <!--ステータスバー関係-->
 
-    <Style x:Key="StatusBarStyle" TargetType="Grid">
+    <Style x:Key="StatusRowStyle" TargetType="Grid">
         <Setter Property="Button.FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
     </Style>
 
