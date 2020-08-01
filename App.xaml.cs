@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows;
 
 namespace Suconbu.Dentacs
@@ -17,7 +13,11 @@ namespace Suconbu.Dentacs
         {
             base.OnStartup(e);
 
-            Application.Current.Resources.MergedDictionaries.Add(LanguageHelper.GetStringResourceDictionary());
+            var languageName = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary()
+            {
+                Source = new Uri($"/Resource/String.{languageName}.xaml", UriKind.Relative)
+            });
         }
     }
 }
