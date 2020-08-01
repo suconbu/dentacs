@@ -347,5 +347,86 @@ namespace test
             Assert.ThrowsException<ErrorException>(() => math.Median(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Median(new[] { new Value("0") }));
         }
+
+        [TestMethod]
+        public void TestTextBoxHelper()
+        {
+            string[] lines =
+            {
+                            // 0  1  2  3  4
+                "xxx",      // x  x  x  \r \n
+
+                            // 5  6  7  8  9
+                "xxx",      // x  x  x  \r \n
+
+                            // 10 11 12 13 14
+                "xxx",      // x  x  x  \r \n
+
+                            // 15 16 17 18 19
+                "xxx",      // x  x  x  \r \n
+            };
+            int s, e;
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 9, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 10, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 11, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 2);
+
+            TextBoxHelper.GetStartEndLineIndex(lines, 4, 9, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 5, 9, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 6, 9, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 1);
+
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 0, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 4, 4, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 4, 5, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 5, 5, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 1);
+
+            TextBoxHelper.GetStartEndLineIndex(lines, 4, 0, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 5, 4, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 6, 4, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
+
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 9999, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, -1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 9999, 0, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, -1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 9999, 9999, out s, out e);
+            Assert.AreEqual(s, -1);
+            Assert.AreEqual(e, -1);
+
+            s = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, 0);
+            Assert.AreEqual(s, 0);
+            s = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, 1);
+            Assert.AreEqual(s, 5);
+            e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 0);
+            Assert.AreEqual(e, 5);
+            e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 1);
+            Assert.AreEqual(e, 10);
+        }
     }
 }

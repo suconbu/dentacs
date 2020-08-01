@@ -208,10 +208,10 @@ namespace Suconbu.Dentacs
             var lines = target.Text.Split(Environment.NewLine);
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
-            var startLineIndex = target.GetLineIndexFromCharacterIndex(selectionStart);
-            var endLineIndex = target.GetLineIndexFromCharacterIndex(selectionEnd);
+            TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
+                out var lineIndexStart, out var lineIndexEnd);
 
-            for (int i = startLineIndex; i <= endLineIndex; i++)
+            for (int i = lineIndexStart; i <= lineIndexEnd; i++)
             {
                 if (this.calculator.Calculate(lines[i]))
                 {
@@ -223,10 +223,8 @@ namespace Suconbu.Dentacs
             }
 
             target.Text = string.Join(Environment.NewLine, lines);
-            target.SelectionStart = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, startLineIndex);
-            target.SelectionLength = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, endLineIndex)
-                - target.SelectionStart
-                + lines[endLineIndex].Length;
+            target.SelectionStart = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndexStart);
+            target.SelectionLength = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, lineIndexEnd) - target.SelectionStart;
         }
 
         void FunctionItemClicked(TextBox target, string name)
@@ -234,22 +232,20 @@ namespace Suconbu.Dentacs
             var lines = target.Text.Split(Environment.NewLine);
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
-            var startLineIndex = target.GetLineIndexFromCharacterIndex(selectionStart);
-            var endLineIndex = target.GetLineIndexFromCharacterIndex(selectionEnd);
+            TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
+                out var lineIndexStart, out var lineIndexEnd);
 
-            if (startLineIndex < endLineIndex)
+            if (lineIndexStart < lineIndexEnd)
             {
                 // Multi lines are selected
-                for(int i = startLineIndex; i <= endLineIndex; i++)
+                for(int i = lineIndexStart; i <= lineIndexEnd; i++)
                 {
                     lines[i] = $"{name}({lines[i]})";
                 }
 
                 target.Text = string.Join(Environment.NewLine, lines);
-                target.SelectionStart = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, startLineIndex);
-                target.SelectionLength = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, endLineIndex)
-                    - target.SelectionStart
-                    + lines[endLineIndex].Length;
+                target.SelectionStart = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndexStart);
+                target.SelectionLength = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, lineIndexEnd) - target.SelectionStart;
             }
             else
             {
@@ -356,7 +352,7 @@ namespace Suconbu.Dentacs
 
             if (selectedText.Length == 0)
             {
-                int lineStartCharIndex = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, lineIndex);
+                int lineStartCharIndex = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndex);
                 int charIndexOfLine = caretIndex - lineStartCharIndex;
                 var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
                 selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
