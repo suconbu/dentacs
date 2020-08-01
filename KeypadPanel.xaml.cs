@@ -19,18 +19,19 @@ namespace Suconbu.Dentacs
     /// </summary>
     public partial class KeypadPanel : UserControl
     {
-        public enum KeyType { Blank, Text, Function, BackSpace, Undo, Redo, Clear, Convert }
+        public enum KeyType { Blank, Text, Function, Convert, BackSpace, Undo, Redo, Clear, SelectAll }
 
         // KeyType      | Content of 'Data'
         // -------------|----------------------
         // Blank        | Not in use
         // Text         | String of text
         // Function     | Function name
+        // Convert      | Radix of result value
         // BackSpace    | Not in use
         // Undo         | Not in use
         // Redo         | Not in use
         // Clear        | Not in use
-        // ToResult     | Radix of result value
+        // SelectAll    | Not in use
 
         public struct Item
         {
@@ -161,7 +162,7 @@ namespace Suconbu.Dentacs
 
                 new Item(KeyType.Clear, "Keypad.Clear", "CLR"),
                 new Item(KeyType.BackSpace, "Keypad.BackSpace", "BS"),
-                new Item(KeyType.Blank, "", ""),
+                new Item(KeyType.SelectAll, "Keypad.SelectAll", "ALL"),
                 new Item(KeyType.Redo, "Keypad.Redo", "↩"),
             };
         }

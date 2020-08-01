@@ -179,6 +179,10 @@ namespace Suconbu.Dentacs
             {
                 target.Clear();
             }
+            else if (item.Type == KeypadPanel.KeyType.SelectAll)
+            {
+                target.SelectAll();
+            }
             else if (item.Type == KeypadPanel.KeyType.Convert)
             {
                 this.ConvertItemClicked(target, (int)item.Data);
