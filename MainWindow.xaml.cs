@@ -272,9 +272,17 @@ namespace Suconbu.Dentacs
 
         void TextItemClicked(TextBox target, string text)
         {
-            target.SelectedText = text;
-            target.SelectionLength = 0;
-            target.SelectionStart += text.Length;
+            if (0 < target.SelectionLength)
+            {
+                // Keep the selection on replacing text
+                target.SelectedText = text;
+            }
+            else
+            {
+                target.SelectedText = text;
+                target.SelectionLength = 0;
+                target.SelectionStart += text.Length;
+            }
         }
 
         void IsFullScreenChanged(bool enable)
