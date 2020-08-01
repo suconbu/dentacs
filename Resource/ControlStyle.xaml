@@ -18,7 +18,7 @@
         <Setter Property="TextBlock.Foreground" Value="{StaticResource CaptionForeBrush}"/>
     </Style>
 
-    <Style x:Key="CaptionIconStyle" TargetType="{x:Type Image}">
+    <Style x:Key="CaptionIconStyle" TargetType="Image">
         <Setter Property="Source" Value="/Resource/dentacs.ico"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -32,11 +32,12 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CaptionButtonStyleBase" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionButtonStyleBase" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontFamily" Value="Marlett"/>
         <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Margin" Value="0" />
@@ -44,13 +45,13 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
 
-    <Style x:Key="CaptionButtonStyle" BasedOn="{StaticResource CaptionButtonStyleBase}" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionButtonStyle" TargetType="Button" BasedOn="{StaticResource CaptionButtonStyleBase}">
         <Setter Property="Background" Value="{StaticResource CaptionButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource CaptionButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource CaptionButtonTemplate}"/>
     </Style>
 
-    <Style x:Key="CaptionCloseButtonStyle" BasedOn="{StaticResource CaptionButtonStyleBase}" TargetType="{x:Type Button}">
+    <Style x:Key="CaptionCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource CaptionButtonStyleBase}">
         <Setter Property="Background" Value="{StaticResource CaptionCloseButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource CaptionCloseButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource CaptionCloseButtonTemplate}"/>
@@ -105,7 +106,8 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ButtonStyle" TargetType="Button">
+    <Style x:Key="ButtonStyleBase" TargetType="Button">
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="FontSize" Value="{c:Binding 12 * RxMildZoomRatio.Value}"></Setter>
         <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
         <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
@@ -115,6 +117,9 @@
         <Setter Property="Template" Value="{DynamicResource ButtonTemplate}"/>
     </Style>
 
+    <Style x:Key="ResultButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyleBase}">
+    </Style>
+
     <!--Status row-->
 
     <Style x:Key="StatusRowStyle" TargetType="Grid">
@@ -122,24 +127,25 @@
     </Style>
 
     <Style x:Key="StatusTextStyle" TargetType="Button">
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
         <Setter Property="Padding" Value="5,5"/>
-        <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Template" Value="{DynamicResource StatusTextTemplate}"/>
     </Style>
 
-    <Style x:Key="StatusButtonStyle" TargetType="Button">
+    <Style x:Key="StatusButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyleBase}">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
-        <Setter Property="Padding" Value="10,5"></Setter>
         <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
     </Style>
 
     <Style x:Key="StatusToggleButtonStyle" TargetType="ToggleButton">
         <Setter Property="IsTabStop" Value="False"/>
-        <Setter Property="Padding" Value="10,5"></Setter>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Padding" Value="10,5"/>
         <Setter Property="Background" Value="{StaticResource StatusButtonBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource StatusButtonForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource StatusToggleButtonTemplate}"/>
@@ -174,7 +180,7 @@
         <Setter Property="Background" Value="Transparent"/>
     </Style>
 
-    <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+    <Style x:Key="KeypadButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyleBase}">
         <Setter Property="MinWidth" Value="{c:Binding 40 * RxMildMildZoomRatio.Value}"/>
     </Style>
 
@@ -186,7 +192,7 @@
 
     <!--Templates-->
 
-    <ControlTemplate x:Key="InputTextTemplate" TargetType="{x:Type TextBoxBase}">
+    <ControlTemplate x:Key="InputTextTemplate" TargetType="TextBoxBase">
         <Border
             Background="{TemplateBinding Background}"
             BorderThickness="{TemplateBinding BorderThickness}"
@@ -195,7 +201,7 @@
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="StatusTextTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="StatusTextTemplate" TargetType="Button">
         <TextBlock
             Background="{TemplateBinding Background}"
             Foreground="{TemplateBinding Foreground}">
@@ -207,7 +213,7 @@
         </TextBlock>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="StatusButtonTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="StatusButtonTemplate" TargetType="Button">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">
@@ -281,7 +287,7 @@
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="StatusToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
+    <ControlTemplate x:Key="StatusToggleButtonTemplate" TargetType="ToggleButton">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">
@@ -355,7 +361,7 @@
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">
@@ -417,7 +423,7 @@
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="CaptionButtonTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="CaptionButtonTemplate" TargetType="Button">
         <Border Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">
@@ -479,7 +485,7 @@
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="CaptionCloseButtonTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="CaptionCloseButtonTemplate" TargetType="Button">
         <Grid x:Name="Grid" SnapsToDevicePixels="True" Background="{TemplateBinding Background}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="CommonStates">

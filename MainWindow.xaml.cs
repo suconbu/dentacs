@@ -72,7 +72,6 @@ namespace Suconbu.Dentacs
             this.RxFullScreenEnabled = new ReactiveProperty<bool>(false);
             this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
             this.RxKeypadEnabled = new ReactiveProperty<bool>();
-            this.RxKeypadEnabled.Subscribe(x => this.InputTextBox.Focus());
             this.RxCurrentText = new ReactiveProperty<string>();
             this.RxSelectionLength = new ReactiveProperty<int>();
 
@@ -163,7 +162,7 @@ namespace Suconbu.Dentacs
         void KeypadPanel_ItemClick(KeypadPanel.Item item)
         {
             var target = this.InputTextBox;
-            target.Focus();
+
             if (item.Type == KeypadPanel.KeyType.BackSpace)
             {
                 System.Windows.Forms.SendKeys.SendWait("{BACKSPACE}");
