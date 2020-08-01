@@ -64,9 +64,16 @@
     <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
         <Setter Property="FontSize" Value="{c:Binding 24 * RxZoomRatio.Value}"/>
-        <Setter Property="Padding" Value="10,10,20,10"/>    <!--右側はちょっと余裕を持たせる-->
+        <Setter Property="Padding" Value="10,10,20,10"/>    <!--Rich margin on the right side-->
         <Setter Property="Background" Value="{StaticResource InputTextBackBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource InputTextForeBrush}"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="IsInactiveSelectionHighlightEnabled" Value="True"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
     </Style>
 

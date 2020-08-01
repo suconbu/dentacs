@@ -58,7 +58,9 @@
             </Grid>
 
             <Grid Grid.Row="1" Style="{StaticResource InputRowStyle}">
-                <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AcceptsReturn="True" SelectionChanged="InputTextBox_SelectionChanged" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="InputTextBox_TextChanged"/>
+                <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}"
+                         SelectionChanged="InputTextBox_SelectionChanged"
+                         TextChanged="InputTextBox_TextChanged"/>
                 <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Top"/>
                 <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Bottom"/>
                 <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
