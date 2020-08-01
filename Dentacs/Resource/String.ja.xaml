@@ -56,4 +56,5 @@
     <system:String x:Key="Keypad.ToDec">全ての行を10進数に変換</system:String>
     <system:String x:Key="Keypad.ToHex">全ての行を16進数に変換</system:String>
     <system:String x:Key="Keypad.ToBin">全ての行を2進数に変換</system:String>
+    <system:String x:Key="Keypad.Random">0以上1未満の乱数</system:String>
 </ResourceDictionary>

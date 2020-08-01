@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -49,6 +50,7 @@ namespace Suconbu.Dentacs
 
         static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0, 4.0 };
         static readonly int kCopyFlashInterval = 100;
+        readonly Random random = new Random();
 
         public MainWindow()
         {
@@ -66,8 +68,8 @@ namespace Suconbu.Dentacs
             this.RxUsageText = new ReactivePropertySlim<string>();
             this.RxZoomIndex = new ReactivePropertySlim<int>();
             this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReadOnlyReactivePropertySlim();
-            this.RxMildZoomRatio = this.RxZoomRatio.Select(x => ((3 - 1) + x) / 3).ToReadOnlyReactivePropertySlim();
-            this.RxMildMildZoomRatio = this.RxZoomRatio.Select(x => ((5 - 1) + x) / 5).ToReadOnlyReactivePropertySlim();
+            this.RxMildZoomRatio = this.RxZoomRatio.Select(x => Math.Pow(x, 1 / 3.0)).ToReadOnlyReactivePropertySlim();
+            this.RxMildMildZoomRatio = this.RxZoomRatio.Select(x => Math.Pow(x, 1 / 5.0)).ToReadOnlyReactivePropertySlim();
             this.RxTitleText = this.RxZoomRatio.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
             this.RxFullScreenEnabled = new ReactivePropertySlim<bool>(false);
             this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
@@ -193,7 +195,7 @@ namespace Suconbu.Dentacs
             }
             else if (item.Type == KeypadPanel.KeyType.Operator || item.Type == KeypadPanel.KeyType.Constant)
             {
-                this.TextItemClicked(target, (string)item.Data);
+                this.StringItemClicked(target, (string)item.Data);
             }
             else
             {
@@ -270,7 +272,7 @@ namespace Suconbu.Dentacs
             }
         }
 
-        void TextItemClicked(TextBox target, string text)
+        void StringItemClicked(TextBox target, string text)
         {
             if (0 < target.SelectionLength)
             {

@@ -56,4 +56,5 @@
     <system:String x:Key="Keypad.ToDec">Convert all lines to decimal</system:String>
     <system:String x:Key="Keypad.ToHex">Convert all lines to hexadecimal</system:String>
     <system:String x:Key="Keypad.ToBin">Convert all lines to binary</system:String>
+    <system:String x:Key="Keypad.Random">Inserts a random number (0 &lt;= n &lt; 1)</system:String>
 </ResourceDictionary>
