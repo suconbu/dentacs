@@ -199,47 +199,75 @@ namespace Suconbu.Dentacs
 
         void ConvertItemClicked(TextBox target, int radix)
         {
-            var results = new List<string>();
             this.calculator.Reset();
-            // GetLineText does not work in fullscreen mode.
+
             var lines = target.Text.Split(Environment.NewLine);
-            for (int i = 0; i < lines.Length; i++)
+            var selectionStart = target.SelectionStart;
+            var selectionEnd = target.SelectionStart + target.SelectionLength;
+            var startLineIndex = target.GetLineIndexFromCharacterIndex(selectionStart);
+            var endLineIndex = target.GetLineIndexFromCharacterIndex(selectionEnd);
+
+            for (int i = startLineIndex; i <= endLineIndex; i++)
             {
-                var converted = lines[i];
                 if (this.calculator.Calculate(lines[i]))
                 {
                     if (decimal.TryParse(this.calculator.Result, out var value))
                     {
-                        converted = ResultConvertHelper.ConvertToResultString(value, radix, ResultConvertHelper.Styles.Prefix);
+                        lines[i] = ResultConvertHelper.ConvertToResultString(value, radix, ResultConvertHelper.Styles.Prefix);
                     }
                 }
-                results.Add(converted);
             }
-            target.Text = string.Join(Environment.NewLine, results.ToArray());
+
+            target.Text = string.Join(Environment.NewLine, lines);
+            target.SelectionStart = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, startLineIndex);
+            target.SelectionLength = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, endLineIndex)
+                - target.SelectionStart
+                + lines[endLineIndex].Length;
         }
 
         void FunctionItemClicked(TextBox target, string name)
         {
-            var prevSelectedLength = target.SelectedText.Length;
+            var lines = target.Text.Split(Environment.NewLine);
+            var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
+            var startLineIndex = target.GetLineIndexFromCharacterIndex(selectionStart);
+            var endLineIndex = target.GetLineIndexFromCharacterIndex(selectionEnd);
 
-            if (0 < name.Length &&
-                selectionEnd < target.Text.Length &&
-                target.Text[selectionEnd] == '(')
+            if (startLineIndex < endLineIndex)
             {
-                // xxxx(... -> FUNC(...
-                // ~~~~             |
-                target.SelectedText = name;
-                target.SelectionLength = 0;
+                // Multi lines are selected
+                for(int i = startLineIndex; i <= endLineIndex; i++)
+                {
+                    lines[i] = $"{name}({lines[i]})";
+                }
+
+                target.Text = string.Join(Environment.NewLine, lines);
+                target.SelectionStart = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, startLineIndex);
+                target.SelectionLength = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, endLineIndex)
+                    - target.SelectionStart
+                    + lines[endLineIndex].Length;
             }
             else
             {
-                // xxxx -> xFUNC(xx)x
-                //  ~~           ~~
-                target.SelectedText = $"{name}({target.SelectedText})";
-                target.SelectionLength = prevSelectedLength;
+                var prevSelectedLength = target.SelectedText.Length;
+                if (0 < name.Length &&
+                    selectionEnd < target.Text.Length &&
+                    target.Text[selectionEnd] == '(')
+                {
+                    // xxxx(... -> FUNC(...
+                    // ~~~~             |
+                    target.SelectedText = name;
+                    target.SelectionLength = 0;
+                }
+                else
+                {
+                    // xxxx -> xFUNC(xx)x
+                    //  ~~           ~~
+                    target.SelectedText = $"{name}({target.SelectedText})";
+                    target.SelectionLength = prevSelectedLength;
+                }
+                target.SelectionStart += name.Length + 1;
             }
-            target.SelectionStart += name.Length + 1;
         }
 
         void TextItemClicked(TextBox target, string text)
@@ -291,7 +319,7 @@ namespace Suconbu.Dentacs
             var caretIndex = this.InputTextBox.CaretIndex;
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
             var lines = this.InputTextBox.Text.Split(Environment.NewLine);
-            // GetLineText does not work in fullscreen mode.
+            // GetLineText and GetCharacterIndexFromLineIndex does not work correctly in full-screen mode.
             var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
             var selectedText = this.InputTextBox.SelectedText;
 
@@ -316,8 +344,8 @@ namespace Suconbu.Dentacs
 
             if (selectedText.Length == 0)
             {
-                int lineStartIndex = lines.Take(lineIndex).Select(line => line.Length + Environment.NewLine.Length).Sum();
-                int charIndexOfLine = caretIndex - lineStartIndex;
+                int lineStartCharIndex = TextBoxHelper.GetCharacterIndexFromLineIndex(lines, lineIndex);
+                int charIndexOfLine = caretIndex - lineStartCharIndex;
                 var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
                 selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
             }
