@@ -19,14 +19,15 @@ namespace Suconbu.Dentacs
     /// </summary>
     public partial class KeypadPanel : UserControl
     {
-        public enum KeyType { Blank, Text, Function, Convert, BackSpace, Undo, Redo, Clear, SelectAll }
+        public enum KeyType { Blank, Operator, Constant, Function, Convert, BackSpace, Undo, Redo, Clear, SelectAll }
 
         // KeyType      | Content of 'Data'
         // -------------|----------------------
         // Blank        | Not in use
-        // Text         | String of text
-        // Function     | Function name
-        // Convert      | Radix of result value
+        // Operator     | Operator : string
+        // Constant     | Constant name : string
+        // Function     | Function name : string
+        // Convert      | Radix of result value : int
         // BackSpace    | Not in use
         // Undo         | Not in use
         // Redo         | Not in use
@@ -115,25 +116,25 @@ namespace Suconbu.Dentacs
         {
             return new[]
             {
-                new Item(KeyType.Text, "Keypad.Division", "/"),
-                new Item(KeyType.Text, "Keypad.Multiplication", "*"),
-                new Item(KeyType.Text, "Keypad.Subtraction", "-"),
-                new Item(KeyType.Text, "Keypad.Addition", "+"),
+                new Item(KeyType.Operator, "Keypad.Division", "/"),
+                new Item(KeyType.Operator, "Keypad.Multiplication", "*"),
+                new Item(KeyType.Operator, "Keypad.Subtraction", "-"),
+                new Item(KeyType.Operator, "Keypad.Addition", "+"),
 
-                new Item(KeyType.Text, "Keypad.IntegerDivision", "//"),
-                new Item(KeyType.Text, "Keypad.Exponentiation", "**"),
-                new Item(KeyType.Text, "Keypad.HexPrefix", "0x"),
-                new Item(KeyType.Text, "Keypad.BinPrefix", "0b"),
+                new Item(KeyType.Operator, "Keypad.IntegerDivision", "//"),
+                new Item(KeyType.Operator, "Keypad.Exponentiation", "**"),
+                new Item(KeyType.Operator, "Keypad.HexPrefix", "0x"),
+                new Item(KeyType.Operator, "Keypad.BinPrefix", "0b"),
 
-                new Item(KeyType.Text, "Keypad.Reminder", "%"),
+                new Item(KeyType.Operator, "Keypad.Reminder", "%"),
                 new Item(KeyType.Function, "Keypad.Parentheses", "( )", ""),
-                new Item(KeyType.Text, "Keypad.BitwiseLeftShift", "<<"),
-                new Item(KeyType.Text, "Keypad.BitwiseRightShift", ">>"),
+                new Item(KeyType.Operator, "Keypad.BitwiseLeftShift", "<<"),
+                new Item(KeyType.Operator, "Keypad.BitwiseRightShift", ">>"),
 
-                new Item(KeyType.Text, "Keypad.BitwiseAnd", "&"),
-                new Item(KeyType.Text, "Keypad.BitwiseOr", "|"),
-                new Item(KeyType.Text, "Keypad.BitwiseXor", "^"),
-                new Item(KeyType.Text, "Keypad.BitwiseNot", "~"),
+                new Item(KeyType.Operator, "Keypad.BitwiseAnd", "&"),
+                new Item(KeyType.Operator, "Keypad.BitwiseOr", "|"),
+                new Item(KeyType.Operator, "Keypad.BitwiseXor", "^"),
+                new Item(KeyType.Operator, "Keypad.BitwiseNot", "~"),
 
                 new Item(KeyType.Function, "Keypad.Trunc", "trunc"),
                 new Item(KeyType.Function, "Keypad.Floor", "floor"),
@@ -143,7 +144,7 @@ namespace Suconbu.Dentacs
                 new Item(KeyType.Function, "Keypad.Sin", "sin"),
                 new Item(KeyType.Function, "Keypad.Cos", "cos"),
                 new Item(KeyType.Function, "Keypad.Tan", "tan"),
-                new Item(KeyType.Text, "Keypad.PI", "PI"),
+                new Item(KeyType.Constant, "Keypad.PI", "PI"),
 
                 new Item(KeyType.Function, "Keypad.Asin", "asin"),
                 new Item(KeyType.Function, "Keypad.Acos", "acos"),
@@ -153,7 +154,7 @@ namespace Suconbu.Dentacs
                 new Item(KeyType.Function, "Keypad.Log10", "log10"),
                 new Item(KeyType.Function, "Keypad.Log2", "log2"),
                 new Item(KeyType.Function, "Keypad.Log", "log"),
-                new Item(KeyType.Text, "Keypad.E", "E"),
+                new Item(KeyType.Constant, "Keypad.E", "E"),
 
                 new Item(KeyType.Convert, "Keypad.ToDec", "=DEC", 10),
                 new Item(KeyType.Convert, "Keypad.ToHex", "=HEX", 16),

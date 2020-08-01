@@ -191,7 +191,7 @@ namespace Suconbu.Dentacs
             {
                 this.FunctionItemClicked(target, (string)item.Data);
             }
-            else if (item.Type == KeypadPanel.KeyType.Text)
+            else if (item.Type == KeypadPanel.KeyType.Operator || item.Type == KeypadPanel.KeyType.Constant)
             {
                 this.TextItemClicked(target, (string)item.Data);
             }
