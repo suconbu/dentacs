@@ -111,13 +111,14 @@ namespace Suconbu.Dentacs
             this.InputTextBox.Focus();
         }
 
-        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
         {
-            base.OnMouseWheel(e);
+            base.OnPreviewMouseWheel(e);
 
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 this.ChangeZoom(0 < e.Delta ? +1 : -1);
+                e.Handled = true;
             }
         }
 

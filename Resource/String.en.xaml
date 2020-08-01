@@ -43,7 +43,7 @@
     <system:String x:Key="Keypad.Asin">Returns the arcsine (in degrees) of a number</system:String>
     <system:String x:Key="Keypad.Acos">Returns the arccosine (in degrees) of a number</system:String>
     <system:String x:Key="Keypad.Atan">Returns the arctangent (in degrees) of a number</system:String>
-    <system:String x:Key="Keypad.Atan2">Returns the arctangent (in degrees) of a x and y</system:String>
+    <system:String x:Key="Keypad.Atan2">Returns the arctangent (in degrees) of a x and y (e.g. atan2(1, 1) -> 45)</system:String>
     <system:String x:Key="Keypad.Log10">Returns the base 10 logarithm of a number</system:String>
     <system:String x:Key="Keypad.Log2">Returns the base 2 logarithm of a number</system:String>
     <system:String x:Key="Keypad.Log">Returns the logarithm of a number with specified base (e.g. log(9, 3) -> 2)</system:String>

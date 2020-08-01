@@ -43,7 +43,7 @@
     <system:String x:Key="Keypad.Asin">逆正弦 (度)</system:String>
     <system:String x:Key="Keypad.Acos">逆余弦 (度)</system:String>
     <system:String x:Key="Keypad.Atan">逆正接 (度)</system:String>
-    <system:String x:Key="Keypad.Atan2">逆正接 (度)</system:String>
+    <system:String x:Key="Keypad.Atan2">逆正接 (度) (例: atan2(1, 1) -> 45)</system:String>
     <system:String x:Key="Keypad.Log10">10を底とする対数</system:String>
     <system:String x:Key="Keypad.Log2">2を底とする対数</system:String>
     <system:String x:Key="Keypad.Log">任意の数値を底とする対数 (例: log(9, 3) -> 2)</system:String>
@@ -51,7 +51,7 @@
     <system:String x:Key="Keypad.Clear">式を消去</system:String>
     <system:String x:Key="Keypad.Undo">元に戻す (Ctrl+Z)</system:String>
     <system:String x:Key="Keypad.Redo">やり直し (Ctrl+Y)</system:String>
-    <system:String x:Key="Keypad.BackSpace">1文字消去 (BackSpace)</system:String>
+    <system:String x:Key="Keypad.BackSpace">1文字または選択中の文字を消去 (BackSpace)</system:String>
     <system:String x:Key="Keypad.SelectAll">全選択</system:String>
     <system:String x:Key="Keypad.ToDec">全ての行を10進数に変換</system:String>
     <system:String x:Key="Keypad.ToHex">全ての行を16進数に変換</system:String>
