@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Reactive.Bindings;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using Reactive.Bindings;
 
 namespace Suconbu.Dentacs
 {
@@ -165,52 +162,91 @@ namespace Suconbu.Dentacs
         void KeypadPanel_ItemClick(KeypadPanel.Item item)
         {
             var target = this.InputTextBox;
-            var data = item.Data;
             target.Focus();
-            if (item.Command == KeypadPanel.Command.BackSpace)
+            if (item.Type == KeypadPanel.KeyType.BackSpace)
             {
                 System.Windows.Forms.SendKeys.SendWait("{BACKSPACE}");
             }
-            else if (item.Command == KeypadPanel.Command.Undo)
+            else if (item.Type == KeypadPanel.KeyType.Undo)
             {
                 target.Undo();
             }
-            else if (item.Command == KeypadPanel.Command.Redo)
+            else if (item.Type == KeypadPanel.KeyType.Redo)
             {
                 target.Redo();
             }
-            else if (item.Command == KeypadPanel.Command.Clear)
+            else if (item.Type == KeypadPanel.KeyType.Clear)
             {
                 target.Clear();
             }
+            else if (item.Type == KeypadPanel.KeyType.Convert)
+            {
+                this.ConvertItemClicked(target, (int)item.Data);
+            }
+            else if (item.Type == KeypadPanel.KeyType.Function)
+            {
+                this.FunctionItemClicked(target, (string)item.Data);
+            }
+            else if (item.Type == KeypadPanel.KeyType.Text)
+            {
+                this.TextItemClicked(target, (string)item.Data);
+            }
             else
             {
-                if (data.EndsWith("()"))
-                {
-                    var name = data.Substring(0, data.Length - 2);
-                    var prevSelectedLength = target.SelectedText.Length;
-                    var selectionEnd = target.SelectionStart + target.SelectionLength;
-                    if (0 < name.Length &&
-                        selectionEnd < target.Text.Length &&
-                        target.Text[selectionEnd] == '(')
-                    {
-                        target.SelectedText = name;
-                        target.SelectionLength = 0;
-                    }
-                    else
-                    {
-                        target.SelectedText = $"{name}({target.SelectedText})";
-                        target.SelectionLength = prevSelectedLength;
-                    }
-                    target.SelectionStart += name.Length + 1;
-                }
-                else
-                {
-                    target.SelectedText = data;
-                    target.SelectionLength = 0;
-                    target.SelectionStart += data.Length;
-                }
+                // NOOP
             }
+        }
+
+        void ConvertItemClicked(TextBox target, int radix)
+        {
+            var results = new List<string>();
+            this.calculator.Reset();
+            // GetLineText does not work in fullscreen mode.
+            var lines = target.Text.Split(Environment.NewLine);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var converted = lines[i];
+                if (this.calculator.Calculate(lines[i]))
+                {
+                    if (decimal.TryParse(this.calculator.Result, out var value))
+                    {
+                        converted = ResultConvertHelper.ConvertToResultString(value, radix, ResultConvertHelper.Styles.Prefix);
+                    }
+                }
+                results.Add(converted);
+            }
+            target.Text = string.Join(Environment.NewLine, results.ToArray());
+        }
+
+        void FunctionItemClicked(TextBox target, string name)
+        {
+            var prevSelectedLength = target.SelectedText.Length;
+            var selectionEnd = target.SelectionStart + target.SelectionLength;
+
+            if (0 < name.Length &&
+                selectionEnd < target.Text.Length &&
+                target.Text[selectionEnd] == '(')
+            {
+                // xxxx(... -> FUNC(...
+                // ~~~~             |
+                target.SelectedText = name;
+                target.SelectionLength = 0;
+            }
+            else
+            {
+                // xxxx -> xFUNC(xx)x
+                //  ~~           ~~
+                target.SelectedText = $"{name}({target.SelectedText})";
+                target.SelectionLength = prevSelectedLength;
+            }
+            target.SelectionStart += name.Length + 1;
+        }
+
+        void TextItemClicked(TextBox target, string text)
+        {
+            target.SelectedText = text;
+            target.SelectionLength = 0;
+            target.SelectionStart += text.Length;
         }
 
         void IsFullScreenChanged(bool enable)

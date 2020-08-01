@@ -19,29 +19,32 @@ namespace Suconbu.Dentacs
     /// </summary>
     public partial class KeypadPanel : UserControl
     {
-        public enum Command { None, BackSpace, Undo, Redo, Clear }
+        public enum KeyType { Blank, Text, Function, BackSpace, Undo, Redo, Clear, Convert }
+
+        // KeyType      | Content of 'Data'
+        // -------------|----------------------
+        // Blank        | Not in use
+        // Text         | String of text
+        // Function     | Function name
+        // BackSpace    | Not in use
+        // Undo         | Not in use
+        // Redo         | Not in use
+        // Clear        | Not in use
+        // ToResult     | Radix of result value
 
         public struct Item
         {
-            public Command Command { get; }
+            public KeyType Type { get; }
             public string Label { get; }
             public string Usage { get; }
-            public string Data { get; }
+            public object Data { get; }
 
-            public Item(string label, string usageKey, string data = null)
+            public Item(KeyType type, string usageKey, string label, object data = null)
             {
-                this.Label = label;
+                this.Type = type;
                 this.Usage = Application.Current.TryFindResource(usageKey) as string;
+                this.Label = label;
                 this.Data = data ?? label;
-                this.Command = Command.None;
-            }
-
-            public Item(string label, string usageKey, Command command)
-            {
-                this.Label = label;
-                this.Usage = Application.Current.TryFindResource(usageKey) as string;
-                this.Data = string.Empty;
-                this.Command = command;
             }
         }
 
@@ -85,7 +88,7 @@ namespace Suconbu.Dentacs
             for (int i = 0; i < this.keypadItems.Length; i++)
             {
                 var item = this.keypadItems[i];
-                var style = (item.Command == Command.Clear) ?
+                var style = (item.Type == KeyType.Clear) ?
                     this.FindResource("KeypadClearButtonStyle") as Style :
                     this.FindResource("KeypadButtonStyle") as Style;
                 var button = new Button()
@@ -111,50 +114,55 @@ namespace Suconbu.Dentacs
         {
             return new[]
             {
-                new Item("/", "Keypad.Division"),
-                new Item("*", "Keypad.Multiplication"),
-                new Item("-", "Keypad.Subtraction"),
-                new Item("+", "Keypad.Addition"),
+                new Item(KeyType.Text, "Keypad.Division", "/"),
+                new Item(KeyType.Text, "Keypad.Multiplication", "*"),
+                new Item(KeyType.Text, "Keypad.Subtraction", "-"),
+                new Item(KeyType.Text, "Keypad.Addition", "+"),
 
-                new Item("//", "Keypad.IntegerDivision"),
-                new Item("**", "Keypad.Exponentiation"),
-                new Item("0x", "Keypad.HexPrefix"),
-                new Item("0b", "Keypad.BinPrefix"),
+                new Item(KeyType.Text, "Keypad.IntegerDivision", "//"),
+                new Item(KeyType.Text, "Keypad.Exponentiation", "**"),
+                new Item(KeyType.Text, "Keypad.HexPrefix", "0x"),
+                new Item(KeyType.Text, "Keypad.BinPrefix", "0b"),
 
-                new Item("%", "Keypad.Reminder"),
-                new Item("( )", "Keypad.Parentheses", "()"),
-                new Item("<<", "Keypad.BitwiseLeftShift"),
-                new Item(">>", "Keypad.BitwiseRightShift"),
+                new Item(KeyType.Text, "Keypad.Reminder", "%"),
+                new Item(KeyType.Function, "Keypad.Parentheses", "( )", ""),
+                new Item(KeyType.Text, "Keypad.BitwiseLeftShift", "<<"),
+                new Item(KeyType.Text, "Keypad.BitwiseRightShift", ">>"),
 
-                new Item("&", "Keypad.BitwiseAnd"),
-                new Item("|", "Keypad.BitwiseOr"),
-                new Item("^", "Keypad.BitwiseXor"),
-                new Item("~", "Keypad.BitwiseNot"),
+                new Item(KeyType.Text, "Keypad.BitwiseAnd", "&"),
+                new Item(KeyType.Text, "Keypad.BitwiseOr", "|"),
+                new Item(KeyType.Text, "Keypad.BitwiseXor", "^"),
+                new Item(KeyType.Text, "Keypad.BitwiseNot", "~"),
 
-                new Item("trunc", "Keypad.Trunc", "trunc()"),
-                new Item("floor", "Keypad.Floor", "floor()"),
-                new Item("ceil", "Keypad.Ceil", "ceil()"),
-                new Item("round", "Keypad.Round", "round()"),
+                new Item(KeyType.Function, "Keypad.Trunc", "trunc"),
+                new Item(KeyType.Function, "Keypad.Floor", "floor"),
+                new Item(KeyType.Function, "Keypad.Ceil", "ceil"),
+                new Item(KeyType.Function, "Keypad.Round", "round"),
 
-                new Item("sin", "Keypad.Sin", "sin()"),
-                new Item("cos", "Keypad.Cos", "cos()"),
-                new Item("tan", "Keypad.Tan", "tan()"),
-                new Item("PI", "Keypad.PI"),
+                new Item(KeyType.Function, "Keypad.Sin", "sin"),
+                new Item(KeyType.Function, "Keypad.Cos", "cos"),
+                new Item(KeyType.Function, "Keypad.Tan", "tan"),
+                new Item(KeyType.Text, "Keypad.PI", "PI"),
 
-                new Item("asin", "Keypad.Asin", "asin()"),
-                new Item("acos", "Keypad.Acos", "acos()"),
-                new Item("atan", "Keypad.Atan", "atan()"),
-                new Item("atan2", "Keypad.Atan2", "atan2()"),
+                new Item(KeyType.Function, "Keypad.Asin", "asin"),
+                new Item(KeyType.Function, "Keypad.Acos", "acos"),
+                new Item(KeyType.Function, "Keypad.Atan", "atan"),
+                new Item(KeyType.Function, "Keypad.Atan2", "atan2"),
 
-                new Item("log10", "Keypad.Log10", "log10()"),
-                new Item("log2", "Keypad.Log2", "log2()"),
-                new Item("log", "Keypad.Log", "log()"),
-                new Item("E", "Keypad.E"),
+                new Item(KeyType.Function, "Keypad.Log10", "log10"),
+                new Item(KeyType.Function, "Keypad.Log2", "log2"),
+                new Item(KeyType.Function, "Keypad.Log", "log"),
+                new Item(KeyType.Text, "Keypad.E", "E"),
 
-                new Item("CLR", "Keypad.Clear", Command.Clear),
-                new Item("↪", "Keypad.Undo", Command.Undo),
-                new Item("↩", "Keypad.Redo", Command.Redo),
-                new Item("BS", "Keypad.BackSpace", Command.BackSpace),
+                new Item(KeyType.Convert, "Keypad.ToDec", "=DEC", 10),
+                new Item(KeyType.Convert, "Keypad.ToHex", "=HEX", 16),
+                new Item(KeyType.Convert, "Keypad.ToBin", "=BIN", 2),
+                new Item(KeyType.Undo, "Keypad.Undo", "↪"),
+
+                new Item(KeyType.Clear, "Keypad.Clear", "CLR"),
+                new Item(KeyType.BackSpace, "Keypad.BackSpace", "BS"),
+                new Item(KeyType.Blank, "", ""),
+                new Item(KeyType.Redo, "Keypad.Redo", "↩"),
             };
         }
     }
