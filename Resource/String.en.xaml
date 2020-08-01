@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
     <system:String x:Key="Status.KeypadSwitch">Open/Close Keypad (Tab)</system:String>
     <system:String x:Key="Status.CharInfoToolTip" xml:space="preserve">String | Unicode CodePoint | UTF-16BE | UTF-8&#13;(Click to copy information to clipboard)</system:String>
     <system:String x:Key="Error.UnknownToken">Unknown token</system:String>

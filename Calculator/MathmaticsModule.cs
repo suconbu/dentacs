@@ -40,9 +40,6 @@ namespace Suconbu.Dentacs
                 { "sinh", this.Sinh },
                 { "cosh", this.Cosh },
                 { "tanh", this.Tanh },
-                { "asinh", this.Asinh },
-                { "acosh", this.Acosh },
-                { "atanh", this.Atanh },
 
                 { "min", this.Min },
                 { "max", this.Max },
@@ -209,24 +206,6 @@ namespace Suconbu.Dentacs
             return new Value(Degrees(Math.Atan2((double)args[0].Number, (double)args[1].Number)));
         }
 
-        public Value Asinh(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
-            return new Value(Degrees(Math.Asinh((double)args[0].Number)));
-        }
-
-        public Value Acosh(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
-            return new Value(Degrees(Math.Acosh((double)args[0].Number)));
-        }
-
-        public Value Atanh(IReadOnlyList<Value> args)
-        {
-            ArgumentsVerifier.VerifyAndThrow(args, "n", ErrorType.InvalidArgument);
-            return new Value(Degrees(Math.Atanh((double)args[0].Number)));
-        }
-
         public Value Min(IReadOnlyList<Value> args)
         {
             var nums = args.Where(a => a.Type == DataType.Number).ToList();
@@ -257,7 +236,7 @@ namespace Suconbu.Dentacs
 
         public Value Median(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(a => a.Type == DataType.Number).ToList();
+            var nums = args.Where(x => x.Type == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             var sorted = nums.OrderBy(n => n.Number).ToList();
             var a = sorted[(sorted.Count - 1) / 2].Number / 2m;

@@ -554,9 +554,9 @@ namespace Suconbu.Scripting.Memezo
 
     public interface IModule
     {
-        public string Name { get; }
-        public IReadOnlyDictionary<string, Function> Functions { get; }
-        public IReadOnlyDictionary<string, Value> Constants { get; }
+        string Name { get; }
+        IReadOnlyDictionary<string, Function> Functions { get; }
+        IReadOnlyDictionary<string, Value> Constants { get; }
     }
 
     public class RunStat

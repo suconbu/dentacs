@@ -1,12 +1,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
-using Suconbu.Dentacs;
 using Suconbu.Scripting.Memezo;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace test
+namespace Suconbu.Dentacs
 {
     [TestClass]
     public class UnitTest

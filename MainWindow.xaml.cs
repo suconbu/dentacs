@@ -20,19 +20,19 @@ namespace Suconbu.Dentacs
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public enum ErrorState { None, ErrorWithoutMessage, ErrorWithMessage }
 
-        public ReactiveProperty<string> RxResult { get; }
-        public ReactiveProperty<string> RxErrorText { get; }
-        public ReactiveProperty<string> RxUsageText { get; }
+        public ReactivePropertySlim<string> RxResult { get; }
+        public ReactivePropertySlim<string> RxErrorText { get; }
+        public ReactivePropertySlim<string> RxUsageText { get; }
         public ReadOnlyReactivePropertySlim<ErrorState> RxErrorState { get; }
-        public ReactiveProperty<double> RxZoomRatio { get; }
+        public ReadOnlyReactivePropertySlim<double> RxZoomRatio { get; }
         public ReadOnlyReactivePropertySlim<double> RxMildZoomRatio { get; }
         public ReadOnlyReactivePropertySlim<double> RxMildMildZoomRatio { get; }
-        public ReactiveProperty<int> RxZoomIndex { get; }
+        public ReactivePropertySlim<int> RxZoomIndex { get; }
         public ReadOnlyReactivePropertySlim<string> RxTitleText { get; }
-        public ReactiveProperty<bool> RxFullScreenEnabled { get; }
-        public ReactiveProperty<bool> RxKeypadEnabled { get; }
-        public ReactiveProperty<string> RxCurrentText { get; }
-        public ReactiveProperty<int> RxSelectionLength { get; }
+        public ReactivePropertySlim<bool> RxFullScreenEnabled { get; }
+        public ReactivePropertySlim<bool> RxKeypadEnabled { get; }
+        public ReactivePropertySlim<string> RxCurrentText { get; }
+        public ReactivePropertySlim<int> RxSelectionLength { get; }
         public ReadOnlyReactivePropertySlim<bool> RxCaptionVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxStatusVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxKeypadVisible { get; }
@@ -56,24 +56,24 @@ namespace Suconbu.Dentacs
 
             this.DataContext = this;
 
-            this.RxResult = new ReactiveProperty<string>();
-            this.RxErrorText = new ReactiveProperty<string>();
+            this.RxResult = new ReactivePropertySlim<string>();
+            this.RxErrorText = new ReactivePropertySlim<string>();
             this.RxErrorState = this.RxErrorText.Select(x =>
                 x == null ? ErrorState.None :
                 x == string.Empty ? ErrorState.ErrorWithoutMessage :
                 ErrorState.ErrorWithMessage)
                 .ToReadOnlyReactivePropertySlim();
-            this.RxUsageText = new ReactiveProperty<string>();
-            this.RxZoomIndex = new ReactiveProperty<int>();
-            this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReactiveProperty();
+            this.RxUsageText = new ReactivePropertySlim<string>();
+            this.RxZoomIndex = new ReactivePropertySlim<int>();
+            this.RxZoomRatio = this.RxZoomIndex.Select(x => kZoomTable[x]).ToReadOnlyReactivePropertySlim();
             this.RxMildZoomRatio = this.RxZoomRatio.Select(x => ((3 - 1) + x) / 3).ToReadOnlyReactivePropertySlim();
             this.RxMildMildZoomRatio = this.RxZoomRatio.Select(x => ((5 - 1) + x) / 5).ToReadOnlyReactivePropertySlim();
             this.RxTitleText = this.RxZoomRatio.Select(_ => this.MakeTitleText()).ToReadOnlyReactivePropertySlim();
-            this.RxFullScreenEnabled = new ReactiveProperty<bool>(false);
+            this.RxFullScreenEnabled = new ReactivePropertySlim<bool>(false);
             this.RxFullScreenEnabled.Subscribe(x => this.IsFullScreenChanged(x));
-            this.RxKeypadEnabled = new ReactiveProperty<bool>();
-            this.RxCurrentText = new ReactiveProperty<string>();
-            this.RxSelectionLength = new ReactiveProperty<int>();
+            this.RxKeypadEnabled = new ReactivePropertySlim<bool>();
+            this.RxCurrentText = new ReactivePropertySlim<string>();
+            this.RxSelectionLength = new ReactivePropertySlim<int>();
 
             this.RxCaptionVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
             this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
@@ -156,7 +156,7 @@ namespace Suconbu.Dentacs
 
         void ChangeZoom(int offset)
         {
-            this.RxZoomIndex.Value = Math.Clamp(this.RxZoomIndex.Value + offset, 0, kZoomTable.Length - 1);
+            this.RxZoomIndex.Value = Math.Max(0, Math.Min(this.RxZoomIndex.Value + offset, kZoomTable.Length - 1));
         }
 
         void KeypadPanel_ItemClick(KeypadPanel.Item item)
@@ -205,7 +205,7 @@ namespace Suconbu.Dentacs
         {
             this.calculator.Reset();
 
-            var lines = target.Text.Split(Environment.NewLine);
+            var lines = target.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
             TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
@@ -229,7 +229,7 @@ namespace Suconbu.Dentacs
 
         void FunctionItemClicked(TextBox target, string name)
         {
-            var lines = target.Text.Split(Environment.NewLine);
+            var lines = target.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
             TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
@@ -326,7 +326,7 @@ namespace Suconbu.Dentacs
 
             var caretIndex = this.InputTextBox.CaretIndex;
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
-            var lines = this.InputTextBox.Text.Split(Environment.NewLine);
+            var lines = this.InputTextBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             // GetLineText and GetCharacterIndexFromLineIndex does not work correctly in full-screen mode.
             var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
             var selectedText = this.InputTextBox.SelectedText;

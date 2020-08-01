@@ -59,7 +59,7 @@ namespace Suconbu.Dentacs
             }
             else if (radix == 16 || radix == 2)
             {
-                var integer = (Int64)Math.Clamp(value, Int64.MinValue, Int64.MaxValue);
+                var integer = (Int64)Math.Max(Int64.MinValue, Math.Min(value, Int64.MaxValue));
                 int bitCount =
                         (integer < -0x10000 || 0xFFFFFFFF < integer) ? 64 :
                         (integer < 0 || 0xFFFF < integer) ? 32 :

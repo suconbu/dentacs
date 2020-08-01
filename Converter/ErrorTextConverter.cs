@@ -14,7 +14,7 @@ namespace Suconbu.Dentacs
         {
             if (!(value is string errorText)) return null;
 
-            var tokens = errorText.Split(':', 2);
+            var tokens = errorText.Split(new[] { ':' }, 2);
             var errorType = tokens[0];
             if (!string.IsNullOrEmpty(errorType))
             {
