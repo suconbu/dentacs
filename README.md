@@ -19,10 +19,6 @@ Main features:
 * Display calculation result in 3 different radix numbers at once
 * Character code information (CodePoint, UTF-16, UTF-8) is displayed in status bar
 
-Motivations to develop this app:  
-When I need to do a little calculation at the work, I wanted to do calculate as easy as writing expressions like as source code, but couldn't find such an calculator app.  
-Also, I have been using with WinForms so far, so I wanted to create a WPF app.  
-
 ## Manual
 
 ### Shortcut keys
@@ -84,6 +80,25 @@ y = x ** 2 # y:100
 PI = 3  # Error: 'PI' is a constant
 pi = 3  # OK: It is case sensitive
 ```
+
+### Functions
+
+Identifier | Parameters  | Description
+-----------|-------------|-----------------------------------------------------------------
+trunc      | (n)         | Returns the integer part of a number by removing any fractional
+floor      | (n)         | Returns the largest integer less than or equal to a given number
+ceil       | (n)         | Returns the number of rounded up to the next largest integer
+round      | (n)         | Returns the value of a number rounded to the nearest integer
+sin        | (d)         | Returns the sine of a number of degrees
+cos        | (d)         | Returns the cosine of a number of degrees
+tan        | (d)         | Returns the tangent of a number of degrees
+asin       | (n)         | Returns the arcsine (in degrees) of a number
+acos       | (n)         | Returns the arccosine (in degrees) of a number
+atan       | (n)         | Returns the arctangent (in degrees) of a number
+atan2      | (y, x)      | Returns the arctangent (in degrees) of a y and x (e.g. atan2(1, 1) -> 45)
+log10      | (n)         | Returns the base 10 logarithm of a number
+log2       | (n)         | Returns the base 2 logarithm of a number
+log        | (n[, base]) | Returns the natural logarithms or logarithm of a number with specified base (e.g. log(9, 3) -> 2)
 
 ### Constants
 
