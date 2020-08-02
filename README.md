@@ -1,5 +1,8 @@
 # dentacs
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/suconbu/dentacs)](https://github.com/suconbu/dentacs/releases)
+[![Build Status](https://suconbu.visualstudio.com/dentacs/_apis/build/status/suconbu.dentacs?branchName=master)](https://suconbu.visualstudio.com/dentacs/_build/latest?definitionId=2&branchName=master)
+
 The dentacs is text-box based calculator for Windows Desktop.  
 It's developing with WPF and C# .NET Framework 4.7.2.
 
