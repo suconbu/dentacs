@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dentacs", "dentacs.csproj", "{6EBC50EB-38B4-438F-80FC-5F2D227971DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dentacs", "Dentacs\Dentacs.csproj", "{6EBC50EB-38B4-438F-80FC-5F2D227971DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{E0820DB0-E1BB-4105-B3BD-72B2CB877929}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dentacs.Test", "Dentacs.Test\Dentacs.Test.csproj", "{E0820DB0-E1BB-4105-B3BD-72B2CB877929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
