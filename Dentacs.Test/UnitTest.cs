@@ -30,6 +30,24 @@ namespace Suconbu.Dentacs
             Assert.IsTrue(calculator.Calculate("0x8000000000000000"));
             Assert.AreEqual("-9223372036854775808", calculator.Result.ToString());
 
+            Assert.IsTrue(calculator.Calculate("10 % 3"));
+            Assert.AreEqual("1", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("10 % -3"));
+            Assert.AreEqual("-2", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-10 % 3"));
+            Assert.AreEqual("2", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-10 % -3"));
+            Assert.AreEqual("-1", calculator.Result.ToString());
+        }
+
+        [TestMethod]
+        public void TestCalculatorBitwiseOperation()
+        {
+            var calculator = new Calculator();
+
             Assert.IsTrue(calculator.Calculate("~0"));
             Assert.AreEqual("-1", calculator.Result.ToString());
 

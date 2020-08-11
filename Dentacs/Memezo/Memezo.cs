@@ -736,7 +736,7 @@ namespace Suconbu.Scripting.Memezo
                         (tokenType == TokenType.Minus) ? new Value(a.Number - b.Number) :
                         (tokenType == TokenType.Division) ? new Value(a.Number / b.Number) :
                         (tokenType == TokenType.FloorDivision) ? new Value(Math.Floor(a.Number / b.Number)) :
-                        (tokenType == TokenType.Remainder) ? new Value(a.Number % b.Number) :
+                        (tokenType == TokenType.Remainder) ? new Value((a.Number - (b.Number * Math.Floor(a.Number / b.Number)))) :
                         (tokenType == TokenType.Exponent) ? new Value((decimal)Math.Pow((double)a.Number, (double)b.Number)) :
                         (tokenType == TokenType.Less) ? new Value(a.Number < b.Number ? 1 : 0) :
                         (tokenType == TokenType.Greater) ? new Value(a.Number > b.Number ? 1 : 0) :
