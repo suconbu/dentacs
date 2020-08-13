@@ -40,10 +40,9 @@ namespace Suconbu.Scripting.Memezo
         int nestingLevelOfDeferredSource;
         readonly StringBuilder interactiveSource = new StringBuilder();
         readonly Stack<Clause> clauses = new Stack<Clause>();
-        readonly Dictionary<TokenType, int> operatorPrecs = new Dictionary<TokenType, int>()
+        readonly Dictionary<TokenType, int> binaryOperatorPrecs = new Dictionary<TokenType, int>()
         {
             { TokenType.Exponent, 12 },
-            { TokenType.BitwiseNot, 11 },
             { TokenType.Multiply, 10 }, {TokenType.Division, 10 }, {TokenType.FloorDivision, 10 }, {TokenType.Remainder, 10 },
             { TokenType.Plus, 9 }, { TokenType.Minus, 9 },
             { TokenType.BitwiseLeftShift, 8 }, { TokenType.BitwiseRightShift, 8 },
@@ -51,9 +50,13 @@ namespace Suconbu.Scripting.Memezo
             { TokenType.BitwiseXor, 6 },
             { TokenType.BitwiseOr, 5 },
             { TokenType.Equal, 4 }, { TokenType.NotEqual, 4 }, { TokenType.Less, 4 }, { TokenType.Greater, 4 }, { TokenType.LessEqual, 4 },  { TokenType.GreaterEqual, 4 },
-            { TokenType.Not, 3 },
             { TokenType.And, 2 },
             { TokenType.Or, 1 }
+        };
+        readonly Dictionary<TokenType, int> unaryOperatorPrecs = new Dictionary<TokenType, int>()
+        {
+            { TokenType.Plus, 11 }, { TokenType.Minus, 11 }, { TokenType.BitwiseNot, 11 },
+            { TokenType.Not, 3 },
         };
         List<IModule> modules = new List<IModule>();
 
@@ -361,11 +364,10 @@ namespace Suconbu.Scripting.Memezo
         Value Expr(int lowestPrec = int.MinValue + 1)
         {
             var lhs = this.Primary();
-            this.lexer.ReadToken();
             while (true)
             {
                 if (!this.lexer.Token.IsOperator()) break;
-                if (!this.operatorPrecs.TryGetValue(this.lexer.Token.Type, out var prec)) prec = int.MinValue;
+                if (!this.binaryOperatorPrecs.TryGetValue(this.lexer.Token.Type, out var prec)) prec = int.MinValue;
                 if (prec <= lowestPrec) break;
 
                 var type = this.lexer.Token.Type;
@@ -388,45 +390,37 @@ namespace Suconbu.Scripting.Memezo
         Value Primary()
         {
             var primary = Value.Zero;
+            var token = this.lexer.Token;
 
-            if (this.lexer.Token.Type == TokenType.String)
+            if (Token.IsUnaryOperator(token.Type))
             {
-                primary = new Value(this.lexer.Token.String);
-            }
-            else if (this.lexer.Token.Type == TokenType.Number)
-            {
-                primary = new Value(this.lexer.Token.Number);
-            }
-            else if (this.lexer.Token.Type == TokenType.Plus || this.lexer.Token.Type == TokenType.Minus)
-            {
-                var type = this.lexer.Token.Type;
-                this.lexer.ReadToken();
-                primary = Value.Zero.BinaryOperation(this.Primary(), type); // we dont realy have a unary operators
-            }
-            else if (this.lexer.Token.Type == TokenType.Not)
-            {
-                this.lexer.ReadToken();
-                primary = new Value(this.Primary().IsTrue());
-            }
-            else if (this.lexer.Token.Type == TokenType.BitwiseNot)
-            {
-                this.lexer.ReadToken();
-                primary = this.Primary();
-                if (!primary.TryToInteger(out var ip))
+                if (!this.unaryOperatorPrecs.TryGetValue(token.Type, out var prec))
                 {
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {primary.Type}");
+                    throw new ErrorException(ErrorType.UnknownOperator, $"{token}");
                 }
-                primary = new Value(~ip);
+                this.lexer.ReadToken();
+                primary = this.Expr(prec).UnaryOperation(token.Type);
             }
-            else if (this.lexer.Token.Type == TokenType.LeftParen)
+            else if (token.Type == TokenType.String)
+            {
+                primary = new Value(token.String);
+                this.lexer.ReadToken();
+            }
+            else if (token.Type == TokenType.Number)
+            {
+                primary = new Value(token.Number);
+                this.lexer.ReadToken();
+            }
+            else if (token.Type == TokenType.LeftParen)
             {
                 this.lexer.ReadToken();
                 primary = this.Expr();
                 this.VerifyToken(this.lexer.Token, TokenType.RightParen);
+                this.lexer.ReadToken();
             }
-            else if (this.lexer.Token.Type == TokenType.Identifer)
+            else if (token.Type == TokenType.Identifer)
             {
-                var identifier = this.lexer.Token.String;
+                var identifier = token.String;
                 if (this.Vars.TryGetValue(identifier, out var value))
                 {
                     primary = value;
@@ -450,7 +444,7 @@ namespace Suconbu.Scripting.Memezo
             }
             else
             {
-                throw new ErrorException(ErrorType.UnexpectedToken, $"{this.lexer.Token}");
+                throw new ErrorException(ErrorType.UnexpectedToken, $"{token}");
             }
 
             return primary;
@@ -473,6 +467,7 @@ namespace Suconbu.Scripting.Memezo
                     while (this.lexer.Token.Type == TokenType.NewLine) this.lexer.ReadToken();
                     if (this.lexer.Token.Type == TokenType.Comma) continue;
                 }
+                this.lexer.ReadToken();
                 break;
             }
             return args;
@@ -649,6 +644,41 @@ namespace Suconbu.Scripting.Memezo
 
         internal bool IsTrue() =>
             (this.Type == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
+
+        internal Value UnaryOperation(TokenType tokenType)
+        {
+            var value = Value.Zero;
+
+            if (tokenType == TokenType.Not)
+            {
+                value = new Value(!this.IsTrue());
+            }
+            else
+            {
+                if (tokenType == TokenType.Plus || tokenType == TokenType.Minus)
+                {
+                    if (this.Type != DataType.Number)
+                    {
+                        throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {this.Type}");
+                    }
+                    value = new Value(tokenType == TokenType.Minus ? -this.Number : this.Number);
+                }
+                else if (tokenType == TokenType.BitwiseNot)
+                {
+                    if (!this.TryToInteger(out var integer))
+                    {
+                        throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {this.Type}");
+                    }
+                    value = new Value(~integer);
+                }
+                else
+                {
+                    throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
+                }
+            }
+
+            return value;
+        }
 
         internal Value BinaryOperation(Value b, TokenType tokenType)
         {
@@ -1079,6 +1109,7 @@ namespace Suconbu.Scripting.Memezo
         public bool IsCompoundStatement() { return this.Type == TokenType.If || this.IsLoop(); }
         public bool IsLoop() { return this.Type == TokenType.For || this.Type == TokenType.Repeat; }
         public bool IsOperator() { return TokenType.OperatorBegin < this.Type && this.Type < TokenType.OperatorEnd; }
+        public static bool IsUnaryOperator(TokenType type) { return type == TokenType.Plus || type == TokenType.Minus || type == TokenType.Not || type == TokenType.BitwiseNot; }
         public static bool IsBitwiseOperator(TokenType type) { return TokenType.BitwiseOperatorBegin < type && type < TokenType.BitwiseOperatorEnd; }
 
         public override string ToString() => $"'{this.String.Replace("\n", "\\n")}'({this.Type})";

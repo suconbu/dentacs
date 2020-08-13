@@ -44,6 +44,30 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
+        public void TestCalculatorPrecedence()
+        {
+            var calculator = new Calculator();
+
+            Assert.IsTrue(calculator.Calculate("1+2*2"));
+            Assert.AreEqual("5", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("(1+2)*2"));
+            Assert.AreEqual("6", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-2+2"));
+            Assert.AreEqual("0", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("-2**2"));
+            Assert.AreEqual("-4", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("(-2)**2"));
+            Assert.AreEqual("4", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("not \"str\""));
+            Assert.AreEqual("0", calculator.Result.ToString());
+        }
+
+        [TestMethod]
         public void TestCalculatorBitwiseOperation()
         {
             var calculator = new Calculator();
