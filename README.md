@@ -48,24 +48,28 @@ Hexadecimal | 0x04d2, 0x4D2
 Octal       | 0o2322
 Binary      | 0b0000010011010010
 
-### Operators
+### Operators and precedence
 
-Operation           | Token | Examples
---------------------|-------|-------------------
-Addition            | +     | 5 + 3  -> 8
-Subtraction         | -     | 5 - 3  -> 2
-Multiplication      | *     | 5 * 3  -> 15
-Division            | /     | 5 / 3  -> 1.666...
-FloorDivision       | //    | 5 // 3 -> 1
-Modulo              | %     | 5 % 3  -> 2
-Exponentiation      | **    | 5 ** 3 -> 125
-Bitwise AND         | &     | 5 & 3  -> 1 (0b0101 & 0b0011 -> 0b0001)
-Bitwise OR          | \|     | 5 \| 3  -> 7 (0b0101 \| 0b0011 -> 0b0111)
-Bitwise XOR         | ^     | 5 ^ 3  -> 6 (0b0101 ^ 0b0011 -> 0b0110)
-Bitwise NOT         | ~     | ~5     -> -6 (~0b0101 -> 0b1111...1010)
-Bitwise left shift  | <<    | 5 << 3 -> 40 (0b0101 << 3 -> 0b00101000)
-Bitwise right shift | >>    | 5 >> 3 -> 0  (0b0101 >> 3 -> 0b0000)
-Assignment          | =     | x = 5 + 3
+The followings the supported operators in dentacs, from highest to lowest precedence.
+
+Precedence | Operation           | Token | Examples
+-----------|---------------------|-------|-------------------
+1          | Exponentiation      | **    | 5 ** 3 -> 125
+2          | Positive sign       | +     | +5     -> 5
+2          | Negative sign       | -     | -5     -> -5
+2          | Bitwise NOT         | ~     | ~5     -> -6 (~0b0101 -> 0b1111...1010)
+3          | Multiplication      | *     | 5 * 3  -> 15
+3          | Division            | /     | 5 / 3  -> 1.666...
+3          | FloorDivision       | //    | 5 // 3 -> 1
+3          | Reminder            | %     | 5 % 3  -> 2
+4          | Addition            | +     | 5 + 3  -> 8
+4          | Subtraction         | -     | 5 - 3  -> 2
+5          | Bitwise left shift  | <<    | 5 << 3 -> 40 (0b0101 << 3 -> 0b00101000)
+5          | Bitwise right shift | >>    | 5 >> 3 -> 0  (0b0101 >> 3 -> 0b0000)
+6          | Bitwise AND         | &     | 5 & 3  -> 1 (0b0101 & 0b0011 -> 0b0001)
+7          | Bitwise OR          | \|    | 5 \| 3 -> 7 (0b0101 \| 0b0011 -> 0b0111)
+8          | Bitwise XOR         | ^     | 5 ^ 3  -> 6 (0b0101 ^ 0b0011 -> 0b0110)
+9          | Assignment          | =     | x = 5 + 3 -> 8
 
 ### Variables
 
