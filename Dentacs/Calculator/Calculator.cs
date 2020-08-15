@@ -19,6 +19,8 @@ namespace Suconbu.Dentacs
             this.memezo.Import(new MathmaticsModule());
             this.memezo.Output += (sender, e) => { this.Result = e.ToString(); };
             this.memezo.Assigning += (sender, e) => { this.Result = e.Value.ToString(); };
+            this.memezo.UnaryOperationOverride += (first, tokenType) => this.UnaryOperation(first, tokenType);
+            this.memezo.BinaryOperationOverride += (first, second, tokenType) => this.BinaryOperation(first, second, tokenType);
             this.memezo.ErrorOccurred += (sender, e) =>
             {
                 if (e.Type == Memezo.ErrorType.UnexpectedToken ||
@@ -48,10 +50,20 @@ namespace Suconbu.Dentacs
             return this.Error == null;
         }
 
-        void ClearResult()
+        private void ClearResult()
         {
             this.Result = string.Empty;
             this.Error = null;
+        }
+
+        private Memezo.Value UnaryOperation(Memezo.Value first, Memezo.TokenType tokenType)
+        {
+            return null;
+        }
+
+        private Memezo.Value BinaryOperation(Memezo.Value first, Memezo.Value second, Memezo.TokenType tokenType)
+        {
+            return null;
         }
     }
 }

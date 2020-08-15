@@ -25,6 +25,9 @@ namespace Suconbu.Scripting.Memezo
         public event EventHandler<string> FunctionInvoking = delegate { };
         public event EventHandler<AssigningEventArgs> Assigning = delegate { };
 
+        public Func<Value, TokenType, Value> UnaryOperationOverride = delegate { return null; };
+        public Func<Value, Value, TokenType, Value> BinaryOperationOverride = delegate { return null; };
+
         public static readonly string[] Keywords = Lexer.Keywords;
         public static readonly string LineCommentMarker = Lexer.LineCommentMarker;
         public static readonly char[] StringQuoteMarkers = Lexer.StringQuoteMarkers;
@@ -393,12 +396,8 @@ namespace Suconbu.Scripting.Memezo
             var primary = Value.Zero;
             var token = this.lexer.Token;
 
-            if (Token.IsUnaryOperator(token.Type))
+            if (this.unaryOperatorPrecs.TryGetValue(token.Type, out var prec))
             {
-                if (!this.unaryOperatorPrecs.TryGetValue(token.Type, out var prec))
-                {
-                    throw new ErrorException(ErrorType.UnknownOperator, $"{token}");
-                }
                 this.lexer.ReadToken();
                 primary = this.UnaryOperation(this.Expr(prec), token.Type);
             }
@@ -481,39 +480,40 @@ namespace Suconbu.Scripting.Memezo
             this.Vars[name] = value;
         }
 
-        internal Value UnaryOperation(Value a, TokenType tokenType)
+        Value UnaryOperation(Value a, TokenType tokenType)
         {
+            if (this.UnaryOperationOverride(a, tokenType) is Value result) return result;
+
             if (tokenType == TokenType.Not)
             {
                 return new Value(!a.IsTrue());
             }
+            else if (tokenType == TokenType.Plus || tokenType == TokenType.Minus)
+            {
+                if (a.Type != DataType.Number)
+                {
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                }
+                return new Value(tokenType == TokenType.Minus ? -a.Number : a.Number);
+            }
+            else if (tokenType == TokenType.BitwiseNot)
+            {
+                if (!a.TryToInteger(out var integer))
+                {
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {a.Type}");
+                }
+                return new Value(~integer);
+            }
             else
             {
-                if (tokenType == TokenType.Plus || tokenType == TokenType.Minus)
-                {
-                    if (a.Type != DataType.Number)
-                    {
-                        throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
-                    }
-                    return new Value(tokenType == TokenType.Minus ? -a.Number : a.Number);
-                }
-                else if (tokenType == TokenType.BitwiseNot)
-                {
-                    if (!a.TryToInteger(out var integer))
-                    {
-                        throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {a.Type}");
-                    }
-                    return new Value(~integer);
-                }
-                else
-                {
-                    throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
-                }
+                throw new ErrorException(ErrorType.UnknownOperator, $"{tokenType}");
             }
         }
 
         Value BinaryOperation(Value a, Value b, TokenType tokenType)
         {
+            if (this.BinaryOperationOverride(a, b, tokenType) is Value result) return result;
+
             if (tokenType == TokenType.Multiply)
             {
                 return
@@ -1049,7 +1049,7 @@ namespace Suconbu.Scripting.Memezo
         bool IsStringEnclosure(char c) => (c == '"' || c == '\'');
     }
 
-    enum TokenType
+    public enum TokenType
     {
         None, Unkown,
 
@@ -1104,7 +1104,6 @@ namespace Suconbu.Scripting.Memezo
         public bool IsCompoundStatement() { return this.Type == TokenType.If || this.IsLoop(); }
         public bool IsLoop() { return this.Type == TokenType.For || this.Type == TokenType.Repeat; }
         public bool IsOperator() { return TokenType.OperatorBegin < this.Type && this.Type < TokenType.OperatorEnd; }
-        public static bool IsUnaryOperator(TokenType type) { return type == TokenType.Plus || type == TokenType.Minus || type == TokenType.Not || type == TokenType.BitwiseNot; }
         public static bool IsBitwiseOperator(TokenType type) { return TokenType.BitwiseOperatorBegin < type && type < TokenType.BitwiseOperatorEnd; }
 
         public override string ToString() => $"'{this.String.Replace("\n", "\\n")}'({this.Type})";
