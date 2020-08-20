@@ -46,6 +46,23 @@ namespace Suconbu.Dentacs
             "yyyyMMddTHHmm",
             "yyyyMMddTHH",
             "yyyyMMdd",
+
+            "yyyy/M/d H:m:s",
+            "yyyy/M/d H:m",
+            "yyyy/M/d H",
+            "yyyy/M/d",
+            "yyyy/M",
+
+            "M/d/yyyy H:m:s",
+            "M/d/yyyy H:m",
+            "M/d/yyyy H",
+            "M/d/yyyy",
+            "M/yyyy",
+
+            "M/d H:m:s",
+            "M/d H:m",
+            "M/d H",
+            "M/d",
         };
 
         public static DateTime Parse(string s)
@@ -57,9 +74,6 @@ namespace Suconbu.Dentacs
             throw new FormatException();
         }
 
-        // 2004/4/1 12:00:00 -> 2004-04-01T12:00:00+09:00
-        // 2004/4/1          -> 2004-04-01T00:00:00+09:00
-        // 4/1               -> 今年-04-01T00:00:00+09:00
         public static bool TryParseDateTime(string s, out DateTime result)
         {
             if (DateTimeOffset.TryParseExact(s, DateTimeUtility.withTimeZoneFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))

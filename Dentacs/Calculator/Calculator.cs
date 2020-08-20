@@ -71,14 +71,14 @@ namespace Suconbu.Dentacs
         {
             var sign = (t.Ticks < 0) ? "-" : "";
             var d = t.Duration();
-            var seconds = d.TotalSeconds - Math.Truncate(d.TotalSeconds);
+            var seconds = d.Seconds + (d.TotalSeconds - Math.Truncate(d.TotalSeconds));
             if (this.culture.TwoLetterISOLanguageName == "ja")
             {
                 return $"{sign}{d.Days}日{d.Hours}時間{d.Minutes}分{seconds}秒";
             }
             else
             {
-                return $"{sign}{d.Days}day{d.Hours}hour{d.Minutes}min{seconds}sec";
+                return $"{sign}{d.Days}day {d.Hours}hour {d.Minutes}min {seconds}sec";
             }
         }
 
