@@ -380,7 +380,7 @@ namespace Suconbu.Scripting.Memezo
                 lhs = this.BinaryOperation(lhs, rhs, type);
                 RunStat.Increment(this.Stat.OperatorCounts, type.ToString());
             }
-            if (lhs.Type == DataType.Number)
+            if (lhs.DataType == DataType.Number)
             {
                 if (lhs.Number < long.MinValue || long.MaxValue < lhs.Number)
                 {
@@ -424,10 +424,12 @@ namespace Suconbu.Scripting.Memezo
                 if (this.Vars.TryGetValue(identifier, out var value))
                 {
                     primary = value;
+                    this.lexer.ReadToken();
                 }
                 else if (this.TryGetConstant(identifier, out var constant))
                 {
                     primary = constant;
+                    this.lexer.ReadToken();
                 }
                 else if (this.TryGetFunction(identifier, out var function))
                 {
@@ -490,9 +492,9 @@ namespace Suconbu.Scripting.Memezo
             }
             else if (tokenType == TokenType.Plus || tokenType == TokenType.Minus)
             {
-                if (a.Type != DataType.Number)
+                if (a.DataType != DataType.Number)
                 {
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
                 }
                 return new Value(tokenType == TokenType.Minus ? -a.Number : a.Number);
             }
@@ -500,7 +502,7 @@ namespace Suconbu.Scripting.Memezo
             {
                 if (!a.TryToInteger(out var integer))
                 {
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"Non-integer number for {a.DataType}");
                 }
                 return new Value(~integer);
             }
@@ -517,49 +519,49 @@ namespace Suconbu.Scripting.Memezo
             if (tokenType == TokenType.Multiply)
             {
                 return
-                    (a.Type == DataType.Number && b.Type == DataType.Number) ?
+                    (a.DataType == DataType.Number && b.DataType == DataType.Number) ?
                         new Value(a.Number * b.Number) :
-                    (a.Type == DataType.String && b.Type == DataType.Number) ?
+                    (a.DataType == DataType.String && b.DataType == DataType.Number) ?
                         new Value((new StringBuilder().Insert(0, a.String, (int)Math.Max(b.Number, 0m))).ToString()) :
-                    (a.Type == DataType.Number && b.Type == DataType.String) ?
+                    (a.DataType == DataType.Number && b.DataType == DataType.String) ?
                         new Value((new StringBuilder().Insert(0, b.String, (int)Math.Max(a.Number, 0m))).ToString()) :
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
             }
 
-            if (a.Type != b.Type)
+            if (a.DataType != b.DataType)
             {
-                if (a.Type == DataType.Number && b.Type == DataType.String)
+                if (a.DataType == DataType.Number && b.DataType == DataType.String)
                     a = new Value(a.ToString());
-                else if (a.Type == DataType.String && b.Type == DataType.Number)
+                else if (a.DataType == DataType.String && b.DataType == DataType.Number)
                     b = new Value(b.ToString());
                 else
-                    throw new ErrorException(ErrorType.InvalidDataType, $"{a.Type} x {b.Type}");
+                    throw new ErrorException(ErrorType.InvalidDataType, $"{a.DataType} x {b.DataType}");
             }
 
             if (tokenType == TokenType.Plus)
             {
                 return
-                    (a.Type == DataType.Number) ? new Value(a.Number + b.Number) :
-                    (a.Type == DataType.String) ? new Value(a.String + b.String) :
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    (a.DataType == DataType.Number) ? new Value(a.Number + b.Number) :
+                    (a.DataType == DataType.String) ? new Value(a.String + b.String) :
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
             }
             else if (tokenType == TokenType.Equal)
             {
                 return
-                    (a.Type == DataType.Number) ? new Value(a.Number == b.Number ? 1 : 0) :
-                    (a.Type == DataType.String) ? new Value(a.String == b.String ? 1 : 0) :
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    (a.DataType == DataType.Number) ? new Value(a.Number == b.Number ? 1 : 0) :
+                    (a.DataType == DataType.String) ? new Value(a.String == b.String ? 1 : 0) :
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
             }
             else if (tokenType == TokenType.NotEqual)
             {
                 return
-                    (a.Type == DataType.Number) ? new Value(a.Number != b.Number ? 1 : 0) :
-                    (a.Type == DataType.String) ? new Value(a.String != b.String ? 1 : 0) :
-                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                    (a.DataType == DataType.Number) ? new Value(a.Number != b.Number ? 1 : 0) :
+                    (a.DataType == DataType.String) ? new Value(a.String != b.String ? 1 : 0) :
+                    throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
             }
             else
             {
-                if (a.Type != DataType.Number) throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.Type}");
+                if (a.DataType != DataType.Number) throw new ErrorException(ErrorType.NotSupportedOperation, $"{tokenType} for {a.DataType}");
 
                 if (Token.IsBitwiseOperator(tokenType))
                 {
@@ -733,24 +735,27 @@ namespace Suconbu.Scripting.Memezo
     {
         public static readonly Value Zero = new Value(0m);
 
-        public DataType Type { get; }
+        public DataType DataType { get; }
+        public string ContentType { get; }
         public decimal Number { get; }
         public string String { get; }
 
-        public Value(decimal n) : this()
+        public Value(decimal n, string contentType = null) : this()
         {
-            this.Type = DataType.Number;
+            this.DataType = DataType.Number;
+            this.ContentType = contentType;
             this.Number = n;
             this.String = this.Number.ToString();
         }
 
-        public Value(long n) : this((decimal)n) { }
-        public Value(double n) : this((decimal)n) { }
-        public Value(bool b) : this(b ? 1m : 0m) { }
+        public Value(long n, string contentType = null) : this((decimal)n, contentType) { }
+        public Value(double n, string contentType = null) : this((decimal)n, contentType) { }
+        public Value(bool b, string contentType = null) : this(b ? 1m : 0m, contentType) { }
 
-        public Value(string s) : this()
+        public Value(string s, string contentType = null) : this()
         {
-            this.Type = DataType.String;
+            this.DataType = DataType.String;
+            this.ContentType = contentType;
             this.Number = 0m;
             this.String = s;
         }
@@ -758,7 +763,7 @@ namespace Suconbu.Scripting.Memezo
         Value() { }
 
         public override string ToString() =>
-            (this.Type == DataType.Number) ? this.String : $"'{this.String}'";
+            (this.DataType == DataType.Number) ? this.String : $"'{this.String}'";
 
         public bool TryToInteger(out long integer)
         {
@@ -776,7 +781,7 @@ namespace Suconbu.Scripting.Memezo
         }
 
         internal bool IsTrue() =>
-            (this.Type == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
+            (this.DataType == DataType.Number) ? (this.Number != 0m) : !string.IsNullOrEmpty(this.String);
     }
 
     public class AssigningEventArgs : EventArgs

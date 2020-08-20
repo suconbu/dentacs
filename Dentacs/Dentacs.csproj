@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6EBC50EB-38B4-438F-80FC-5F2D227971DD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>dentacs</RootNamespace>
+    <RootNamespace>Suconbu.Dentacs</RootNamespace>
     <AssemblyName>dentacs</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -116,6 +116,7 @@
     </ApplicationDefinition>
     <Compile Include="Calculator\ArgumentsVerifier.cs" />
     <Compile Include="Calculator\Calculator.cs" />
+    <Compile Include="Calculator\DateTimeUtility.cs" />
     <Compile Include="Calculator\MathmaticsModule.cs" />
     <Compile Include="Converter\CharInfoConverter.cs" />
     <Compile Include="Converter\ErrorTextConverter.cs" />

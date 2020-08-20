@@ -125,6 +125,61 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
+        public void TestCalculatorDateTimeOperation()
+        {
+            var calculator = new Calculator();
+
+            var utcDates = new Dictionary<string, string>()
+            {
+                { "2019-08-18T07:36:13+01:00", "2019/08/18 06:36:13" },
+                { "2019-08-18T07:36:13+01", "2019/08/18 06:36:13" },
+                { "2019-08-18T07:36+01:00", "2019/08/18 06:36:00" },
+                { "2019-08-18T07:36+01", "2019/08/18 06:36:00" },
+                { "2019-08-18T07+01:00", "2019/08/18 06:00:00" },
+                { "2019-08-18T07+01", "2019/08/18 06:00:00" },
+                { "20190818T073613+01:00", "2019/08/18 06:36:13" },
+                { "20190818T073613+01", "2019/08/18 06:36:13" },
+                { "20190818T0736+01:00", "2019/08/18 06:36:00" },
+                { "20190818T0736+01", "2019/08/18 06:36:00" },
+                { "20190818T07+01:00", "2019/08/18 06:00:00" },
+                { "20190818T07+01", "2019/08/18 06:00:00" },
+                { "2019-08-18T06:36:13Z", "2019/08/18 06:36:13" },
+                { "2019-08-18T06:36Z", "2019/08/18 06:36:00" },
+                { "2019-08-18T06Z", "2019/08/18 06:00:00" },
+                { "20190818T063613Z", "2019/08/18 06:36:13" },
+                { "20190818T0636Z", "2019/08/18 06:36:00" },
+                { "20190818T06Z", "2019/08/18 06:00:00" },
+            };
+            var localDates = new Dictionary<string, string>()
+            {
+                { "2019-08-18T07:36:13", "2019/08/18 07:36:13" },
+                { "2019-08-18T07:36", "2019/08/18 07:36:00" },
+                { "2019-08-18T07", "2019/08/18 07:00:00" },
+                { "2019-08-18", "2019/08/18 00:00:00" },
+                { "2019-08", "2019/08/01 00:00:00" },
+                { "2019", "2019/01/01 00:00:00" },
+                { "20190818T07", "2019/08/18 07:00:00" },
+                { "20190818", "2019/08/18 00:00:00" },
+            };
+
+            var format = "yyyy'/'MM'/'dd' 'HH':'mm':'ss";
+            int count = 0;
+            foreach(var date in utcDates)
+            {
+                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result));
+                Assert.AreEqual($"{count}:{date.Value}", $"{count}:" + result.ToString(format));
+                count++;
+            }
+            count = 0;
+            foreach (var date in localDates)
+            {
+                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result));
+                Assert.AreEqual($"{count}:{date.Value}", $"{count}:" + result.ToString(format));
+                count++;
+            }
+        }
+
+        [TestMethod]
         public void TestResultValueConverter()
         {
             var calture = System.Globalization.CultureInfo.CurrentCulture;
