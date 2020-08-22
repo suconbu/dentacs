@@ -72,7 +72,8 @@ namespace Suconbu.Dentacs
         private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
         private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
         private static readonly string seccondPattern = @"(?:(\d+(?:\.\d+)?)(?:s|sec|second))?";
-        private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}$");
+        private static readonly string milliSeccondPattern = @"(?:(\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
+        private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
 
         public static DateTime Parse(string input)
         {
@@ -162,11 +163,13 @@ namespace Suconbu.Dentacs
                 var h = match.Groups[2].Value;
                 var m = match.Groups[3].Value;
                 var s = match.Groups[4].Value;
+                var ms = match.Groups[5].Value;
                 var days = string.IsNullOrEmpty(d) ? 0 : double.Parse(d);
                 var hours = string.IsNullOrEmpty(h) ? 0 : double.Parse(h);
                 var minutes = string.IsNullOrEmpty(m) ? 0 : double.Parse(m);
                 var seconds = string.IsNullOrEmpty(s) ? 0 : double.Parse(s);
-                result = new TimeSpan(DateTimeUtility.GetTicks(days, hours, minutes, seconds));
+                var milliSeconds = string.IsNullOrEmpty(ms) ? 0 : double.Parse(ms);
+                result = new TimeSpan(DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliSeconds / 1000.0));
                 return true;
             }
             return false;
