@@ -68,6 +68,11 @@ namespace Suconbu.Dentacs
             "M/d",
         };
         private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?$");
+        private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
+        private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
+        private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
+        private static readonly string seccondPattern = @"(?:(\d+(?:\.\d+)?)(?:s|sec|second))?";
+        private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}$");
 
         public static DateTime Parse(string input)
         {
@@ -143,15 +148,37 @@ namespace Suconbu.Dentacs
                 var h = match.Groups[1].Value;
                 var m = match.Groups[2].Value;
                 var s = match.Groups[3].Value;
-                var hi = int.Parse(h);
-                var mi = string.IsNullOrEmpty(m) ? 0 : int.Parse(m);
-                var si = string.IsNullOrEmpty(s) ? 0 : int.Parse(s);
-                var days = hi / 60;
-                hi %= 60;
-                result = new TimeSpan(days, hi, mi, si);
+                var hours = int.Parse(h);
+                var minutes = string.IsNullOrEmpty(m) ? 0 : int.Parse(m);
+                var seconds = string.IsNullOrEmpty(s) ? 0 : int.Parse(s);
+                result = new TimeSpan(hours, minutes, seconds);
+                return true;
+            }
+            match = DateTimeUtility.unitSpecifiedTimeRegex.Match(input);
+            if (match.Success)
+            {
+                var d = match.Groups[1].Value;
+                var h = match.Groups[2].Value;
+                var m = match.Groups[3].Value;
+                var s = match.Groups[4].Value;
+                var days = string.IsNullOrEmpty(d) ? 0 : double.Parse(d);
+                var hours = string.IsNullOrEmpty(h) ? 0 : double.Parse(h);
+                var minutes = string.IsNullOrEmpty(m) ? 0 : double.Parse(m);
+                var seconds = string.IsNullOrEmpty(s) ? 0 : double.Parse(s);
+                result = new TimeSpan(DateTimeUtility.GetTicks(days, hours, minutes, seconds));
                 return true;
             }
             return false;
+        }
+
+        private static long GetTicks(double days, double hours, double minutes, double seconds)
+        {
+            double ticks = 0;
+            ticks += TimeSpan.TicksPerSecond * seconds;
+            ticks += TimeSpan.TicksPerMinute * minutes;
+            ticks += TimeSpan.TicksPerHour * hours;
+            ticks += TimeSpan.TicksPerDay * days;
+            return (long)ticks;
         }
     }
 }

@@ -129,9 +129,9 @@ namespace Suconbu.Dentacs
         {
             var calculator = new Calculator();
 
-            var patterns = new Dictionary<string, string>()
+            var datePatterns = new Dictionary<string, string>()
             {
-                { "2019-08-18T07:36:13+01:00", "2019/08/18 06:36:13" }, // 0
+                { "2019-08-18T07:36:13+01:00", "2019/08/18 06:36:13" },
                 { "2019-08-18T07:36:13+01", "2019/08/18 06:36:13" },
                 { "2019-08-18T07:36+01:00", "2019/08/18 06:36:00" },
                 { "2019-08-18T07:36+01", "2019/08/18 06:36:00" },
@@ -141,7 +141,7 @@ namespace Suconbu.Dentacs
                 { "20190818T073613+01", "2019/08/18 06:36:13" },
                 { "20190818T0736+01:00", "2019/08/18 06:36:00" },
                 { "20190818T0736+01", "2019/08/18 06:36:00" },
-                { "20190818T07+01:00", "2019/08/18 06:00:00" },         // 10
+                { "20190818T07+01:00", "2019/08/18 06:00:00" },
                 { "20190818T07+01", "2019/08/18 06:00:00" },
                 { "2019-08-18T06:36:13Z", "2019/08/18 06:36:13" },
                 { "2019-08-18T06:36Z", "2019/08/18 06:36:00" },
@@ -152,7 +152,7 @@ namespace Suconbu.Dentacs
 
                 { "2019-08-18T07:36:13", "2019/08/18 07:36:13" },
                 { "2019-08-18T07:36", "2019/08/18 07:36:00" },
-                { "2019-08-18T07", "2019/08/18 07:00:00" },             // 20
+                { "2019-08-18T07", "2019/08/18 07:00:00" },
                 { "2019-08-18", "2019/08/18 00:00:00" },
                 { "2019-08", "2019/08/01 00:00:00" },
                 { "2019", "2019/01/01 00:00:00" },
@@ -163,12 +163,45 @@ namespace Suconbu.Dentacs
                 { "2019/08/18 07:36", "2019/08/18 07:36:00" },
                 { "2019/08/18 07", "2019/08/18 07:00:00" },
                 { "2019/08/18", "2019/08/18 00:00:00" },
-                { "2019/08", "2019/08/01 00:00:00" },                   // 30
+                { "2019/08", "2019/08/01 00:00:00" },
                 { "08/18/2019 07:36:13", "2019/08/18 07:36:13" },
                 { "08/18/2019 07:36", "2019/08/18 07:36:00" },
                 { "08/18/2019 07", "2019/08/18 07:00:00" },
                 { "08/18/2019", "2019/08/18 00:00:00" },
                 { "08/2019", "2019/08/01 00:00:00" },
+            };
+            var timePatterns = new Dictionary<string, string>()
+            {
+                { "11:22:33", "11:22:33" },
+                { "11:22", "11:22:00" },
+                { "11", "11:00:00" },
+                { "100d", "100.00:00:00" },
+                { "100day", "100.00:00:00" },
+                { "100h", "4.04:00:00" },
+                { "100hour", "4.04:00:00" },
+                { "100m", "01:40:00" },
+                { "100min", "01:40:00" },
+                { "100minute", "01:40:00" },
+                { "100s", "00:01:40" },
+                { "100sec", "00:01:40" },
+                { "100second", "00:01:40" },
+                { "1d2h3m4s", "1.02:03:04" },
+                { "1d 2h3m4s", "1.02:03:04" },
+                { "1d  2h  3m  4s", "1.02:03:04" },
+                { "1.5d", "1.12:00:00" },
+                { "1.5d1.5h", "1.13:30:00" },
+                { "1.5d1.5h1.5m", "1.13:31:30" },
+                { "1.5d1.5h1.5m1.5s", "1.13:31:31.5000000" },
+                { "1.5d1.5m", "1.12:01:30" },
+                { "1.5h1.5m1.5s", "01:31:31.5000000" },
+            };
+            var errorTimePatterns = new[]
+            {
+                "11:22:33:",
+                "11:22:",
+                "11:",
+                "1m1h",
+                "1h1h",
             };
             var operations = new Dictionary<string, string>()
             {
@@ -182,19 +215,24 @@ namespace Suconbu.Dentacs
             };
 
             var format = "yyyy'/'MM'/'dd' 'HH':'mm':'ss";
-            int count = 0;
-            foreach(var date in patterns)
+            foreach(var date in datePatterns)
             {
-                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result));
-                Assert.AreEqual($"{count}:{date.Value}", $"{count}:" + result.ToString(format));
-                count++;
+                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result), $"{date.Key}");
+                Assert.AreEqual(date.Value, result.ToString(format), $"{date.Key}");
             }
-            count = 0;
+            foreach (var time in errorTimePatterns)
+            {
+                Assert.IsFalse(DateTimeUtility.TryParseTimeSpan(time, out var result), $"{time}");
+            }
+            foreach (var time in timePatterns)
+            {
+                Assert.IsTrue(DateTimeUtility.TryParseTimeSpan(time.Key, out var result), $"{time.Key}");
+                Assert.AreEqual(time.Value, result.ToString(), $"{time.Key}");
+            }
             foreach (var operation in operations)
             {
-                Assert.IsTrue(calculator.Calculate(operation.Key));
-                Assert.AreEqual($"{count}:{operation.Value}", $"{count}:" + calculator.Result);
-                count++;
+                Assert.IsTrue(calculator.Calculate(operation.Key), $"{operation}");
+                Assert.AreEqual(operation.Value, calculator.Result, $"{operation}");
             }
         }
 
