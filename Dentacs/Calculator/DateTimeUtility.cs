@@ -13,18 +13,18 @@ namespace Suconbu.Dentacs
         private static readonly string[] isoDateTimeWithTimeZoneFormats =
         {
             "yyyy-MM-ddTHH:mm:sszzz",
-            "yyyy-MM-ddTHH:mm:sszz",
+            //"yyyy-MM-ddTHH:mm:sszz",
             "yyyy-MM-ddTHH:mmzzz",
-            "yyyy-MM-ddTHH:mmzz",
+            //"yyyy-MM-ddTHH:mmzz",
             "yyyy-MM-ddTHHzzz",
-            "yyyy-MM-ddTHHzz",
+            //"yyyy-MM-ddTHHzz",
 
             "yyyyMMddTHHmmsszzz",
-            "yyyyMMddTHHmmsszz",
+            //"yyyyMMddTHHmmsszz",
             "yyyyMMddTHHmmzzz",
-            "yyyyMMddTHHmmzz",
+            //"yyyyMMddTHHmmzz",
             "yyyyMMddTHHzzz",
-            "yyyyMMddTHHzz",
+            //"yyyyMMddTHHzz",
 
             "yyyy-MM-ddTHH:mm:ssZ",
             "yyyy-MM-ddTHH:mmZ",
