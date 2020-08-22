@@ -106,43 +106,6 @@ namespace Suconbu.Dentacs
 
         public static bool TryParseTimeSpan(string input, out TimeSpan result)
         {
-            // If this function call do not put first, the hours part might be parsed as days like as:
-            // 48:10:20 -> 48days + 10:20:00 (Not as expected)
-            if (DateTimeUtility.TryParseCustomTimeSpan(input, out result))
-            {
-                return true;
-            }
-            if (!int.TryParse(input, out var _) &&
-                TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out result))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public static DateTime DateTimeFromSeconds(decimal seconds)
-        {
-            return new DateTime((long)(seconds * TimeSpan.TicksPerSecond));
-        }
-
-        public static TimeSpan TimeSpanFromSeconds(decimal seconds)
-        {
-            return new TimeSpan((long)(seconds * TimeSpan.TicksPerSecond));
-        }
-
-        public static decimal DateTimeToSeconds(DateTime d)
-        {
-            return (decimal)d.Ticks / TimeSpan.TicksPerSecond;
-        }
-
-        public static decimal TimeSpanToSeconds(TimeSpan t)
-        {
-            return (decimal)t.Ticks / TimeSpan.TicksPerSecond;
-        }
-
-        private static bool TryParseCustomTimeSpan(string input, out TimeSpan result)
-        {
-            result = TimeSpan.Zero;
             var match = DateTimeUtility.colonSeparatedTimeRegex.Match(input);
             if (match.Success)
             {
@@ -172,7 +135,35 @@ namespace Suconbu.Dentacs
                 result = new TimeSpan(DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliSeconds / 1000.0));
                 return true;
             }
+            // If this function call put first, the hours part might be parsed as days like as:
+            // 48:10:20 -> 48days + 10:20:00 (Not as expected)
+            if (!int.TryParse(input, out var _) &&
+                TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out result))
+            {
+                return true;
+            }
+            result = TimeSpan.Zero;
             return false;
+        }
+
+        public static DateTime DateTimeFromSeconds(decimal seconds)
+        {
+            return new DateTime((long)(seconds * TimeSpan.TicksPerSecond));
+        }
+
+        public static TimeSpan TimeSpanFromSeconds(decimal seconds)
+        {
+            return new TimeSpan((long)(seconds * TimeSpan.TicksPerSecond));
+        }
+
+        public static decimal DateTimeToSeconds(DateTime d)
+        {
+            return (decimal)d.Ticks / TimeSpan.TicksPerSecond;
+        }
+
+        public static decimal TimeSpanToSeconds(TimeSpan t)
+        {
+            return (decimal)t.Ticks / TimeSpan.TicksPerSecond;
         }
 
         private static long GetTicks(double days, double hours, double minutes, double seconds)
