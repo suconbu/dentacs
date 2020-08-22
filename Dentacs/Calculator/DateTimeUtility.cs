@@ -41,12 +41,12 @@ namespace Suconbu.Dentacs
             "yyyy-MM-ddTHH",
             "yyyy-MM-dd",
             "yyyy-MM",
-            "yyyy",
+            //"yyyy",
 
             "yyyyMMddTHHmmss",
             "yyyyMMddTHHmm",
             "yyyyMMddTHH",
-            "yyyyMMdd",
+            //"yyyyMMdd",
         };
         private static readonly string[] generalDateTimeFormats =
         {
@@ -67,7 +67,7 @@ namespace Suconbu.Dentacs
             "M/d H",
             "M/d",
         };
-        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?$");
+        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$");
         private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
         private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
         private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
@@ -111,7 +111,8 @@ namespace Suconbu.Dentacs
             {
                 return true;
             }
-            if (TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out result))
+            if (!int.TryParse(input, out var _) &&
+                TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out result))
             {
                 return true;
             }
