@@ -13,12 +13,7 @@ namespace Suconbu.Dentacs
         public string Result { get; private set; }
         public string Error { get; private set; }
 
-        private static class ContentType
-        {
-            public static readonly string DateTime = nameof(DateTime);
-            public static readonly string TimeSpan = nameof(TimeSpan);
-        }
-
+        private enum ContentType { Number, String, DateTime, TimeSpan }
         private readonly Memezo.Interpreter memezo = new Memezo.Interpreter();
         private CultureInfo culture;
 
@@ -80,50 +75,59 @@ namespace Suconbu.Dentacs
             TimeSpan secondTimeSpan = TimeSpan.MinValue;
 
             var firstType =
+                (first.DataType == Memezo.DataType.Number) ? ContentType.Number :
                 DateTimeUtility.TryParseDateTime(first.String, out firstDateTime) ? ContentType.DateTime :
                 DateTimeUtility.TryParseTimeSpan(first.String, out firstTimeSpan) ? ContentType.TimeSpan :
-                null;
+                ContentType.String;
             var secondType =
+                (second.DataType == Memezo.DataType.Number) ? ContentType.Number :
                 DateTimeUtility.TryParseDateTime(second.String, out secondDateTime) ? ContentType.DateTime :
                 DateTimeUtility.TryParseTimeSpan(second.String, out secondTimeSpan) ? ContentType.TimeSpan :
-                null;
+                ContentType.String;
 
-            if (firstType != null && secondType != null)
+            if (firstType == ContentType.DateTime && secondType == ContentType.DateTime)
             {
-                if (firstType == ContentType.DateTime && secondType == ContentType.DateTime)
+                if (tokenType == Memezo.TokenType.Minus)
                 {
-                    if (tokenType == Memezo.TokenType.Minus)
-                    {
-                        var span = firstDateTime - secondDateTime;
-                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
-                    }
-                }
-                else if (firstType == ContentType.DateTime && secondType == ContentType.TimeSpan)
-                {
-                    if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
-                    {
-                        var date = (tokenType == Memezo.TokenType.Plus) ?
-                            (firstDateTime + secondTimeSpan) :
-                            (firstDateTime - secondTimeSpan);
-                        return new Memezo.Value(DateTimeUtility.DateTimeToString(date));
-                    }
-                }
-                else if (firstType == ContentType.TimeSpan && secondType == ContentType.TimeSpan)
-                {
-                    if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
-                    {
-                        var span = (tokenType == Memezo.TokenType.Plus) ?
-                            (firstTimeSpan + secondTimeSpan) :
-                            (firstTimeSpan - secondTimeSpan);
-                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
-                    }
-                }
-                else
-                {
-                    ;
+                    var span = firstDateTime - secondDateTime;
+                    return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
                 }
             }
-
+            else if (firstType == ContentType.DateTime && secondType == ContentType.TimeSpan)
+            {
+                if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
+                {
+                    var date = (tokenType == Memezo.TokenType.Plus) ?
+                        (firstDateTime + secondTimeSpan) :
+                        (firstDateTime - secondTimeSpan);
+                    return new Memezo.Value(DateTimeUtility.DateTimeToString(date));
+                }
+            }
+            else if (firstType == ContentType.TimeSpan && secondType == ContentType.TimeSpan)
+            {
+                if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
+                {
+                    var span = (tokenType == Memezo.TokenType.Plus) ?
+                        (firstTimeSpan + secondTimeSpan) :
+                        (firstTimeSpan - secondTimeSpan);
+                    return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
+                }
+            }
+            else if (firstType == ContentType.TimeSpan && secondType == ContentType.Number)
+            {
+                if (tokenType == Memezo.TokenType.Multiply || tokenType == Memezo.TokenType.Division)
+                {
+                    var ticks = (tokenType == Memezo.TokenType.Multiply) ?
+                        (firstTimeSpan.Ticks * second.Number) :
+                        (firstTimeSpan.Ticks / second.Number);
+                    if (ticks < long.MinValue || long.MaxValue < ticks) throw new OverflowException();
+                    return new Memezo.Value(DateTimeUtility.TimeSpanToString(new TimeSpan((long)ticks)));
+                }
+            }
+            else
+            {
+                ;
+            }
             return null;
         }
     }

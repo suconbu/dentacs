@@ -51,8 +51,15 @@ Binary      | 0b0000010011010010
 
 Term     | Definition                         | Example
 ---------|------------------------------------|------------------
-Datetime | Represents a point on the timeline | `'2001/4/1 00:00', '4/1'`
-Timespan | Represents the length of time      | `'15:00', '9h300m'`
+Datetime | Represents a point on the timeline | `'2001/4/1 12:00'`, `'4/1'`
+Timespan | Represents the length of time      | `'15:00'`, `'10h300m'`
+
+```
+Timeline
+----------x----------x============x---------->
+          ^          <--Timespan-->
+       Datetime   
+```
 
 Supported operations:
 
