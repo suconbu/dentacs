@@ -736,26 +736,23 @@ namespace Suconbu.Scripting.Memezo
         public static readonly Value Zero = new Value(0m);
 
         public DataType DataType { get; }
-        public string ContentType { get; }
         public decimal Number { get; }
         public string String { get; }
 
-        public Value(decimal n, string contentType = null) : this()
+        public Value(decimal n) : this()
         {
             this.DataType = DataType.Number;
-            this.ContentType = contentType;
             this.Number = n;
             this.String = this.Number.ToString();
         }
 
-        public Value(long n, string contentType = null) : this((decimal)n, contentType) { }
-        public Value(double n, string contentType = null) : this((decimal)n, contentType) { }
-        public Value(bool b, string contentType = null) : this(b ? 1m : 0m, contentType) { }
+        public Value(long n) : this((decimal)n) { }
+        public Value(double n) : this((decimal)n) { }
+        public Value(bool b) : this(b ? 1m : 0m) { }
 
-        public Value(string s, string contentType = null) : this()
+        public Value(string s) : this()
         {
             this.DataType = DataType.String;
-            this.ContentType = contentType;
             this.Number = 0m;
             this.String = s;
         }

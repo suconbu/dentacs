@@ -125,10 +125,8 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
-        public void TestCalculatorDateTimeOperation()
+        public void TestDateTimeUtility()
         {
-            var calculator = new Calculator();
-
             var datePatterns = new Dictionary<string, string>()
             {
                 { "2019-08-18T07:36:13+01:00", "2019/08/18 06:36:13" },
@@ -170,6 +168,12 @@ namespace Suconbu.Dentacs
                 { "08/18/2019", "2019/08/18 00:00:00" },
                 { "08/2019", "2019/08/01 00:00:00" },
             };
+            foreach (var date in datePatterns)
+            {
+                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result), $"{date.Key}");
+                Assert.AreEqual(date.Value, DateTimeUtility.DateTimeToString(result), $"{date.Key}");
+            }
+
             var monthDatePatterns = new Dictionary<string, string>()
             {
                 { "8/18 7:36:13", "08/18 07:36:13" },
@@ -177,34 +181,13 @@ namespace Suconbu.Dentacs
                 { "8/18 7", "08/18 07:00:00" },
                 { "8/18", "08/18 00:00:00" },
             };
-            var timePatterns = new Dictionary<string, string>()
+            foreach (var date in monthDatePatterns)
             {
-                { "11:22:33", "11:22:33" },
-                { "11:22", "11:22:00" },
-                //{ "11", "11:00:00" },
-                { "100d", "100.00:00:00" },
-                { "100day", "100.00:00:00" },
-                { "100h", "4.04:00:00" },
-                { "100hour", "4.04:00:00" },
-                { "100m", "01:40:00" },
-                { "100min", "01:40:00" },
-                { "100minute", "01:40:00" },
-                { "100s", "00:01:40" },
-                { "100sec", "00:01:40" },
-                { "100second", "00:01:40" },
-                { "100ms", "00:00:00.1000000" },
-                { "100msec", "00:00:00.1000000" },
-                { "100millisecond", "00:00:00.1000000" },
-                { "1d2h3m4s", "1.02:03:04" },
-                { "1d 2h3m4s", "1.02:03:04" },
-                { "1d  2h  3m  4s", "1.02:03:04" },
-                { "1.5d", "1.12:00:00" },
-                { "1.5d1.5h", "1.13:30:00" },
-                { "1.5d1.5h1.5m", "1.13:31:30" },
-                { "1.5d1.5h1.5m1.5s", "1.13:31:31.5000000" },
-                { "1.5d1.5m", "1.12:01:30" },
-                { "1.5h1.5m1.5s", "01:31:31.5000000" },
-            };
+                var format = "MM'/'dd' 'HH':'mm':'ss";
+                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result), $"{date.Key}");
+                Assert.AreEqual(date.Value, result.ToString(format), $"{date.Key}");
+            }
+
             var errorTimePatterns = new[]
             {
                 "11:22:33:",
@@ -213,38 +196,63 @@ namespace Suconbu.Dentacs
                 "1m1h",
                 "1h1h",
             };
-            var operations = new Dictionary<string, string>()
-            {
-                { "'2019/08/18 07:36:13'-'2019/07/17 06:35:12'", "32day 1hour 1min 1sec" },
-                { "'2019/08/18 07:36:13'+'17:1:1'", "2019/08/19 0:37:14" },
-                { "'2019/08/18 07:36:13'-'8:30'", "2019/08/17 23:06:13" },
-                { "'2019/08/18 07:36:13'-'31:36:13'", "2019/08/17 0:00:00" },
-                { "'23:59:59'+'0:0:1'", "1day 0hour 0min 0sec" },
-                { "'12:00:00'-'0:0:1'", "0day 11hour 59min 59sec" },
-                { "'48:00:00'-'0:0:1'", "1day 23hour 59min 59sec" },
-            };
-
-            foreach(var date in datePatterns)
-            {
-                var format = "yyyy'/'MM'/'dd' 'HH':'mm':'ss";
-                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result), $"{date.Key}");
-                Assert.AreEqual(date.Value, result.ToString(format), $"{date.Key}");
-            }
-            foreach (var date in monthDatePatterns)
-            {
-                var format = "MM'/'dd' 'HH':'mm':'ss";
-                Assert.IsTrue(DateTimeUtility.TryParseDateTime(date.Key, out var result), $"{date.Key}");
-                Assert.AreEqual(date.Value, result.ToString(format), $"{date.Key}");
-            }
             foreach (var time in errorTimePatterns)
             {
                 Assert.IsFalse(DateTimeUtility.TryParseTimeSpan(time, out var result), $"{time}");
             }
+
+            var timePatterns = new Dictionary<string, string>()
+            {
+                { "11:22:33", "11:22:33" },
+                { "11:22", "11:22:00" },
+                //{ "11", "11:00:00" },
+                { "11:22:33.0010000", "11:22:33.001" },
+                { "100d", "100d 00:00:00" },
+                { "100day", "100d 00:00:00" },
+                { "100h", "4d 04:00:00" },
+                { "100hour", "4d 04:00:00" },
+                { "100m", "01:40:00" },
+                { "100min", "01:40:00" },
+                { "100minute", "01:40:00" },
+                { "100s", "00:01:40" },
+                { "100sec", "00:01:40" },
+                { "100second", "00:01:40" },
+                { "100ms", "00:00:00.1" },
+                { "100msec", "00:00:00.1" },
+                { "100millisecond", "00:00:00.1" },
+                { "1d2h3m4s", "1d 02:03:04" },
+                { "1d 2h3m4s", "1d 02:03:04" },
+                { "1d  2h  3m  4s", "1d 02:03:04" },
+                { "1.5d", "1d 12:00:00" },
+                { "1.5d1.5h", "1d 13:30:00" },
+                { "1.5d1.5h1.5m", "1d 13:31:30" },
+                { "1.5d1.5h1.5m1.5s", "1d 13:31:31.5" },
+                { "1.5d1.5m", "1d 12:01:30" },
+                { "1.5h1.5m1.5s", "01:31:31.5" },
+            };
             foreach (var time in timePatterns)
             {
                 Assert.IsTrue(DateTimeUtility.TryParseTimeSpan(time.Key, out var result), $"{time.Key}");
-                Assert.AreEqual(time.Value, result.ToString(), $"{time.Key}");
+                Assert.AreEqual(time.Value, DateTimeUtility.TimeSpanToString(result), $"{time.Key}");
             }
+        }
+
+        [TestMethod]
+        public void TestCalculatorDateTimeOperation()
+        {
+            var calculator = new Calculator();
+
+            var operations = new Dictionary<string, string>()
+            {
+                { "'2019/08/18 07:36:13'-'2019/07/17 06:35:12'", "'32d 01:01:01'" },
+                { "'2019/08/18 07:36:13'+'17:1:1'", "'2019/08/19 00:37:14'" },
+                { "'2019/08/18 07:36:13'-'8:30'", "'2019/08/17 23:06:13'" },
+                { "'2019/08/18 07:36:13'-'31:36:13'", "'2019/08/17 00:00:00'" },
+                { "'23:59:59'+'0:0:1'", "'1d 00:00:00'" },
+                { "'12:00:00'-'0:0:1'", "'11:59:59'" },
+                { "'48:00:00'-'0:0:1'", "'1d 23:59:59'" },
+                { "'00:00:00.00025'+'00:00:00.00025'+'00:00:00.00025'+'00:00:00.00025'", "'00:00:00.001'" },
+            };
             foreach (var operation in operations)
             {
                 Assert.IsTrue(calculator.Calculate(operation.Key), $"{operation}");

@@ -67,7 +67,7 @@ namespace Suconbu.Dentacs
             "M/d H",
             "M/d",
         };
-        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$");
+        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
         private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
         private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
         private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
@@ -75,9 +75,18 @@ namespace Suconbu.Dentacs
         private static readonly string milliSeccondPattern = @"(?:(\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
         private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
 
-        public static DateTime Parse(string input)
+        public static DateTime ParseDateTime(string input)
         {
             if (DateTimeUtility.TryParseDateTime(input, out var result))
+            {
+                return result;
+            }
+            throw new FormatException();
+        }
+
+        public static TimeSpan ParseTimeSpan(string input)
+        {
+            if (DateTimeUtility.TryParseTimeSpan(input, out var result))
             {
                 return result;
             }
@@ -113,10 +122,14 @@ namespace Suconbu.Dentacs
                 var h = match.Groups[1].Value;
                 var m = match.Groups[2].Value;
                 var s = match.Groups[3].Value;
-                var hours = int.Parse(h);
-                var minutes = string.IsNullOrEmpty(m) ? 0 : int.Parse(m);
-                var seconds = string.IsNullOrEmpty(s) ? 0 : int.Parse(s);
-                result = new TimeSpan(hours, minutes, seconds);
+                var ms = match.Groups[4].Value;
+                var hours = long.Parse(h);
+                var minutes = string.IsNullOrEmpty(m) ? 0 : long.Parse(m);
+                var seconds = string.IsNullOrEmpty(s) ? 0 : long.Parse(s);
+                double milliseconds = string.IsNullOrEmpty(ms) ? 0 : long.Parse(ms);
+                milliseconds = milliseconds * 1000.0 / Math.Pow(10.0, ms.Length);
+                var ticks = DateTimeUtility.GetTicks(0.0, hours, minutes, seconds + milliseconds / 1000.0);
+                result = new TimeSpan(ticks);
                 return true;
             }
             match = DateTimeUtility.unitSpecifiedTimeRegex.Match(input);
@@ -131,15 +144,9 @@ namespace Suconbu.Dentacs
                 var hours = string.IsNullOrEmpty(h) ? 0 : double.Parse(h);
                 var minutes = string.IsNullOrEmpty(m) ? 0 : double.Parse(m);
                 var seconds = string.IsNullOrEmpty(s) ? 0 : double.Parse(s);
-                var milliSeconds = string.IsNullOrEmpty(ms) ? 0 : double.Parse(ms);
-                result = new TimeSpan(DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliSeconds / 1000.0));
-                return true;
-            }
-            // If this function call put first, the hours part might be parsed as days like as:
-            // 48:10:20 -> 48days + 10:20:00 (Not as expected)
-            if (!int.TryParse(input, out var _) &&
-                TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out result))
-            {
+                var milliseconds = string.IsNullOrEmpty(ms) ? 0 : double.Parse(ms);
+                var ticks = DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliseconds / 1000.0);
+                result = new TimeSpan(ticks);
                 return true;
             }
             result = TimeSpan.Zero;
@@ -156,14 +163,34 @@ namespace Suconbu.Dentacs
             return new TimeSpan((long)(seconds * TimeSpan.TicksPerSecond));
         }
 
-        public static decimal DateTimeToSeconds(DateTime d)
+        // yyyy/MM/dd HH:mm:ss[.fff]
+        public static string DateTimeToString(DateTime d)
         {
-            return (decimal)d.Ticks / TimeSpan.TicksPerSecond;
+            var sb = new StringBuilder();
+            sb.Append(d.ToString("yyyy'/'MM'/'dd' 'HH':'mm':'ss"));
+            var milliseconds = GetMillisecondPartFromTicks(d.Ticks) / 1000.0;
+            if (milliseconds != 0)
+            {
+                sb.Append(milliseconds.ToString().Substring(1).TrimEnd('0'));
+            }
+            return sb.ToString();
         }
 
-        public static decimal TimeSpanToSeconds(TimeSpan t)
+        // [{day}d ]{HH}:{mm}:{ss}[.{fff}]
+        public static string TimeSpanToString(TimeSpan t)
         {
-            return (decimal)t.Ticks / TimeSpan.TicksPerSecond;
+            var sb = new StringBuilder();
+            if (t.Days != 0)
+            {
+                sb.Append($"{t.Days}d ");
+            }
+            sb.Append(t.ToString("hh':'mm':'ss"));
+            var milliseconds = GetMillisecondPartFromTicks(t.Ticks) / 1000.0;
+            if (milliseconds != 0)
+            {
+                sb.Append(milliseconds.ToString().Substring(1).TrimEnd('0'));
+            }
+            return sb.ToString();
         }
 
         private static long GetTicks(double days, double hours, double minutes, double seconds)
@@ -173,7 +200,14 @@ namespace Suconbu.Dentacs
             ticks += TimeSpan.TicksPerMinute * minutes;
             ticks += TimeSpan.TicksPerHour * hours;
             ticks += TimeSpan.TicksPerDay * days;
+            if (ticks < long.MinValue || long.MaxValue < ticks) throw new OverflowException();
             return (long)ticks;
+        }
+
+        private static double GetMillisecondPartFromTicks(long ticks)
+        {
+            var millisecondTicks = ticks % TimeSpan.TicksPerSecond;
+            return (double)millisecondTicks / TimeSpan.TicksPerMillisecond;
         }
     }
 }

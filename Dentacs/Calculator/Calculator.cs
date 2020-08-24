@@ -61,25 +61,7 @@ namespace Suconbu.Dentacs
 
         private void SetResult(Memezo.Value value)
         {
-            this.Result =
-                (value.ContentType == ContentType.DateTime) ? DateTimeUtility.DateTimeFromSeconds(value.Number).ToString() :
-                (value.ContentType == ContentType.TimeSpan) ? this.TimeSpanToString(DateTimeUtility.TimeSpanFromSeconds(value.Number)) :
-                value.ToString();
-        }
-
-        private string TimeSpanToString(TimeSpan t)
-        {
-            var sign = (t.Ticks < 0) ? "-" : "";
-            var d = t.Duration();
-            var seconds = d.Seconds + (d.TotalSeconds - Math.Truncate(d.TotalSeconds));
-            if (this.culture.TwoLetterISOLanguageName == "ja")
-            {
-                return $"{sign}{d.Days}日{d.Hours}時間{d.Minutes}分{seconds}秒";
-            }
-            else
-            {
-                return $"{sign}{d.Days}day {d.Hours}hour {d.Minutes}min {seconds}sec";
-            }
+            this.Result = value.ToString();
         }
 
         private void ClearResult()
@@ -92,52 +74,19 @@ namespace Suconbu.Dentacs
 
         private Memezo.Value BinaryOperation(Memezo.Value first, Memezo.Value second, Memezo.TokenType tokenType)
         {
-            string firstType = null;
-            string secondType = null;
             DateTime firstDateTime = DateTime.MinValue;
             DateTime secondDateTime = DateTime.MinValue;
             TimeSpan firstTimeSpan = TimeSpan.MinValue;
             TimeSpan secondTimeSpan = TimeSpan.MinValue;
 
-            if (first.ContentType != null)
-            {
-                firstType = first.ContentType;
-                if (first.ContentType == ContentType.DateTime)
-                {
-                    firstDateTime = DateTimeUtility.DateTimeFromSeconds(first.Number);
-                }
-                else if (first.ContentType == ContentType.TimeSpan)
-                {
-                    firstTimeSpan = DateTimeUtility.TimeSpanFromSeconds(first.Number);
-                }
-            }
-            else if (first.DataType == Memezo.DataType.String)
-            {
-                firstType =
-                    DateTimeUtility.TryParseDateTime(first.String, out firstDateTime) ? ContentType.DateTime :
-                    DateTimeUtility.TryParseTimeSpan(first.String, out firstTimeSpan) ? ContentType.TimeSpan :
-                    null;
-            }
-
-            if (second.ContentType != null)
-            {
-                secondType = second.ContentType;
-                if (second.ContentType == ContentType.DateTime)
-                {
-                    secondDateTime = DateTimeUtility.DateTimeFromSeconds(second.Number);
-                }
-                else if (second.ContentType == ContentType.TimeSpan)
-                {
-                    secondTimeSpan = DateTimeUtility.TimeSpanFromSeconds(second.Number);
-                }
-            }
-            else if (second.DataType == Memezo.DataType.String)
-            {
-                secondType =
-                    DateTimeUtility.TryParseDateTime(second.String, out secondDateTime) ? ContentType.DateTime :
-                    DateTimeUtility.TryParseTimeSpan(second.String, out secondTimeSpan) ? ContentType.TimeSpan :
-                    null;
-            }
+            var firstType =
+                DateTimeUtility.TryParseDateTime(first.String, out firstDateTime) ? ContentType.DateTime :
+                DateTimeUtility.TryParseTimeSpan(first.String, out firstTimeSpan) ? ContentType.TimeSpan :
+                null;
+            var secondType =
+                DateTimeUtility.TryParseDateTime(second.String, out secondDateTime) ? ContentType.DateTime :
+                DateTimeUtility.TryParseTimeSpan(second.String, out secondTimeSpan) ? ContentType.TimeSpan :
+                null;
 
             if (firstType != null && secondType != null)
             {
@@ -146,8 +95,7 @@ namespace Suconbu.Dentacs
                     if (tokenType == Memezo.TokenType.Minus)
                     {
                         var span = firstDateTime - secondDateTime;
-                        var seconds = DateTimeUtility.TimeSpanToSeconds(span);
-                        return new Memezo.Value(seconds, ContentType.TimeSpan);
+                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
                     }
                 }
                 else if (firstType == ContentType.DateTime && secondType == ContentType.TimeSpan)
@@ -157,8 +105,7 @@ namespace Suconbu.Dentacs
                         var date = (tokenType == Memezo.TokenType.Plus) ?
                             (firstDateTime + secondTimeSpan) :
                             (firstDateTime - secondTimeSpan);
-                        var seconds = DateTimeUtility.DateTimeToSeconds(date);
-                        return new Memezo.Value(seconds, ContentType.DateTime);
+                        return new Memezo.Value(DateTimeUtility.DateTimeToString(date));
                     }
                 }
                 else if (firstType == ContentType.TimeSpan && secondType == ContentType.TimeSpan)
@@ -168,8 +115,7 @@ namespace Suconbu.Dentacs
                         var span = (tokenType == Memezo.TokenType.Plus) ?
                             (firstTimeSpan + secondTimeSpan) :
                             (firstTimeSpan - secondTimeSpan);
-                        var seconds = DateTimeUtility.TimeSpanToSeconds(span);
-                        return new Memezo.Value(seconds, ContentType.TimeSpan);
+                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
                     }
                 }
                 else
