@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Memezo = Suconbu.Scripting.Memezo;
@@ -12,13 +13,23 @@ namespace Suconbu.Dentacs
         public string Result { get; private set; }
         public string Error { get; private set; }
 
-        readonly Memezo.Interpreter memezo = new Memezo.Interpreter();
-
-        public Calculator()
+        private static class ContentType
         {
+            public static readonly string DateTime = nameof(DateTime);
+            public static readonly string TimeSpan = nameof(TimeSpan);
+        }
+
+        private readonly Memezo.Interpreter memezo = new Memezo.Interpreter();
+        private CultureInfo culture;
+
+        public Calculator(CultureInfo culture = null)
+        {
+            this.culture = culture ?? CultureInfo.InvariantCulture;
             this.memezo.Import(new MathmaticsModule());
-            this.memezo.Output += (sender, e) => { this.Result = e.ToString(); };
-            this.memezo.Assigning += (sender, e) => { this.Result = e.Value.ToString(); };
+            this.memezo.Output += (sender, e) => { this.SetResult(e); };
+            this.memezo.Assigning += (sender, e) => { this.SetResult(e.Value); };
+            this.memezo.UnaryOperationOverride += (first, tokenType) => this.UnaryOperation(first, tokenType);
+            this.memezo.BinaryOperationOverride += (first, second, tokenType) => this.BinaryOperation(first, second, tokenType);
             this.memezo.ErrorOccurred += (sender, e) =>
             {
                 if (e.Type == Memezo.ErrorType.UnexpectedToken ||
@@ -48,10 +59,72 @@ namespace Suconbu.Dentacs
             return this.Error == null;
         }
 
-        void ClearResult()
+        private void SetResult(Memezo.Value value)
+        {
+            this.Result = value.ToString();
+        }
+
+        private void ClearResult()
         {
             this.Result = string.Empty;
             this.Error = null;
+        }
+
+        private Memezo.Value UnaryOperation(Memezo.Value first, Memezo.TokenType tokenType) => null;
+
+        private Memezo.Value BinaryOperation(Memezo.Value first, Memezo.Value second, Memezo.TokenType tokenType)
+        {
+            DateTime firstDateTime = DateTime.MinValue;
+            DateTime secondDateTime = DateTime.MinValue;
+            TimeSpan firstTimeSpan = TimeSpan.MinValue;
+            TimeSpan secondTimeSpan = TimeSpan.MinValue;
+
+            var firstType =
+                DateTimeUtility.TryParseDateTime(first.String, out firstDateTime) ? ContentType.DateTime :
+                DateTimeUtility.TryParseTimeSpan(first.String, out firstTimeSpan) ? ContentType.TimeSpan :
+                null;
+            var secondType =
+                DateTimeUtility.TryParseDateTime(second.String, out secondDateTime) ? ContentType.DateTime :
+                DateTimeUtility.TryParseTimeSpan(second.String, out secondTimeSpan) ? ContentType.TimeSpan :
+                null;
+
+            if (firstType != null && secondType != null)
+            {
+                if (firstType == ContentType.DateTime && secondType == ContentType.DateTime)
+                {
+                    if (tokenType == Memezo.TokenType.Minus)
+                    {
+                        var span = firstDateTime - secondDateTime;
+                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
+                    }
+                }
+                else if (firstType == ContentType.DateTime && secondType == ContentType.TimeSpan)
+                {
+                    if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
+                    {
+                        var date = (tokenType == Memezo.TokenType.Plus) ?
+                            (firstDateTime + secondTimeSpan) :
+                            (firstDateTime - secondTimeSpan);
+                        return new Memezo.Value(DateTimeUtility.DateTimeToString(date));
+                    }
+                }
+                else if (firstType == ContentType.TimeSpan && secondType == ContentType.TimeSpan)
+                {
+                    if (tokenType == Memezo.TokenType.Plus || tokenType == Memezo.TokenType.Minus)
+                    {
+                        var span = (tokenType == Memezo.TokenType.Plus) ?
+                            (firstTimeSpan + secondTimeSpan) :
+                            (firstTimeSpan - secondTimeSpan);
+                        return new Memezo.Value(DateTimeUtility.TimeSpanToString(span));
+                    }
+                }
+                else
+                {
+                    ;
+                }
+            }
+
+            return null;
         }
     }
 }

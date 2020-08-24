@@ -208,35 +208,35 @@ namespace Suconbu.Dentacs
 
         public Value Min(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(a => a.Type == DataType.Number).ToList();
+            var nums = args.Where(a => a.DataType == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             return new Value(nums.Min(n => n.Number));
         }
 
         public Value Max(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(a => a.Type == DataType.Number).ToList();
+            var nums = args.Where(a => a.DataType == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             return new Value(nums.Max(n => n.Number));
         }
 
         public Value Sum(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(a => a.Type == DataType.Number).ToList();
+            var nums = args.Where(a => a.DataType == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             return new Value(nums.Sum(n => n.Number));
         }
 
         public Value Average(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(a => a.Type == DataType.Number).ToList();
+            var nums = args.Where(a => a.DataType == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             return new Value(nums.Average(n => n.Number));
         }
 
         public Value Median(IReadOnlyList<Value> args)
         {
-            var nums = args.Where(x => x.Type == DataType.Number).ToList();
+            var nums = args.Where(x => x.DataType == DataType.Number).ToList();
             ArgumentsVerifier.VerifyAndThrow(nums, "n+", ErrorType.InvalidArgument);
             var sorted = nums.OrderBy(n => n.Number).ToList();
             var a = sorted[(sorted.Count - 1) / 2].Number / 2m;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -42,7 +43,7 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<bool> RxCharInfoVisible { get; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
-        readonly Calculator calculator = new Calculator();
+        readonly Calculator calculator = new Calculator(CultureInfo.CurrentCulture);
         int lastLineIndex = -1;
         int zoomIndexBackup = 0;
         int fullScreenZoomIndexBackup = 4;

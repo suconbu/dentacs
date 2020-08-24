@@ -17,7 +17,7 @@ namespace Suconbu.Dentacs
 
         public static bool Verify(IReadOnlyList<Value> args, string pattern)
         {
-            var argsString = string.Join(null, args.Select(a => replacer[a.Type]));
+            var argsString = string.Join(null, args.Select(a => replacer[a.DataType]));
             var verifyPattern = pattern;
             verifyPattern = regexNs.Replace(verifyPattern, @"[$0]");
             verifyPattern = regexX.Replace(verifyPattern, @"[ns]");
