@@ -18,10 +18,9 @@ Main features:
 * Can be mix different radix numbers in a expression
 * Display calculation result in 3 different radix numbers at once
 * Character code information (CodePoint, UTF-16, UTF-8) is displayed in status bar
+* Operation for datetime / timespan -> [Datetime/Timespan](#Datetime/Timespan)
 
-## Manual
-
-### Shortcut keys
+## Shortcut keys
 
 Key               | Description
 ------------------|------------------------
@@ -32,7 +31,7 @@ Ctrl + A          | Select all lines
 Ctrl + Z          | Undo
 Ctrl + Y          | Redo
 
-### Numbers
+## Numbers
 
 Numbers can be integer and floating point, which are usually not distinct.  
 (but bitwise operations can only use integers)  
@@ -48,7 +47,31 @@ Hexadecimal | 0x04d2, 0x4D2
 Octal       | 0o2322
 Binary      | 0b0000010011010010
 
-### Operators and precedence
+## Datetime/Timespan
+
+Term     | Definition                         | Example
+---------|------------------------------------|------------------
+Datetime | Represents a point on the timeline | `'2001/4/1 00:00', '4/1'`
+Timespan | Represents the length of time      | `'15:00', '9h300m'`
+
+Supported operations:
+
+Left hand side | Operation  | Right hand side | Result
+---------------|------------|-----------------|-------
+Datetime       | -          | Datetime        | Timespan
+Datetime       | +/-        | Timespan        | Datetime
+Timespan       | +/-        | Timespan        | Timespan
+
+Example of use:
+```py
+'2000/4/1 12:00' - '1999/4/1 12:00'  # '366d 00:00:00'
+'2000/4/1 12:00' + '15:00'           # '2000/04/02 03:00:00'
+'4/1'   + '40day'                    # '2020/05/11 00:00:00' (In 2020)
+'15:00' - '300min'                   # '10:00:00'
+'3day'  - '10.5h'                    # '2d 13:30:00'
+```
+
+## Operators and precedence
 
 The followings the supported operators in dentacs, from highest to lowest precedence.
 
@@ -71,7 +94,7 @@ Precedence | Operation           | Token | Examples
 8          | Bitwise XOR         | ^     | 5 ^ 3  -> 6 (0b0101 ^ 0b0011 -> 0b0110)
 9          | Assignment          | =     | x = 5 + 3 -> 8
 
-### Variables
+## Variables
 
 Variable can store calculated value temporary.  
 When you delete the expression of assignment, the variable value also delete.  
@@ -85,7 +108,7 @@ PI = 3  # Error: 'PI' is a constant
 pi = 3  # OK: It is case sensitive
 ```
 
-### Functions
+## Functions
 
 Identifier | Parameters  | Description
 -----------|-------------|-----------------------------------------------------------------
@@ -104,14 +127,14 @@ log10      | (n)         | Returns the base 10 logarithm of a number
 log2       | (n)         | Returns the base 2 logarithm of a number
 log        | (n[, base]) | Returns the natural logarithms or logarithm of a number with specified base (e.g. log(9, 3) -> 2)
 
-### Constants
+## Constants
 
 Identifier | Description
 -----------|----------------------------------------------------------------------
 PI         | The ratio of the circumference of a circle to its diameter (3.141...)
 E          | The base of natural logarithms (2.718...)
 
-### Keywords
+## Keywords
 
 The following identifiers are reserved words and cannot be used as variable names.
 
