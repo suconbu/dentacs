@@ -67,13 +67,15 @@ namespace Suconbu.Dentacs
             "M/d H",
             "M/d",
         };
+        private static readonly Regex calenderWeekRegex = new Regex(@"^CW(\d\d)(?:\.([1-7]))?(?:/(\d{4}))?$");
         private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
+        private static readonly string weekPattern = @"(?:(\d+(?:\.\d+)?)(?:w|week))?";
         private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
         private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
         private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
         private static readonly string seccondPattern = @"(?:(\d+(?:\.\d+)?)(?:s|sec|second))?";
         private static readonly string milliSeccondPattern = @"(?:(\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
-        private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
+        private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{weekPattern}\\s*{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
 
         public static DateTime ParseDateTime(string input)
         {
@@ -110,6 +112,11 @@ namespace Suconbu.Dentacs
             {
                 return true;
             }
+            if (DateTimeUtility.TryParseCalenderWeek(input, out result))
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -135,17 +142,19 @@ namespace Suconbu.Dentacs
             match = DateTimeUtility.unitSpecifiedTimeRegex.Match(input);
             if (match.Success)
             {
-                var d = match.Groups[1].Value;
-                var h = match.Groups[2].Value;
-                var m = match.Groups[3].Value;
-                var s = match.Groups[4].Value;
-                var ms = match.Groups[5].Value;
+                var w = match.Groups[1].Value;
+                var d = match.Groups[2].Value;
+                var h = match.Groups[3].Value;
+                var m = match.Groups[4].Value;
+                var s = match.Groups[5].Value;
+                var ms = match.Groups[6].Value;
+                var weeks = string.IsNullOrEmpty(w) ? 0 : double.Parse(w);
                 var days = string.IsNullOrEmpty(d) ? 0 : double.Parse(d);
                 var hours = string.IsNullOrEmpty(h) ? 0 : double.Parse(h);
                 var minutes = string.IsNullOrEmpty(m) ? 0 : double.Parse(m);
                 var seconds = string.IsNullOrEmpty(s) ? 0 : double.Parse(s);
                 var milliseconds = string.IsNullOrEmpty(ms) ? 0 : double.Parse(ms);
-                var ticks = DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliseconds / 1000.0);
+                var ticks = DateTimeUtility.GetTicks(weeks * 7 + days, hours, minutes, seconds + milliseconds / 1000.0);
                 result = new TimeSpan(ticks);
                 return true;
             }
@@ -191,6 +200,29 @@ namespace Suconbu.Dentacs
                 sb.Append(milliseconds.ToString().Substring(1).TrimEnd('0'));
             }
             return sb.ToString();
+        }
+
+        private static bool TryParseCalenderWeek(string input, out DateTime result)
+        {
+            var match = calenderWeekRegex.Match(input);
+            if (!match.Success)
+            {
+                result = DateTime.MinValue;
+                return false;
+            }
+            var w = match.Groups[1].Value;
+            var d = match.Groups[2].Value;
+            var y = match.Groups[3].Value;
+            var weeek = int.Parse(w);
+            var day = string.IsNullOrEmpty(d) ? 1 : int.Parse(d);
+            var year = string.IsNullOrEmpty(y) ? DateTime.Now.Year : int.Parse(y);
+            var t = new DateTime(year, 1, 1);
+            var offset = (int)t.DayOfWeek;
+            // 0:mon 1:tue 2:wed 3:thu 4:fri 5:sat 6:sun
+            offset = (offset == 0) ? 6 : (offset - 1);
+            offset = (3 < offset) ? (offset - 7) : offset;
+            result = t.AddDays((weeek - 1) * 7 + (day - 1) - offset);
+            return true;
         }
 
         private static long GetTicks(double days, double hours, double minutes, double seconds)
