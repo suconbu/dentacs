@@ -203,6 +203,8 @@ namespace Suconbu.Dentacs
                 "11:",
                 "1m1h",
                 "1h1h",
+                " ",
+                "",
             };
             foreach (var time in errorTimePatterns)
             {

@@ -122,6 +122,11 @@ namespace Suconbu.Dentacs
 
         public static bool TryParseTimeSpan(string input, out TimeSpan result)
         {
+            result = TimeSpan.Zero;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return false;
+            }
             var match = DateTimeUtility.colonSeparatedTimeRegex.Match(input);
             if (match.Success)
             {
@@ -158,7 +163,6 @@ namespace Suconbu.Dentacs
                 result = new TimeSpan(ticks);
                 return true;
             }
-            result = TimeSpan.Zero;
             return false;
         }
 
