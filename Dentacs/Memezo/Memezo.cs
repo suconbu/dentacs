@@ -130,6 +130,11 @@ namespace Suconbu.Scripting.Memezo
                 }
                 return true;
             }
+            catch (OverflowException ex)
+            {
+                this.HandleException(new ErrorException(ErrorType.NumberOverflow, ex));
+                return false;
+            }
             catch (Exception ex)
             {
                 this.HandleException(ex);
@@ -1119,8 +1124,9 @@ namespace Suconbu.Scripting.Memezo
         {
             this.ErrorType = type;
         }
-        public ErrorException() : base() { }
-        public ErrorException(string message) : base(message) { }
-        public ErrorException(string message, Exception inner) : base(message, inner) { }
+        public ErrorException(ErrorType type, Exception inner) : base($"{type}", inner)
+        {
+            this.ErrorType = type;
+        }
     }
 }
