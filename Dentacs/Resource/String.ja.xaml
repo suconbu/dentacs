@@ -15,6 +15,7 @@
     <system:String x:Key="Error.InvalidNumberFormat">不正な数値</system:String>
     <system:String x:Key="Error.InvalidStringLiteral">不正な文字列</system:String>
     <system:String x:Key="Error.NumberOverflow">オーバーフロー</system:String>
+    <system:String x:Key="Error.StringOverflow">長すぎる文字列</system:String>
     <system:String x:Key="Error.UnknownError">不明なエラー</system:String>
     <system:String x:Key="Keypad.Division">除算</system:String>
     <system:String x:Key="Keypad.Multiplication">乗算</system:String>

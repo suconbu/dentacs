@@ -15,6 +15,7 @@
     <system:String x:Key="Error.InvalidNumberFormat">Invalid number format</system:String>
     <system:String x:Key="Error.InvalidStringLiteral">Invalid string literal</system:String>
     <system:String x:Key="Error.NumberOverflow">Number overflow</system:String>
+    <system:String x:Key="Error.StringOverflow">Too long string</system:String>
     <system:String x:Key="Error.UnknownError">Unknown error</system:String>
     <system:String x:Key="Keypad.Division">Division</system:String>
     <system:String x:Key="Keypad.Multiplication">Multiplication</system:String>

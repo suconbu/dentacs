@@ -125,6 +125,40 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
+        public void TestCalculatorStringOperation()
+        {
+            var calculator = new Calculator();
+
+            Assert.IsTrue(calculator.Calculate("'xyz' + 'xyz'"));
+            Assert.AreEqual("'xyzxyz'", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("'xyz' + 123"));
+            Assert.AreEqual("'xyz123'", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("'xyz' * 3"));
+            Assert.AreEqual("'xyzxyzxyz'", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("3 * 'xyz'"));
+            Assert.AreEqual("'xyzxyzxyz'", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("'xyz' * 0"));
+            Assert.AreEqual("''", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("'xyz' * -3"));
+            Assert.AreEqual("''", calculator.Result.ToString());
+
+            Assert.IsTrue(calculator.Calculate("'x' * 10000"));
+            Assert.IsFalse(calculator.Calculate("'x' * 10001"));
+            Assert.IsFalse(calculator.Calculate("'x' * 10000 + 'x'"));
+
+            Assert.IsFalse(calculator.Calculate("'xyz' - 123"));
+            Assert.IsFalse(calculator.Calculate("'xyz' - 'xyz'"));
+            Assert.IsFalse(calculator.Calculate("'xyz' * 'xyz'"));
+            Assert.IsFalse(calculator.Calculate("'xyz' / 123"));
+            Assert.IsFalse(calculator.Calculate("'xyz' / 'xyz'"));
+        }
+
+        [TestMethod]
         public void TestDateTimeUtility()
         {
             var datePatterns = new Dictionary<string, string>()
