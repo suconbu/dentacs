@@ -217,7 +217,7 @@ namespace Suconbu.Dentacs
             var w = match.Groups[1].Value;
             var d = match.Groups[2].Value;
             var y = match.Groups[3].Value;
-            var weeek = int.Parse(w);
+            var week = int.Parse(w);
             var day = string.IsNullOrEmpty(d) ? 1 : int.Parse(d);
             var year = string.IsNullOrEmpty(y) ? DateTime.Now.Year : int.Parse(y);
             var t = new DateTime(year, 1, 1);
@@ -225,7 +225,7 @@ namespace Suconbu.Dentacs
             // 0:mon 1:tue 2:wed 3:thu 4:fri 5:sat 6:sun
             offset = (offset == 0) ? 6 : (offset - 1);
             offset = (3 < offset) ? (offset - 7) : offset;
-            result = t.AddDays((weeek - 1) * 7 + (day - 1) - offset);
+            result = t.AddDays((week - 1) * 7 + (day - 1) - offset);
             return true;
         }
 
