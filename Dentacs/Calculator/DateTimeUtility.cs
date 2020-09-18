@@ -68,7 +68,7 @@ namespace Suconbu.Dentacs
             "M/d",
         };
         private static readonly Regex calenderWeekRegex = new Regex(@"^CW(\d\d)(?:\.([1-7]))?(?:/(\d{4}))?$");
-        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
+        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(?:(\d+)d\s*)?(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
         private static readonly string weekPattern = @"(?:(\d+(?:\.\d+)?)(?:w|week))?";
         private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
         private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
@@ -131,16 +131,18 @@ namespace Suconbu.Dentacs
             if (match.Success)
             {
                 // 26:00:00 -> 1day + 02:00:00
-                var h = match.Groups[1].Value;
-                var m = match.Groups[2].Value;
-                var s = match.Groups[3].Value;
-                var ms = match.Groups[4].Value;
+                var d = match.Groups[1].Value;
+                var h = match.Groups[2].Value;
+                var m = match.Groups[3].Value;
+                var s = match.Groups[4].Value;
+                var ms = match.Groups[5].Value;
+                var days = string.IsNullOrEmpty(d) ? 0 : long.Parse(d);
                 var hours = long.Parse(h);
-                var minutes = string.IsNullOrEmpty(m) ? 0 : long.Parse(m);
+                var minutes = long.Parse(m);
                 var seconds = string.IsNullOrEmpty(s) ? 0 : long.Parse(s);
                 double milliseconds = string.IsNullOrEmpty(ms) ? 0 : long.Parse(ms);
                 milliseconds = milliseconds * 1000.0 / Math.Pow(10.0, ms.Length);
-                var ticks = DateTimeUtility.GetTicks(0.0, hours, minutes, seconds + milliseconds / 1000.0);
+                var ticks = DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliseconds / 1000.0);
                 result = new TimeSpan(ticks);
                 return true;
             }
