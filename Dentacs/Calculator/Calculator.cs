@@ -56,7 +56,10 @@ namespace Suconbu.Dentacs
 
         private void SetResult(Memezo.Value value)
         {
-            this.Result = value.ToString();
+            this.Result =
+                DateTimeUtility.TryParseDateTime(value.String, out var dateTime) ? DateTimeUtility.DateTimeToString(dateTime) :
+                DateTimeUtility.TryParseTimeSpan(value.String, out var timeSpan) ? DateTimeUtility.TimeSpanToString(timeSpan) :
+                value.ToString();
         }
 
         private void ClearResult()
