@@ -14,12 +14,22 @@ namespace Suconbu.Dentacs
         {
             this.Functions = new Dictionary<string, Function>()
             {
+                // DateTime
+                { "dayofweek", this.DayOfWeek },
+
+                // TimeSpan
                 { "seconds", this.Seconds },
                 { "minutes", this.Minutes },
                 { "hours", this.Hours },
                 { "days", this.Days },
                 { "weeks", this.Weeks },
             };
+        }
+
+        public Value DayOfWeek(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            return new Value(DateTimeUtility.ParseDateTime(args[0].String).DayOfWeek.ToString().Substring(0, 3).ToLower());
         }
 
         public Value Seconds(IReadOnlyList<Value> args)
