@@ -627,7 +627,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if (module.Functions.TryGetValue(name, out function)) return true;
+                if (module.Functions != null && module.Functions.TryGetValue(name, out function)) return true;
             }
             function = null;
             return false;
@@ -637,7 +637,7 @@ namespace Suconbu.Scripting.Memezo
         {
             foreach (var module in this.modules)
             {
-                if (module.Constants.TryGetValue(name, out value)) return true;
+                if (module.Constants != null && module.Constants.TryGetValue(name, out value)) return true;
             }
             value = null;
             return false;

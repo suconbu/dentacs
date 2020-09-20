@@ -351,7 +351,7 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
-        public void TestMathmaticsLibrary()
+        public void TestMathmaticsModule()
         {
             var math = new MathmaticsModule();
 
@@ -576,6 +576,17 @@ namespace Suconbu.Dentacs
             Assert.AreEqual(math.Median(new[] { new Value(-1), new Value(0), new Value("1"), new Value(10) }).Number, 0m);
             Assert.ThrowsException<ErrorException>(() => math.Median(new List<Value>()));
             Assert.ThrowsException<ErrorException>(() => math.Median(new[] { new Value("0") }));
+        }
+
+        [TestMethod]
+        public void TestDateTimeModule()
+        {
+            var module = new DateTimeModule();
+            Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);
+            Assert.AreEqual(module.Minutes(new[] { new Value("60s") }).Number, 1.0m);
+            Assert.AreEqual(module.Hours(new[] { new Value("60m") }).Number, 1.0m);
+            Assert.AreEqual(module.Days(new[] { new Value("24h") }).Number, 1.0m);
+            Assert.AreEqual(module.Weeks(new[] { new Value("7d") }).Number, 1.0m);
         }
 
         [TestMethod]

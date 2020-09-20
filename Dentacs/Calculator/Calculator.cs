@@ -21,6 +21,7 @@ namespace Suconbu.Dentacs
         {
             this.culture = culture ?? CultureInfo.InvariantCulture;
             this.memezo.Import(new MathmaticsModule());
+            this.memezo.Import(new DateTimeModule());
             this.memezo.Output += (sender, e) => { this.SetResult(e); };
             this.memezo.Assigning += (sender, e) => { this.SetResult(e.Value); };
             this.memezo.UnaryOperationOverride += (first, tokenType) => this.UnaryOperation(first, tokenType);

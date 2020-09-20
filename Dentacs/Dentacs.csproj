@@ -117,6 +117,7 @@
     <Compile Include="Calculator\ArgumentsVerifier.cs" />
     <Compile Include="Calculator\Calculator.cs" />
     <Compile Include="Calculator\DateTimeUtility.cs" />
+    <Compile Include="Calculator\DateTimeModule.cs" />
     <Compile Include="Calculator\MathmaticsModule.cs" />
     <Compile Include="Converter\CharInfoConverter.cs" />
     <Compile Include="Converter\ErrorTextConverter.cs" />
