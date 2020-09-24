@@ -4,6 +4,7 @@ using System;
 using Suconbu.Scripting.Memezo;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Suconbu.Dentacs
 {
@@ -583,6 +584,8 @@ namespace Suconbu.Dentacs
         {
             var module = new DateTimeModule();
             Assert.AreEqual(module.DayOfWeek(new[] { new Value("2019/08/18") }).String, "sun");
+            Assert.IsTrue(Regex.IsMatch(module.Today(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} 00:00:00"));
+            Assert.IsTrue(Regex.IsMatch(module.Now(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}"));
             Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);
             Assert.AreEqual(module.Minutes(new[] { new Value("60s") }).Number, 1.0m);
             Assert.AreEqual(module.Hours(new[] { new Value("60m") }).Number, 1.0m);

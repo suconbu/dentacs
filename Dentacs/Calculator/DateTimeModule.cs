@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Suconbu.Scripting.Memezo;
 
 namespace Suconbu.Dentacs
@@ -16,6 +17,8 @@ namespace Suconbu.Dentacs
             {
                 // DateTime
                 { "dayofweek", this.DayOfWeek },
+                { "today", this.Today },
+                { "now", this.Now },
 
                 // TimeSpan
                 { "seconds", this.Seconds },
@@ -30,6 +33,20 @@ namespace Suconbu.Dentacs
         {
             ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
             return new Value(DateTimeUtility.ParseDateTime(args[0].String).DayOfWeek.ToString().Substring(0, 3).ToLower());
+        }
+
+        public Value Today(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
+            var ticks = DateTime.Today.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
+            return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
+        }
+
+        public Value Now(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
+            var ticks = DateTime.Now.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
+            return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
         }
 
         public Value Seconds(IReadOnlyList<Value> args)
