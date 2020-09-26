@@ -66,16 +66,19 @@ namespace Suconbu.Dentacs
             "M/d H:m",
             "M/d H",
             "M/d",
+
+            "H:m:s",
+            "H:m",
         };
         private static readonly Regex calenderWeekRegex = new Regex(@"^CW(\d\d)(?:\.([1-7]))?(?:/(\d{4}))?$");
-        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^(?:(\d+)d\s*)?(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
-        private static readonly string weekPattern = @"(?:(\d+(?:\.\d+)?)(?:w|week))?";
-        private static readonly string dayPattern = @"(?:(\d+(?:\.\d+)?)(?:d|day))?";
-        private static readonly string hourPattern = @"(?:(\d+(?:\.\d+)?)(?:h|hour))?";
-        private static readonly string minutePattern = @"(?:(\d+(?:\.\d+)?)(?:m|min|minute))?";
-        private static readonly string seccondPattern = @"(?:(\d+(?:\.\d+)?)(?:s|sec|second))?";
-        private static readonly string milliSeccondPattern = @"(?:(\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
+        private static readonly string weekPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:w|week))?";
+        private static readonly string dayPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:d|day))?";
+        private static readonly string hourPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:h|hour))?";
+        private static readonly string minutePattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:m|min|minute))?";
+        private static readonly string seccondPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:s|sec|second))?";
+        private static readonly string milliSeccondPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
         private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{weekPattern}\\s*{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
+        private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^([+-])(?:(\d+)d\s*)?(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
 
         public static DateTime ParseDateTime(string input)
         {
@@ -131,11 +134,12 @@ namespace Suconbu.Dentacs
             if (match.Success)
             {
                 // 26:00:00 -> 1day + 02:00:00
-                var d = match.Groups[1].Value;
-                var h = match.Groups[2].Value;
-                var m = match.Groups[3].Value;
-                var s = match.Groups[4].Value;
-                var ms = match.Groups[5].Value;
+                var sign = match.Groups[1].Value;
+                var d = match.Groups[2].Value;
+                var h = match.Groups[3].Value;
+                var m = match.Groups[4].Value;
+                var s = match.Groups[5].Value;
+                var ms = match.Groups[6].Value;
                 var days = string.IsNullOrEmpty(d) ? 0 : long.Parse(d);
                 var hours = long.Parse(h);
                 var minutes = long.Parse(m);
@@ -143,6 +147,7 @@ namespace Suconbu.Dentacs
                 double milliseconds = string.IsNullOrEmpty(ms) ? 0 : long.Parse(ms);
                 milliseconds = milliseconds * 1000.0 / Math.Pow(10.0, ms.Length);
                 var ticks = DateTimeUtility.GetTicks(days, hours, minutes, seconds + milliseconds / 1000.0);
+                ticks = (sign == "-") ? -ticks : ticks;
                 result = new TimeSpan(ticks);
                 return true;
             }
@@ -178,7 +183,7 @@ namespace Suconbu.Dentacs
             return new TimeSpan((long)(seconds * TimeSpan.TicksPerSecond));
         }
 
-        // yyyy/MM/dd HH:mm:ss[.fff]
+        // {yyyy}/{MM}/{dd} {HH}:{mm}:{ss}[.{fff}]
         public static string DateTimeToString(DateTime d)
         {
             var sb = new StringBuilder();
@@ -191,13 +196,14 @@ namespace Suconbu.Dentacs
             return sb.ToString();
         }
 
-        // [{day}d ]{HH}:{mm}:{ss}[.{fff}]
+        // (+|-)[{day}d ]{HH}:{mm}:{ss}[.{fff}]
         public static string TimeSpanToString(TimeSpan t)
         {
             var sb = new StringBuilder();
-            if (t.Days != 0)
+            sb.Append(0 <= t.Ticks ? "+" : "-");
+            if (0 != t.Days)
             {
-                sb.Append($"{t.Days}d ");
+                sb.Append(t.ToString("d'd '"));
             }
             sb.Append(t.ToString("hh':'mm':'ss"));
             var milliseconds = GetMillisecondPartFromTicks(t.Ticks) / 1000.0;
