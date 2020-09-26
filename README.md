@@ -9,16 +9,29 @@ It's developing with WPF and C# .NET Framework 4.7.2.
 Executable binaries are available:  
 https://github.com/suconbu/dentacs/releases
 
-Demo:  
+## Table of contents
+
+* [Demo](#Demo) | [Features](#Features)
+* [Shortcut keys](#Shortcut-keys)
+* [Numbers](#Numbers) | [DateTime and TimeSpan](#DateTime-and-TimeSpan)
+* [Operators](#Operators)
+* [Variables](#Variables) | [Functions](#Functions) | [Constants](#Constants)
+* [Reserved keywords](#Reserved-keywords)
+* [License](#License)
+
+## Demo
 
 ![screenshot](image/demo1.gif)
 
-Main features:  
+![screenshot](image/demo2.gif)
+
+## Features
+
 * Multiline expression editor
 * Can be mix different radix numbers in a expression
 * Display calculation result in 3 different radix numbers at once
 * Character code information (CodePoint, UTF-16, UTF-8) is displayed in status bar
-* Operation for datetime / timespan -> [Datetime/Timespan](#Datetime/Timespan)
+* Operation for DateTime and TimeSpan -> [DateTime and TimeSpan](#DateTime-and-TimeSpan)
 
 ## Shortcut keys
 
@@ -47,38 +60,144 @@ Hexadecimal | 0x04d2, 0x4D2
 Octal       | 0o2322
 Binary      | 0b0000010011010010
 
-## Datetime/Timespan
+## DateTime and TimeSpan
 
-Term     | Definition                         | Example
----------|------------------------------------|------------------
-Datetime | Represents a point on the timeline | `'2001/4/1 12:00'`, `'4/1'`
-Timespan | Represents the length of time      | `'15:00'`, `'10h300m'`
+DateTime and TimeSpan describe as quoted string.  
+Double quotes (`"`) or single quotes (`'`) can be used as the quotation mark.
 
+### DateTime
+
+DateTime represents a point on the timeline.
 ```
-Timeline
-----------x----------x============x---------->
-          ^          <--Timespan-->
-       Datetime   
+----------x----------> Passage of time
+          ^          
+       DateTime   
 ```
 
-Supported operations:
+There are following types of specification methods.
 
-Left hand side | Operation  | Right hand side | Result
+1. [General style](#DateTime---General-style)
+2. [Standard style](#DateTime---Standard-style)
+3. [Week number style](#DateTime---Week-number-style)
+
+#### DateTime - General style
+
+This is a general notation with separated by a slash and colons.  
+The year and date part can be omitted, in which case the current year/day will be used.
+
+Input                 | Result
+----------------------|----------------------
+'2019/8/18 7:36:13'   | '2019/08/18 07:36:13'
+'2019/8/18 7:36'      | '2019/08/18 07:36:00'
+'2019/8/18 7'         | '2019/08/18 07:00:00'
+'2019/8/18'           | '2019/08/18 00:00:00'
+'2019/8'              | '2019/08/01 00:00:00'
+'08/18 7:36:13'       | '2020/08/18 07:36:13'
+'7:36:13'             | '2020/04/01 07:36:13'
+
+#### DateTime - Standard style
+
+This style is according as ISO8601.  
+The year and date part cannot be omitted in this style.
+
+Input                      | Result
+---------------------------|----------------------
+'20190818T073613+0700'     | '2019/08/18 00:36:13'
+'20190818T073613'          | '2019/08/18 07:36:13'
+'20190818T0736'            | '2020/04/01 07:36:00'
+'20190818T07'              | '2020/04/01 07:00:00'
+'2019-08-18T07:36:13+7:00' | '2019/08/18 00:36:13'
+'2019-08-18T07:36:13'      | '2019/08/18 07:36:13'
+'2019-08-18T07:36'         | '2019/08/18 07:36:00'
+'2019-08-18T07'            | '2019/08/18 07:00:00'
+'2019-08-18'               | '2019/08/18 00:00:00'
+'2019-08'                  | '2019/08/01 00:00:00'
+
+#### DateTime - Week number style
+
+Specify the date by the week number of the year.  
+'CW01' is the week with the year's first Thursday in it.  
+The fraction part represents the day of week, begening at 1:Monday and ending at 7:Sunday.  
+If the year part is omitted, the current year will be used.  
+
+Input                 | Result
+----------------------|----------------------
+'CW33.7/2019'         | '2019/08/18 00:00:00'
+'CW33.7'              | '2020/08/16 00:00:00'
+'CW33/2019'           | '2019/08/12 00:00:00'
+'CW33'                | '2020/08/10 00:00:00'
+
+### TimeSpan
+
+TimeSpan represents the length between two points on the timeline.  
+TimeSpan can be negative value.
+```
+-----x================x---x============x-----> Passage of time
+     -----TimeSpan---->   <--TimeSpan---
+         (Positive)         (Negative)
+```
+
+There are following types of specification methods.
+
+1. [Comma separated style](#TimeSpan---Comma-separated-style)
+2. [Unit specified style](#TimeSpan---Unit-specified-style)
+
+#### TimeSpan - Comma separated style
+
+This style must start with a sign (+/-).  
+If the value is less than 24 hours, can be omit the date part.
+
+Input                          | Result
+-------------------------------|-------------------
+'+7:36:13.123'                 | '+7:36:13.123'
+'-7:36:13'                     | '-07:36:13'
+'+7:36'                        | '+07:36:00'
+'+7:96'                        | '+08:36:00'
+'+1d 7:36:13'                  | '+1d 07:36:13'
+
+#### TimeSpan - Unit specified style
+
+Specify the value as combination of numbers and units.  
+Can be use fraction part and negative number in each unit.
+
+Input                          | Result
+-------------------------------|-------------------
+'1w1d7h36m13s123ms'            | '+8d 7:36:13.123'
+'1week 1day 7hour 36min 13sec' | '+8d 7:36:13'
+'1.5h 300sec'                  | '+01:35:00'
+'1day -4hour 30min -10sec'     | '+20:29:50'
+
+This style spoorts the following units.
+
+Unit        | Specifier
+------------|----------
+Week        | 'week', 'w'
+Day         | 'day', 'd'
+Hour        | 'hour', 'h'
+Minute      | 'minute', 'min', 'm'
+Second      | 'second', 'sec', 's'
+Millisecond | 'millisecond', 'msec', 'ms'
+
+### Supported operations
+
+Left hand side | Operator   | Right hand side | Result
 ---------------|------------|-----------------|-------
-Datetime       | -          | Datetime        | Timespan
-Datetime       | +/-        | Timespan        | Datetime
-Timespan       | +/-        | Timespan        | Timespan
+DateTime       | -          | DateTime        | TimeSpan
+DateTime       | +, -       | TimeSpan        | DateTime
+TimeSpan       | +, -       | TimeSpan        | TimeSpan
+TimeSpan       | *, /       | Number          | TimeSpan
 
 Example of use:
 ```py
 '2000/4/1 12:00' - '1999/4/1 12:00'  # '366d 00:00:00'
-'2000/4/1 12:00' + '15:00'           # '2000/04/02 03:00:00'
+'2000/4/1 12:00' + '+15:00'           # '2000/04/02 03:00:00'
 '4/1'   + '40day'                    # '2020/05/11 00:00:00' (In 2020)
 '15:00' - '300min'                   # '10:00:00'
 '3day'  - '10.5h'                    # '2d 13:30:00'
+'1day'  * 1.5                        # '+1d 12:00:00'
 ```
 
-## Operators and precedence
+## Operators
 
 The followings the supported operators in dentacs, from highest to lowest precedence.
 
@@ -117,22 +236,37 @@ pi = 3  # OK: It is case sensitive
 
 ## Functions
 
-Identifier | Parameters  | Description
------------|-------------|-----------------------------------------------------------------
-trunc      | (n)         | Returns the integer part of a number by removing any fractional
-floor      | (n)         | Returns the largest integer less than or equal to a given number
-ceil       | (n)         | Returns the number of rounded up to the next largest integer
-round      | (n)         | Returns the value of a number rounded to the nearest integer
-sin        | (d)         | Returns the sine of a number of degrees
-cos        | (d)         | Returns the cosine of a number of degrees
-tan        | (d)         | Returns the tangent of a number of degrees
-asin       | (n)         | Returns the arcsine (in degrees) of a number
-acos       | (n)         | Returns the arccosine (in degrees) of a number
-atan       | (n)         | Returns the arctangent (in degrees) of a number
-atan2      | (y, x)      | Returns the arctangent (in degrees) of a y and x (e.g. atan2(1, 1) -> 45)
-log10      | (n)         | Returns the base 10 logarithm of a number
-log2       | (n)         | Returns the base 2 logarithm of a number
-log        | (n[, base]) | Returns the natural logarithms or logarithm of a number with specified base (e.g. log(9, 3) -> 2)
+### Arithmetic
+
+Identifier | Parameters  | Description                                                         | Examples
+-----------|-------------|---------------------------------------------------------------------|--------------------
+trunc      | (n)         | Returns the integer part of a number by removing any fractional     | trunc(1.5) -> 1, trunc(-1.5) -> -1
+floor      | (n)         | Returns the largest integer less than or equal to a given number    | floor(1.5) -> 1, floor(-1.5) -> -2
+ceil       | (n)         | Returns the number of rounded up to the next largest integer        |  ceil(1.5) -> 2,  ceil(-1.5) -> -1
+round      | (n)         | Returns the value of a number rounded to the nearest integer        | round(1.5) -> 2, round(-1.5) -> -2
+sin        | (n)         | Returns the sine of a number of degrees                             |
+cos        | (n)         | Returns the cosine of a number of degrees                           |
+tan        | (n)         | Returns the tangent of a number of degrees                          |
+asin       | (n)         | Returns the arcsine (in degrees) of a number                        |
+acos       | (n)         | Returns the arccosine (in degrees) of a number                      |
+atan       | (n)         | Returns the arctangent (in degrees) of a number                     |
+atan2      | (n1, n2)    | Returns the arctangent (in degrees) of a y (n2) and x (n1)          | atan2(1, 1) -> 45)
+log10      | (n)         | Returns the base 10 logarithm of a number                           | log10(1000) -> 3
+log2       | (n)         | Returns the base 2 logarithm of a number                            | log2(256) -> 8
+log        | (n1, n2)    | Returns the natural logarithms or logarithm of a number (n1) with specified base (n2) | log(9, 3) -> 2)
+
+### DateTime/TimeSpan
+
+Identifier | Parameters  | Description                                          | Examples
+-----------|-------------|------------------------------------------------------|---------------------------------
+dayofweek  | (datetime)  | Returns day of week in a DateTime                    | dayofweek('2019/08/18') -> 'sun'
+today      | ()          | Returns DateTime of the beginning of the current day | today() -> '2020/04/01 00:00:00'
+now        | ()          | Returns DateTime of the current time                 | now() -> '2020/04/01 07:36:13'
+seconds    | (timespan)  | Returns total seconds of TimeSpan                    | seconds('+01:01:01') -> 3661
+minutes    | (timespan)  | Returns total minutes of TimeSpan                    | minutes('+01:01:01') -> 61.016...
+hours      | (timespan)  | Returns total hours of TimeSpan                      | hours('+01:01:01') -> 1.01694...
+days       | (timespan)  | Returns total days of TimeSpan                       | days('+36:00:00') -> 1.5
+weeks      | (timespan)  | Returns total weeks of TimeSpan                      | weeks('+3d 12:01:01') -> 0.5
 
 ## Constants
 
@@ -141,7 +275,7 @@ Identifier | Description
 PI         | The ratio of the circumference of a circle to its diameter (3.141...)
 E          | The base of natural logarithms (2.718...)
 
-## Keywords
+## Reserved keywords
 
 The following identifiers are reserved words and cannot be used as variable names.
 
