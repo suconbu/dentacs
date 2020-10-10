@@ -599,41 +599,83 @@ namespace Suconbu.Dentacs
         [TestMethod]
         public void TestTextBoxHelper()
         {
-            string[] lines =
+            LineString[] lines =
             {
-                            // 0  1  2  3  4
-                "xxx",      // x  x  x  \r \n
+                                                                    // 0  1  2  3  4
+                new LineString { Text = "xxx", NewLine = "\r\n" },  // x  x  x  \r \n
 
-                            // 5  6  7  8  9
-                "xxx",      // x  x  x  \r \n
+                                                                    // 5  6  7  8
+                new LineString { Text = "xxx", NewLine = "\n" },    // x  x  x  \n
 
-                            // 10 11 12 13 14
-                "xxx",      // x  x  x  \r \n
+                                                                    // 9  10 11 12
+                new LineString { Text = "xxx", NewLine = "\r" },    // x  x  x  \r
 
-                            // 15 16 17 18 19
-                "xxx",      // x  x  x  \r \n
+                                                                    // 13 14 15
+                new LineString { Text = "xxx", NewLine = "" },      // x  x  x
             };
             int s, e;
+            // End index on around the new line
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 4, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 5, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 0);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 6, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 8, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 1);
             TextBoxHelper.GetStartEndLineIndex(lines, 0, 9, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 1);
             TextBoxHelper.GetStartEndLineIndex(lines, 0, 10, out s, out e);
             Assert.AreEqual(s, 0);
-            Assert.AreEqual(e, 1);
-            TextBoxHelper.GetStartEndLineIndex(lines, 0, 11, out s, out e);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 12, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 13, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 14, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 0, 16, out s, out e);
+            Assert.AreEqual(s, 0);
+            Assert.AreEqual(e, 3);
 
-            TextBoxHelper.GetStartEndLineIndex(lines, 4, 9, out s, out e);
+            // Start index on around the new line
+            TextBoxHelper.GetStartEndLineIndex(lines, 4, 8, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 1);
-            TextBoxHelper.GetStartEndLineIndex(lines, 5, 9, out s, out e);
+            TextBoxHelper.GetStartEndLineIndex(lines, 5, 8, out s, out e);
             Assert.AreEqual(s, 1);
             Assert.AreEqual(e, 1);
-            TextBoxHelper.GetStartEndLineIndex(lines, 6, 9, out s, out e);
+            TextBoxHelper.GetStartEndLineIndex(lines, 6, 8, out s, out e);
             Assert.AreEqual(s, 1);
             Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 8, 12, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 9, 12, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 10, 12, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 12, 16, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 13, 16, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 14, 16, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
 
+            // Start and end index on around the new line
             TextBoxHelper.GetStartEndLineIndex(lines, 0, 0, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 0);
@@ -646,7 +688,35 @@ namespace Suconbu.Dentacs
             TextBoxHelper.GetStartEndLineIndex(lines, 5, 5, out s, out e);
             Assert.AreEqual(s, 1);
             Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 8, 8, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 8, 9, out s, out e);
+            Assert.AreEqual(s, 1);
+            Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 9, 9, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 12, 12, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 12, 13, out s, out e);
+            Assert.AreEqual(s, 2);
+            Assert.AreEqual(e, 2);
+            TextBoxHelper.GetStartEndLineIndex(lines, 13, 13, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 15, 15, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 15, 16, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
+            TextBoxHelper.GetStartEndLineIndex(lines, 16, 16, out s, out e);
+            Assert.AreEqual(s, -1);
+            Assert.AreEqual(e, -1);
 
+            // Inverted index
             TextBoxHelper.GetStartEndLineIndex(lines, 4, 0, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 0);
@@ -656,7 +726,11 @@ namespace Suconbu.Dentacs
             TextBoxHelper.GetStartEndLineIndex(lines, 6, 4, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, 1);
+            TextBoxHelper.GetStartEndLineIndex(lines, 16, 15, out s, out e);
+            Assert.AreEqual(s, 3);
+            Assert.AreEqual(e, 3);
 
+            // Out of range
             TextBoxHelper.GetStartEndLineIndex(lines, 0, 9999, out s, out e);
             Assert.AreEqual(s, 0);
             Assert.AreEqual(e, -1);
@@ -671,10 +745,21 @@ namespace Suconbu.Dentacs
             Assert.AreEqual(s, 0);
             s = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, 1);
             Assert.AreEqual(s, 5);
+            s = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, 2);
+            Assert.AreEqual(s, 9);
+            s = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, 3);
+            Assert.AreEqual(s, 13);
             e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 0);
             Assert.AreEqual(e, 5);
             e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 1);
-            Assert.AreEqual(e, 10);
+            Assert.AreEqual(e, 9);
+            e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 2);
+            Assert.AreEqual(e, 13);
+            e = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, 3);
+            Assert.AreEqual(e, 16);
+
+            var joined = LineString.Join(lines);
+            Assert.AreEqual(joined, "xxx\r\nxxx\nxxx\rxxx");
         }
     }
 }

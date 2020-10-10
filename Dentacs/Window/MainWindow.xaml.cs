@@ -44,7 +44,7 @@ namespace Suconbu.Dentacs
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator(CultureInfo.CurrentCulture);
-        int lastLineIndex = -1;
+        int lastCalculatedLineIndex = -1;
         int zoomIndexBackup = 0;
         int fullScreenZoomIndexBackup = 4;
         double maxWidthBackup = SystemParameters.WorkArea.Width;
@@ -208,7 +208,7 @@ namespace Suconbu.Dentacs
         {
             this.calculator.Reset();
 
-            var lines = target.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = LineString.Split(target.Text).ToArray();
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
             TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
@@ -216,23 +216,23 @@ namespace Suconbu.Dentacs
 
             for (int i = lineIndexStart; i <= lineIndexEnd; i++)
             {
-                if (this.calculator.Calculate(lines[i]))
+                if (this.calculator.Calculate(lines[i].Text))
                 {
                     if (decimal.TryParse(this.calculator.Result, out var value))
                     {
-                        lines[i] = ResultConvertHelper.ConvertToResultString(value, radix, ResultConvertHelper.Styles.Prefix);
+                        lines[i].Text = ResultConvertHelper.ConvertToResultString(value, radix, ResultConvertHelper.Styles.Prefix);
                     }
                 }
             }
 
-            target.Text = string.Join(Environment.NewLine, lines);
+            target.Text = LineString.Join(lines);
             target.SelectionStart = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndexStart);
             target.SelectionLength = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, lineIndexEnd) - target.SelectionStart;
         }
 
         void FunctionItemClicked(TextBox target, string name)
         {
-            var lines = target.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = LineString.Split(target.Text).ToArray();
             var selectionStart = target.SelectionStart;
             var selectionEnd = target.SelectionStart + target.SelectionLength;
             TextBoxHelper.GetStartEndLineIndex(lines, selectionStart, selectionEnd,
@@ -243,10 +243,10 @@ namespace Suconbu.Dentacs
                 // Multi lines are selected
                 for(int i = lineIndexStart; i <= lineIndexEnd; i++)
                 {
-                    lines[i] = $"{name}({lines[i]})";
+                    lines[i].Text = $"{name}({lines[i].Text})";
                 }
 
-                target.Text = string.Join(Environment.NewLine, lines);
+                target.Text = LineString.Join(lines);
                 target.SelectionStart = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndexStart);
                 target.SelectionLength = TextBoxHelper.GetCharacterIndexOfLineEndFromLineIndex(lines, lineIndexEnd) - target.SelectionStart;
             }
@@ -320,7 +320,7 @@ namespace Suconbu.Dentacs
 
         private void InputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.lastLineIndex = -1;
+            this.lastCalculatedLineIndex = -1;
         }
 
         private void InputTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -329,17 +329,18 @@ namespace Suconbu.Dentacs
 
             var caretIndex = this.InputTextBox.CaretIndex;
             var lineIndex = this.InputTextBox.GetLineIndexFromCharacterIndex(caretIndex);
-            var lines = this.InputTextBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = LineString.Split(this.InputTextBox.Text).ToArray();
             // GetLineText and GetCharacterIndexFromLineIndex does not work correctly in full-screen mode.
             var currentLine = lines[lineIndex]; //this.InputTextBox.GetLineText(lineIndex);
             var selectedText = this.InputTextBox.SelectedText;
 
-            if (lineIndex != this.lastLineIndex || this.RxSelectionLength.Value != selectedText.Length)
+            if (lineIndex != this.lastCalculatedLineIndex || this.RxSelectionLength.Value != selectedText.Length)
             {
+                // Recalculate current line
                 this.calculator.Reset();
                 for (int i = 0; i <= lineIndex; i++)
                 {
-                    this.calculator.Calculate(lines[i]);
+                    this.calculator.Calculate(lines[i].Text);
                 }
                 if (0 < selectedText.Length)
                 {
@@ -350,15 +351,15 @@ namespace Suconbu.Dentacs
                     this.RxResult.Value = this.calculator.Result.ToString();
                 }
                 this.RxErrorText.Value = this.calculator.Error;
-                this.lastLineIndex = lineIndex;
+                this.lastCalculatedLineIndex = lineIndex;
             }
 
             if (selectedText.Length == 0)
             {
                 int lineStartCharIndex = TextBoxHelper.GetCharacterIndexOfLineStartFromLineIndex(lines, lineIndex);
                 int charIndexOfLine = caretIndex - lineStartCharIndex;
-                var offset = (charIndexOfLine < currentLine.Length) ? 0 : -1;
-                selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine, charIndexOfLine + offset);
+                var offset = (charIndexOfLine < currentLine.Text.Length) ? 0 : -1;
+                selectedText = CharInfoConvertHelper.GetUnicodeElement(currentLine.Text, charIndexOfLine + offset);
             }
             this.RxCurrentText.Value = selectedText;
             this.RxSelectionLength.Value = this.InputTextBox.SelectionLength;
