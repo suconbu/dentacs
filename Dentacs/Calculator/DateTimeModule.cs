@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Suconbu.Scripting.Memezo;
 
 namespace Suconbu.Dentacs
@@ -11,14 +12,19 @@ namespace Suconbu.Dentacs
         public IReadOnlyDictionary<string, Function> Functions { get; }
         public IReadOnlyDictionary<string, Value> Constants { get; }
 
+        private Calendar gregorianCalendar = new GregorianCalendar();
+
         public DateTimeModule()
         {
             this.Functions = new Dictionary<string, Function>()
             {
                 // DateTime
+                { "dayofyear", this.DayOfYear },
                 { "dayofweek", this.DayOfWeek },
-                { "today", this.Today },
+                { "daysinyear", this.DaysInYear },
+                { "daysinmonth", this.DaysInMonth },
                 { "now", this.Now },
+                { "today", this.Today },
 
                 // TimeSpan
                 { "seconds", this.Seconds },
@@ -29,23 +35,43 @@ namespace Suconbu.Dentacs
             };
         }
 
+        public Value DayOfYear(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            return new Value(DateTimeUtility.ParseDateTime(args[0].String).DayOfYear);
+        }
+
         public Value DayOfWeek(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
             return new Value(DateTimeUtility.ParseDateTime(args[0].String).DayOfWeek.ToString().Substring(0, 3).ToLower());
         }
 
-        public Value Today(IReadOnlyList<Value> args)
+        public Value DaysInYear(IReadOnlyList<Value> args)
         {
-            ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
-            var ticks = DateTime.Today.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
-            return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            return new Value(this.gregorianCalendar.GetDaysInYear(date.Year));
+        }
+
+        public Value DaysInMonth(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            return new Value(this.gregorianCalendar.GetDaysInMonth(date.Year, date.Month));
         }
 
         public Value Now(IReadOnlyList<Value> args)
         {
             ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
             var ticks = DateTime.Now.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
+            return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
+        }
+
+        public Value Today(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
+            var ticks = DateTime.Today.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
             return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
         }
 

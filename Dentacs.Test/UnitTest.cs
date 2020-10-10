@@ -586,7 +586,10 @@ namespace Suconbu.Dentacs
         public void TestDateTimeModule()
         {
             var module = new DateTimeModule();
+            Assert.AreEqual(module.DayOfYear(new[] { new Value("2019/08/18") }).Number, 230);
             Assert.AreEqual(module.DayOfWeek(new[] { new Value("2019/08/18") }).String, "sun");
+            Assert.AreEqual(module.DaysInYear(new[] { new Value("2019/08/18") }).Number, 365);
+            Assert.AreEqual(module.DaysInMonth(new[] { new Value("2019/08/18") }).Number, 31);
             Assert.IsTrue(Regex.IsMatch(module.Today(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} 00:00:00"));
             Assert.IsTrue(Regex.IsMatch(module.Now(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}"));
             Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);
