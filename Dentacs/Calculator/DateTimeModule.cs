@@ -15,6 +15,8 @@ namespace Suconbu.Dentacs
         private readonly Calendar gregorianCalendar = new GregorianCalendar();
         private readonly Calendar jpOldCalendar = new JapaneseLunisolarCalendar();
         private readonly string[] rokuyoStrings = new[] { "大安", "赤口", "先勝", "友引", "先負", "仏滅" };
+        private readonly string[] kanStrings = new string[] { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸" };
+        private readonly string[] shiStrings = new string[] { "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥" };
 
         public DateTimeModule()
         {
@@ -27,6 +29,7 @@ namespace Suconbu.Dentacs
                 { "daysinmonth", this.DaysInMonth },
                 { "wareki", this.Wareki },
                 { "rokuyo", this.Rokuyo },
+                { "eto", this.Eto },
                 { "now", this.Now },
                 { "today", this.Today },
 
@@ -75,7 +78,6 @@ namespace Suconbu.Dentacs
         public Value Rokuyo(IReadOnlyList<Value> args)
         {
             // https://qiita.com/yo-i/items/21650243f4e08314afd3
-            // http://zecl.hatenablog.com/entry/20090218/p1
             ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
             var date = DateTimeUtility.ParseDateTime(args[0].String);
             int e = this.jpOldCalendar.GetEra(date);
@@ -83,13 +85,19 @@ namespace Suconbu.Dentacs
             int m = this.jpOldCalendar.GetMonth(date);
             int d = this.jpOldCalendar.GetDayOfMonth(date);
             int leapMonth = this.jpOldCalendar.GetLeapMonth(y, e);
-            string[] kan = new string[] { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸" };
-            string[] shi = new string[] { "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥" };
-            var k = kan[(date.Year - 594) % 10];
-            var s = shi[(date.Year - 592) % 12];
             m = (0 < leapMonth && 0 <= (m - leapMonth)) ? (m - 1) : m;
             int index = (m + d) % this.rokuyoStrings.Length;
             return new Value(this.rokuyoStrings[index]);
+        }
+
+        public Value Eto(IReadOnlyList<Value> args)
+        {
+            // http://zecl.hatenablog.com/entry/20090218/p1
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            var k = this.kanStrings[(date.Year - 594) % 10];
+            var s = this.shiStrings[(date.Year - 592) % 12];
+            return new Value(k + s);
         }
 
         public Value Now(IReadOnlyList<Value> args)
