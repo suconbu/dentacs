@@ -13,6 +13,8 @@ namespace Suconbu.Dentacs
         public IReadOnlyDictionary<string, Value> Constants { get; }
 
         private readonly Calendar gregorianCalendar = new GregorianCalendar();
+        private readonly Calendar jpOldCalendar = new JapaneseLunisolarCalendar();
+        private readonly string[] rokuyoStrings = new[] { "大安", "赤口", "先勝", "友引", "先負", "仏滅" };
 
         public DateTimeModule()
         {
@@ -24,6 +26,7 @@ namespace Suconbu.Dentacs
                 { "daysinyear", this.DaysInYear },
                 { "daysinmonth", this.DaysInMonth },
                 { "wareki", this.Wareki },
+                { "rokuyo", this.Rokuyo },
                 { "now", this.Now },
                 { "today", this.Today },
 
@@ -67,6 +70,26 @@ namespace Suconbu.Dentacs
             ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
             var date = DateTimeUtility.ParseDateTime(args[0].String);
             return new Value(DateTimeUtility.DateTimeToWarekiString(date, false));
+        }
+
+        public Value Rokuyo(IReadOnlyList<Value> args)
+        {
+            // https://qiita.com/yo-i/items/21650243f4e08314afd3
+            // http://zecl.hatenablog.com/entry/20090218/p1
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            int e = this.jpOldCalendar.GetEra(date);
+            int y = this.jpOldCalendar.GetYear(date);
+            int m = this.jpOldCalendar.GetMonth(date);
+            int d = this.jpOldCalendar.GetDayOfMonth(date);
+            int leapMonth = this.jpOldCalendar.GetLeapMonth(y, e);
+            string[] kan = new string[] { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸" };
+            string[] shi = new string[] { "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥" };
+            var k = kan[(date.Year - 594) % 10];
+            var s = shi[(date.Year - 592) % 12];
+            m = (0 < leapMonth && 0 <= (m - leapMonth)) ? (m - 1) : m;
+            int index = (m + d) % this.rokuyoStrings.Length;
+            return new Value(this.rokuyoStrings[index]);
         }
 
         public Value Now(IReadOnlyList<Value> args)

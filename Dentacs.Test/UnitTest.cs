@@ -611,6 +611,7 @@ namespace Suconbu.Dentacs
             Assert.AreEqual(module.Wareki(new[] { new Value("1926/12/25") }).String, "è∫òa01.12.25");
             Assert.AreEqual(module.Wareki(new[] { new Value("1989/01/08") }).String, "ïΩê¨01.01.08");
             Assert.AreEqual(module.Wareki(new[] { new Value("2019/08/18") }).String, "óﬂòa01.08.18");
+            Assert.AreEqual(module.Rokuyo(new[] { new Value("2019/08/18") }).String, "ê‘å˚");
             Assert.IsTrue(Regex.IsMatch(module.Today(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} 00:00:00"));
             Assert.IsTrue(Regex.IsMatch(module.Now(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}"));
             Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);
