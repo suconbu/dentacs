@@ -12,7 +12,7 @@ namespace Suconbu.Dentacs
         public IReadOnlyDictionary<string, Function> Functions { get; }
         public IReadOnlyDictionary<string, Value> Constants { get; }
 
-        private Calendar gregorianCalendar = new GregorianCalendar();
+        private readonly Calendar gregorianCalendar = new GregorianCalendar();
 
         public DateTimeModule()
         {
@@ -23,6 +23,7 @@ namespace Suconbu.Dentacs
                 { "dayofweek", this.DayOfWeek },
                 { "daysinyear", this.DaysInYear },
                 { "daysinmonth", this.DaysInMonth },
+                { "wareki", this.Wareki },
                 { "now", this.Now },
                 { "today", this.Today },
 
@@ -59,6 +60,13 @@ namespace Suconbu.Dentacs
             ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
             var date = DateTimeUtility.ParseDateTime(args[0].String);
             return new Value(this.gregorianCalendar.GetDaysInMonth(date.Year, date.Month));
+        }
+
+        public Value Wareki(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            return new Value(DateTimeUtility.DateTimeToWarekiString(date, false));
         }
 
         public Value Now(IReadOnlyList<Value> args)

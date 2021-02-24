@@ -70,6 +70,15 @@ namespace Suconbu.Dentacs
             "H:m:s",
             "H:m",
         };
+        private static readonly string[] warekiDateTimeFormats =
+        {
+            "gyy.MM.dd H:m:s",
+            "gyy.MM.dd H:m",
+            "gyy.MM.dd H",
+            "gyy.MM.dd",
+            "gyy.MM",
+            "gyy",
+        };
         private static readonly Regex calenderWeekRegex = new Regex(@"^CW(\d\d)(?:\.([1-7]))?(?:/(\d{4}))?$");
         private static readonly string weekPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:w|week))?";
         private static readonly string dayPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:d|day))?";
@@ -79,6 +88,9 @@ namespace Suconbu.Dentacs
         private static readonly string milliSeccondPattern = @"(?:([+-]?\d+(?:\.\d+)?)(?:ms|msec|millisecond))?";
         private static readonly Regex unitSpecifiedTimeRegex = new Regex($"^{weekPattern}\\s*{dayPattern}\\s*{hourPattern}\\s*{minutePattern}\\s*{seccondPattern}\\s*{milliSeccondPattern}$");
         private static readonly Regex colonSeparatedTimeRegex = new Regex(@"^([+-])(?:(\d+)d\s*)?(\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?$");
+        private static Dictionary<int, string> indexToNengo = null;
+        private static Dictionary<string, int> nengoToIndex = null;
+        private static readonly CultureInfo cultureInfoJp = new CultureInfo("ja-JP", false) { DateTimeFormat = { Calendar = new JapaneseCalendar() } };
 
         public static DateTime ParseDateTime(string input)
         {
@@ -116,6 +128,10 @@ namespace Suconbu.Dentacs
                 return true;
             }
             if (DateTimeUtility.TryParseCalenderWeek(input, out result))
+            {
+                return true;
+            }
+            if (DateTimeUtility.TryParseWareki(input, out result))
             {
                 return true;
             }
@@ -196,6 +212,24 @@ namespace Suconbu.Dentacs
             return sb.ToString();
         }
 
+        // {N}{yy}.{MM}.{dd}
+        public static string DateTimeToWarekiString(DateTime d, bool useSymbol)
+        {
+            var sb = new StringBuilder();
+            if (useSymbol)
+            {
+                // M, T, S, ...
+                sb.Append(DateTimeUtility.GetNengoSymbol(d));
+                sb.Append(d.ToString("yy'.'MM'.'dd", DateTimeUtility.cultureInfoJp));
+            }
+            else
+            {
+                // 明治, 大正, 昭和, ...
+                sb.Append(d.ToString("gyy'.'MM'.'dd", DateTimeUtility.cultureInfoJp));
+            }
+            return sb.ToString();
+        }
+
         // (+|-)[{day}d ]{HH}:{mm}:{ss}[.{fff}]
         public static string TimeSpanToString(TimeSpan t)
         {
@@ -237,6 +271,19 @@ namespace Suconbu.Dentacs
             return true;
         }
 
+        private static bool TryParseWareki(string input, out DateTime result)
+        {
+            // Era accepts only english symbol (e.g. 'M', 'T', 'S', ...)
+            var s = input;
+            if (0 < s.Length && DateTimeUtility.TryGetNengoIndex(input.Substring(0, 1), out var index))
+            {
+                s = DateTimeUtility.cultureInfoJp.DateTimeFormat.GetEraName(index) + input.Substring(1);
+                return DateTime.TryParseExact(s, DateTimeUtility.warekiDateTimeFormats, DateTimeUtility.cultureInfoJp, DateTimeStyles.None, out result);
+            }
+            result = DateTime.MinValue;
+            return false;
+        }
+
         private static long GetTicks(double days, double hours, double minutes, double seconds)
         {
             double ticks = 0;
@@ -252,6 +299,46 @@ namespace Suconbu.Dentacs
         {
             var millisecondTicks = ticks % TimeSpan.TicksPerSecond;
             return (double)millisecondTicks / TimeSpan.TicksPerMillisecond;
+        }
+
+        private static string GetNengoSymbol(DateTime d)
+        {
+            DateTimeUtility.GetNengoTable(out var indexToNengo, out var _);
+            var eraIndex = DateTimeUtility.cultureInfoJp.DateTimeFormat.Calendar.GetEra(d);
+            indexToNengo.TryGetValue(eraIndex, out var era);
+            return era;
+        }
+
+        private static bool TryGetNengoIndex(string nengo, out int index)
+        {
+            DateTimeUtility.GetNengoTable(out var _, out var nengoToIndex);
+            return nengoToIndex.TryGetValue(nengo, out index);
+        }
+
+        private static void GetNengoTable(out Dictionary<int, string> indexToNengo, out Dictionary<string, int> nengoToIndex)
+        {
+            // https://www.atmarkit.co.jp/ait/articles/1506/10/news022.html
+            var i2n = DateTimeUtility.indexToNengo;
+            var n2i = DateTimeUtility.nengoToIndex;
+            if (i2n == null || n2i == null)
+            {
+                i2n = new Dictionary<int, string>();
+                n2i = new Dictionary<string, int>();
+                for (var c = 'A'; c <= 'Z'; c++)
+                {
+                    int index = DateTimeUtility.cultureInfoJp.DateTimeFormat.GetEra(c.ToString());
+                    if (index > 0)
+                    {
+                        i2n.Add(index, c.ToString());
+                        n2i.Add(c.ToString(), index);
+                    }
+                }
+                DateTimeUtility.indexToNengo = i2n;
+                DateTimeUtility.nengoToIndex = n2i;
+            }
+            indexToNengo = i2n;
+            nengoToIndex = n2i;
+            return;
         }
     }
 }
