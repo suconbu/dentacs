@@ -211,8 +211,8 @@ namespace Suconbu.Dentacs
                 { "7:36", "{yyyy}/{MM}/{dd} 07:36:00" },
 
                 { "CW33.7/2019", "2019/08/18 00:00:00" },
-                { "CW33.7", "2020/08/16 00:00:00" },
-                { "CW33", "2020/08/10 00:00:00" },
+                { "CW33.7", (DateTimeUtility.TryParseDateTime($"CW33.7/{DateTime.Today.Year}", out var d1) ? d1.ToString("yyyy/MM/dd HH:mm:ss") : null) },
+                { "CW33", (DateTimeUtility.TryParseDateTime($"CW33.1/{DateTime.Today.Year}", out var d2) ? d2.ToString("yyyy/MM/dd HH:mm:ss") : null) },
                 { "CW01/2009", "2008/12/29 00:00:00" },
                 { "CW01/2010", "2010/01/04 00:00:00" },
                 { "CW01/2011", "2011/01/03 00:00:00" },
