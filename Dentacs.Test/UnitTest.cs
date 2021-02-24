@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+Ôªøusing Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using Suconbu.Scripting.Memezo;
@@ -606,13 +606,13 @@ namespace Suconbu.Dentacs
             Assert.AreEqual(module.DayOfWeek(new[] { new Value("2019/08/18") }).String, "sun");
             Assert.AreEqual(module.DaysInYear(new[] { new Value("2019/08/18") }).Number, 365);
             Assert.AreEqual(module.DaysInMonth(new[] { new Value("2019/08/18") }).Number, 31);
-            Assert.AreEqual(module.Wareki(new[] { new Value("1868/09/08") }).String, "ñæé°01.09.08");
-            Assert.AreEqual(module.Wareki(new[] { new Value("1912/07/30") }).String, "ëÂê≥01.07.30");
-            Assert.AreEqual(module.Wareki(new[] { new Value("1926/12/25") }).String, "è∫òa01.12.25");
-            Assert.AreEqual(module.Wareki(new[] { new Value("1989/01/08") }).String, "ïΩê¨01.01.08");
-            Assert.AreEqual(module.Wareki(new[] { new Value("2019/08/18") }).String, "óﬂòa01.08.18");
-            Assert.AreEqual(module.Rokuyo(new[] { new Value("2019/08/18") }).String, "ê‘å˚");
-            Assert.AreEqual(module.Eto(new[] { new Value("2019/08/18") }).String, "å»àÂ");
+            Assert.AreEqual(module.Wareki(new[] { new Value("1868/09/08") }).String, "ÊòéÊ≤ª01.09.08");
+            Assert.AreEqual(module.Wareki(new[] { new Value("1912/07/30") }).String, "Â§ßÊ≠£01.07.30");
+            Assert.AreEqual(module.Wareki(new[] { new Value("1926/12/25") }).String, "Êò≠Âíå01.12.25");
+            Assert.AreEqual(module.Wareki(new[] { new Value("1989/01/08") }).String, "Âπ≥Êàê01.01.08");
+            Assert.AreEqual(module.Wareki(new[] { new Value("2019/08/18") }).String, "‰ª§Âíå01.08.18");
+            Assert.AreEqual(module.Rokuyo(new[] { new Value("2019/08/18") }).String, "Ëµ§Âè£");
+            Assert.AreEqual(module.Eto(new[] { new Value("2019/08/18") }).String, "Â∑±‰∫•");
             Assert.IsTrue(Regex.IsMatch(module.Today(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} 00:00:00"));
             Assert.IsTrue(Regex.IsMatch(module.Now(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}"));
             Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);
