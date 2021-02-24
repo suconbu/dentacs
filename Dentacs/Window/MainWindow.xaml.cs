@@ -45,11 +45,11 @@ namespace Suconbu.Dentacs
 
         readonly Calculator calculator = new Calculator(CultureInfo.CurrentCulture);
         int lastCalculatedLineIndex = -1;
-        int zoomIndexBackup = 0;
-        int fullScreenZoomIndexBackup = 4;
+        int zoomIndexBackup = 2;
+        int fullScreenZoomIndexBackup = 6;
         double maxWidthBackup = SystemParameters.WorkArea.Width;
 
-        static readonly double[] kZoomTable = new[] { 1.0, 1.5, 2.0, 3.0, 4.0 };
+        static readonly double[] kZoomTable = new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0 };
         static readonly int kCopyFlashInterval = 100;
         readonly Random random = new Random();
 
