@@ -394,7 +394,7 @@ namespace Suconbu.Dentacs
 
         private void CharInfo_Click(object sender, RoutedEventArgs e)
         {
-            var text = CharInfoConvertHelper.ConvertToElementInfoString(this.RxCurrentText.Value, false);
+            var text = CharInfoConvertHelper.ConvertToElementInfoTableString(this.RxCurrentText.Value);
             Clipboard.SetText(text);
             var item = sender as Control;
             item.Visibility = Visibility.Hidden;
