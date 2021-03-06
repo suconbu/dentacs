@@ -271,10 +271,13 @@ namespace Suconbu.Dentacs
                 return false;
             }
             // https://qiita.com/yo-i/items/21650243f4e08314afd3
-            int e = DateTimeUtility.jpOldCalendar.GetEra(input);
-            int y = DateTimeUtility.jpOldCalendar.GetYear(input);
             int m = DateTimeUtility.jpOldCalendar.GetMonth(input);
             int d = DateTimeUtility.jpOldCalendar.GetDayOfMonth(input);
+            var oldFirstDateOfYear = DateTimeUtility.jpOldCalendar.AddDays(
+                input,
+                1 - DateTimeUtility.jpOldCalendar.GetDayOfYear(input));
+            int e = DateTimeUtility.jpOldCalendar.GetEra(oldFirstDateOfYear);
+            int y = DateTimeUtility.jpOldCalendar.GetYear(oldFirstDateOfYear);
             int leapMonth = DateTimeUtility.jpOldCalendar.GetLeapMonth(y, e);
             m = (0 < leapMonth && 0 <= (m - leapMonth)) ? (m - 1) : m;
             int index = (m + d) % DateTimeUtility.rokuyoStrings.Length;
