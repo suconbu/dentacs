@@ -615,6 +615,14 @@ namespace Suconbu.Dentacs
             Assert.AreEqual(module.Wareki(new[] { new Value("1989/01/08") }).String, "平成元年01月08日 己巳 赤口");
             Assert.AreEqual(module.Wareki(new[] { new Value("2019/04/30") }).String, "平成31年04月30日 己亥 仏滅");
             Assert.AreEqual(module.Wareki(new[] { new Value("2019/05/01") }).String, "令和元年05月01日 己亥 大安");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("1960/01/28") }).String, "昭和35年01月01日 庚子 先勝");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("1989/01/07") }).String, "昭和63年11月30日 己巳 仏滅");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("1989/01/08") }).String, "平成00年12月01日 己巳 赤口");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("1989/02/05") }).String, "平成00年12月29日 己巳 仏滅");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("1989/02/06") }).String, "平成元年01月01日 己巳 先勝");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("2019/04/30") }).String, "平成31年03月26日 己亥 仏滅");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("2019/05/01") }).String, "令和元年03月27日 己亥 大安");
+            Assert.AreEqual(module.Kyureki(new[] { new Value("2050/01/22") }).String, "令和31年12月29日 庚午 仏滅");
             Assert.IsTrue(Regex.IsMatch(module.Today(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} 00:00:00"));
             Assert.IsTrue(Regex.IsMatch(module.Now(new List<Value>()).String, @"\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}"));
             Assert.AreEqual(module.Seconds(new[] { new Value("1000ms") }).Number, 1.0m);

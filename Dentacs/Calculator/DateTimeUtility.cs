@@ -234,6 +234,26 @@ namespace Suconbu.Dentacs
             }
         }
 
+        public static string DateTimeToKyurekiString(DateTime input)
+        {
+            int e = DateTimeUtility.jpOldCalendar.GetEra(input);
+            int y = DateTimeUtility.jpOldCalendar.GetYear(input);
+            int m = DateTimeUtility.jpOldCalendar.GetMonth(input);
+            int d = DateTimeUtility.jpOldCalendar.GetDayOfMonth(input);
+            var oldFirstDateOfYear = DateTimeUtility.jpOldCalendar.AddDays(
+                input,
+                1 - DateTimeUtility.jpOldCalendar.GetDayOfYear(input));
+            int oldEra = DateTimeUtility.jpOldCalendar.GetEra(oldFirstDateOfYear);
+            int oldYear = DateTimeUtility.jpOldCalendar.GetYear(oldFirstDateOfYear);
+            int leapMonth = DateTimeUtility.jpOldCalendar.GetLeapMonth(oldYear, oldEra);
+            var leapPrefix = (0 < leapMonth && m == leapMonth) ? "閏" : null;
+            m = (0 < leapMonth && 0 <= m - leapMonth) ? (m - 1) : m;
+
+            var eraName = DateTimeUtility.cultureInfoJp.DateTimeFormat.GetEraName(e);
+            var yearName = (y == 1) ? "元" : $"{y:00}";
+            return $"{eraName}{yearName}年{leapPrefix}{m:00}月{d:00}日";
+        }
+
         // (+|-)[{day}d ]{HH}:{mm}:{ss}[.{fff}]
         public static string TimeSpanToString(TimeSpan t)
         {

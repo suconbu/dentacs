@@ -23,6 +23,7 @@ namespace Suconbu.Dentacs
                 { "daysinyear", this.DaysInYear },
                 { "daysinmonth", this.DaysInMonth },
                 { "wareki", this.Wareki },
+                { "kyureki", this.Kyureki },
                 { "now", this.Now },
                 { "today", this.Today },
 
@@ -67,6 +68,17 @@ namespace Suconbu.Dentacs
             var date = DateTimeUtility.ParseDateTime(args[0].String);
             var sb = new StringBuilder();
             sb.Append(DateTimeUtility.DateTimeToWarekiString(date, false));
+            sb.Append(DateTimeUtility.TryGetEtoString(date, out var eto) ? $" {eto}" : null);
+            sb.Append(DateTimeUtility.TryGetRokuyoString(date, out var rokuyo) ? $" {rokuyo}" : null);
+            return new Value(sb.ToString());
+        }
+
+        public Value Kyureki(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            var sb = new StringBuilder();
+            sb.Append(DateTimeUtility.DateTimeToKyurekiString(date));
             sb.Append(DateTimeUtility.TryGetEtoString(date, out var eto) ? $" {eto}" : null);
             sb.Append(DateTimeUtility.TryGetRokuyoString(date, out var rokuyo) ? $" {rokuyo}" : null);
             return new Value(sb.ToString());
