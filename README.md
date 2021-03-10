@@ -259,9 +259,14 @@ log        | (n1, n2)    | Returns the natural logarithms or logarithm of a numb
 
 Identifier | Parameters  | Description                                          | Examples
 -----------|-------------|------------------------------------------------------|---------------------------------
-dayofweek  | (datetime)  | Returns day of week in a DateTime                    | dayofweek('2019/08/18') -> 'sun'
 today      | ()          | Returns DateTime of the beginning of the current day | today() -> '2020/04/01 00:00:00'
 now        | ()          | Returns DateTime of the current time                 | now() -> '2020/04/01 07:36:13'
+dayofyear  | (datetime)  | Returns day of the year in a DateTime                | dayofyear('2020/04/01') -> '92'
+dayofweek  | (datetime)  | Returns day of the week in a DateTime                | dayofweek('2020/04/01') -> 'wed'
+daysinyear | (datetime)  | Returns how many days in specified year              | daysinyear('2020/04/01') -> 366
+daysinmonth| (datetime)  | Returns how many days in specified month             | daysinmonth('2020/04/01') -> 30
+wareki     | (datetime)  | Returns date of Japanese calendars, Kanshi (干支) and Rokuyo (六曜) | wareki('2020/04/01') -> '令和02年04月01日 庚子 大安'
+kyureki    | (datetime)  | Returns date of old Japanese calendars, Kanshi (干支) and Rokuyo (六曜) | kyureki('2020/04/01') -> '令和02年03月09日 庚子 大安'
 seconds    | (timespan)  | Returns total seconds of TimeSpan                    | seconds('+01:01:01') -> 3661
 minutes    | (timespan)  | Returns total minutes of TimeSpan                    | minutes('+01:01:01') -> 61.016...
 hours      | (timespan)  | Returns total hours of TimeSpan                      | hours('+01:01:01') -> 1.01694...
