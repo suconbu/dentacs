@@ -291,6 +291,6 @@ continue  break     exit      or        and
 not
 ```
 
-## Lisence
+## License
 
 MIT License
