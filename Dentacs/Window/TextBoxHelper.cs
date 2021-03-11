@@ -37,11 +37,12 @@ namespace Suconbu.Dentacs
 
             foreach (var line in lines)
             {
-                count += line.FullLength;
-                if (lineIndexStart == -1 && start < count)
+                count += line.Text.Length;
+                if (lineIndexStart == -1 && start <= count)
                 {
                     lineIndexStart = lineIndex;
                 }
+                count += line.NewLine.Length;
                 if (lineIndexStart != -1 && end <= count)
                 {
                     lineIndexEnd = lineIndex;
