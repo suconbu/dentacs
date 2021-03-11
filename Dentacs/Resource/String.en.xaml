@@ -54,8 +54,8 @@
     <system:String x:Key="Keypad.Redo">Redo (Ctrl+Y)</system:String>
     <system:String x:Key="Keypad.BackSpace">Back space</system:String>
     <system:String x:Key="Keypad.SelectAll">Select all</system:String>
-    <system:String x:Key="Keypad.ToDec">Convert all lines to decimal</system:String>
-    <system:String x:Key="Keypad.ToHex">Convert all lines to hexadecimal</system:String>
-    <system:String x:Key="Keypad.ToBin">Convert all lines to binary</system:String>
+    <system:String x:Key="Keypad.ToDec">Convert selected lines to decimal</system:String>
+    <system:String x:Key="Keypad.ToHex">Convert selected lines to hexadecimal</system:String>
+    <system:String x:Key="Keypad.ToBin">Convert selected lines to binary</system:String>
     <system:String x:Key="Keypad.Random">Inserts a random number (0 &lt;= n &lt; 1)</system:String>
 </ResourceDictionary>

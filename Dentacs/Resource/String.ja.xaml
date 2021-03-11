@@ -54,8 +54,8 @@
     <system:String x:Key="Keypad.Redo">やり直し (Ctrl+Y)</system:String>
     <system:String x:Key="Keypad.BackSpace">1文字または選択中の文字を消去 (BackSpace)</system:String>
     <system:String x:Key="Keypad.SelectAll">全選択</system:String>
-    <system:String x:Key="Keypad.ToDec">全ての行を10進数に変換</system:String>
-    <system:String x:Key="Keypad.ToHex">全ての行を16進数に変換</system:String>
-    <system:String x:Key="Keypad.ToBin">全ての行を2進数に変換</system:String>
+    <system:String x:Key="Keypad.ToDec">選択行を10進数に変換</system:String>
+    <system:String x:Key="Keypad.ToHex">選択行を16進数に変換</system:String>
+    <system:String x:Key="Keypad.ToBin">選択行を2進数に変換</system:String>
     <system:String x:Key="Keypad.Random">0以上1未満の乱数</system:String>
 </ResourceDictionary>
