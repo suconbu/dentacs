@@ -395,10 +395,13 @@ namespace Suconbu.Dentacs
         private void CharInfo_Click(object sender, RoutedEventArgs e)
         {
             var text = CharInfoConvertHelper.ConvertToElementInfoTableString(this.RxCurrentText.Value);
-            Clipboard.SetText(text);
-            var item = sender as Control;
-            item.Visibility = Visibility.Hidden;
-            Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { item.Visibility = Visibility.Visible; }); });
+            if (text != null)
+            {
+                Clipboard.SetText(text);
+                var item = sender as Control;
+                item.Visibility = Visibility.Hidden;
+                Task.Delay(kCopyFlashInterval).ContinueWith(x => { this.Dispatcher.Invoke(() => { item.Visibility = Visibility.Visible; }); });
+            }
         }
 
         private void FullScreenCloseButton_Click(object sender, RoutedEventArgs e)
