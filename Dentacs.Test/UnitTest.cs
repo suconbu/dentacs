@@ -160,7 +160,7 @@ namespace Suconbu.Dentacs
         }
 
         [TestMethod]
-        public void TestDateTimeUtility()
+        public void TestDateTimeUtility_TryParseDateTime()
         {
             var datePatterns = new Dictionary<string, string>()
             {
@@ -244,7 +244,11 @@ namespace Suconbu.Dentacs
                     .Replace("{dd}", today.Day.ToString("00"));
                 Assert.AreEqual(expect, DateTimeUtility.DateTimeToString(result), $"{date.Key}");
             }
+        }
 
+        [TestMethod]
+        public void TestDateTimeUtility_TryParseTimeSpan()
+        {
             var errorTimePatterns = new[]
             {
                 "+11:22:33:",
@@ -304,6 +308,67 @@ namespace Suconbu.Dentacs
             {
                 Assert.IsTrue(DateTimeUtility.TryParseTimeSpan(time.Key, out var result), $"{time.Key}");
                 Assert.AreEqual(time.Value, DateTimeUtility.TimeSpanToString(result), $"{time.Key}");
+            }
+        }
+
+        [TestMethod]
+        public void TestDateTimeUtility_GetDaysInYear()
+        {
+            var daysInYearPatterns = new (int year, int days)[]
+            {
+                (1900, 365),
+                (1999, 365),
+                (2000, 366),
+                (2001, 365),
+                (2004, 366),
+            };
+            foreach (var pattern in daysInYearPatterns)
+            {
+                Assert.AreEqual(pattern.days, DateTimeUtility.GetDaysInYear(pattern.year));
+            }
+        }
+
+        [TestMethod]
+        public void TestDateTimeUtility_GetDaysInMonth()
+        {
+            var daysInMonthPatterns = new (DateTime date, int days)[]
+            {
+                (new DateTime(2000, 1, 1), 31),
+                (new DateTime(2000, 4, 1), 30),
+                (new DateTime(1900, 2, 1), 28),
+                (new DateTime(1999, 2, 1), 28),
+                (new DateTime(2000, 2, 1), 29),
+            };
+            foreach (var pattern in daysInMonthPatterns)
+            {
+                Assert.AreEqual(pattern.days, DateTimeUtility.GetDaysInMonth(pattern.date.Year, pattern.date.Month));
+            }
+        }
+
+
+        [TestMethod]
+        public void TestDateTimeUtility_GetWeekOfYear()
+        {
+            var weekOfYearPatterns = new (DateTime date, int week)[]
+            {
+                (new DateTime(2000, 1, 1), 0),
+                (new DateTime(2000, 1, 3), 1),
+                (new DateTime(2000, 1, 9), 1),
+                (new DateTime(2000, 1, 10), 2),
+                (new DateTime(2000, 12, 31), 52),
+                (new DateTime(2001, 1, 1), 1),
+                (new DateTime(2001, 1, 7), 1),
+                (new DateTime(2001, 1, 8), 2),
+                (new DateTime(2001, 12, 30), 52),
+                (new DateTime(2001, 12, 31), 53),
+                (new DateTime(2004, 1, 1), 1),
+                (new DateTime(2010, 1, 1), 0),
+                (new DateTime(2010, 1, 3), 0),
+                (new DateTime(2010, 1, 4), 1),
+            };
+            foreach (var pattern in weekOfYearPatterns)
+            {
+                Assert.AreEqual(pattern.week, DateTimeUtility.GetWeekOfYear(pattern.date), pattern.date.ToString());
             }
         }
 

@@ -282,6 +282,19 @@ namespace Suconbu.Dentacs
             return DateTimeUtility.gregorianCalendar.GetDaysInMonth(year, month);
         }
 
+        public static int GetWeekOfYear(DateTime input)
+        {
+            var first = new DateTime(input.Year, 1, 1);
+            var dow = ((int)first.DayOfWeek == 0) ? 7 : (int)first.DayOfWeek;
+            var week = (input.DayOfYear - 1 + (dow - 1)) / 7 + 1;
+            // ISO8601
+            if (4 < dow)
+            {
+                week--;
+            }
+            return week;
+        }
+
         public static bool TryGetRokuyoString(DateTime input, out string output)
         {
             if (input < DateTimeUtility.jpOldCalendar.MinSupportedDateTime ||

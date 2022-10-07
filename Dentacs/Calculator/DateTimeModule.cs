@@ -22,6 +22,8 @@ namespace Suconbu.Dentacs
                 { "dayofweek", this.DayOfWeek },
                 { "daysinyear", this.DaysInYear },
                 { "daysinmonth", this.DaysInMonth },
+                { "weekofyear", this.WeekOfYear },
+                { "cw", this.CalendarWeek },
                 { "wareki", this.Wareki },
                 { "kyureki", this.Kyureki },
                 { "now", this.Now },
@@ -96,6 +98,30 @@ namespace Suconbu.Dentacs
             ArgumentsVerifier.VerifyAndThrow(args, "", ErrorType.InvalidArgument);
             var ticks = DateTime.Today.Ticks / TimeSpan.TicksPerSecond * TimeSpan.TicksPerSecond;
             return new Value(DateTimeUtility.DateTimeToString(new DateTime(ticks)));
+        }
+
+        public Value WeekOfYear(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            var week = DateTimeUtility.GetWeekOfYear(date);
+            return new Value(week);
+        }
+
+        public Value CalendarWeek(IReadOnlyList<Value> args)
+        {
+            ArgumentsVerifier.VerifyAndThrow(args, "s", ErrorType.InvalidArgument);
+            var date = DateTimeUtility.ParseDateTime(args[0].String);
+            var year = date.Year;
+            double week = DateTimeUtility.GetWeekOfYear(date);
+            var dow = (date.DayOfWeek == 0) ? 7 : (int)date.DayOfWeek;
+            if (week == 0)
+            {
+                var last = new DateTime(date.Year, 1, 1).AddDays(-1);
+                year = last.Year;
+                week = DateTimeUtility.GetWeekOfYear(last); 
+            }
+            return new Value($"{week:00}.{dow}/{year:0000}");
         }
 
         public Value Seconds(IReadOnlyList<Value> args)
