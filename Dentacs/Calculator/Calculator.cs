@@ -62,6 +62,7 @@ namespace Suconbu.Dentacs
             this.Result =
                 DateTimeUtility.TryParseDateTime(value.String, out var dateTime) ? $"'{DateTimeUtility.DateTimeToString(dateTime)}'" :
                 DateTimeUtility.TryParseTimeSpan(value.String, out var timeSpan) ? $"'{DateTimeUtility.TimeSpanToString(timeSpan)}'" :
+                TryParseUnicode(value.String, out var moji) ? $"'{CharInfoConvertHelper.ConvertToPrintable(moji)}'" :
                 value.ToString();
         }
 
@@ -135,6 +136,17 @@ namespace Suconbu.Dentacs
                 ;
             }
             return null;
+        }
+
+        bool TryParseUnicode(string input, out string moji)
+        {
+            if (input.StartsWith("U+") && int.TryParse(input.Substring(2), NumberStyles.HexNumber, null, out int cp))
+            {
+                moji = char.ConvertFromUtf32(cp);
+                return true;
+            }
+            moji = null;
+            return false;
         }
     }
 }

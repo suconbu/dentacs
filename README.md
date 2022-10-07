@@ -13,7 +13,7 @@ https://github.com/suconbu/dentacs/releases
 
 * [Demo](#Demo) | [Features](#Features)
 * [Shortcut keys](#Shortcut-keys)
-* [Numbers](#Numbers) | [DateTime and TimeSpan](#DateTime-and-TimeSpan)
+* [Numbers](#Numbers) | [DateTime and TimeSpan](#DateTime-and-TimeSpan) | [Unicode codepoint](#unicode-codepoint)
 * [Operators](#Operators)
 * [Variables](#Variables) | [Functions](#Functions) | [Constants](#Constants)
 * [Reserved keywords](#Reserved-keywords)
@@ -196,6 +196,15 @@ Example of use:
 '3day'  - '10.5h'                    # '2d 13:30:00'
 '1day'  * 1.5                        # '+1d 12:00:00'
 ```
+
+## Unicode codepoint
+
+Represent a single unicode character as a number starting with "U+".
+
+Example:
+* "U+41" -> 'A'
+* "U+3042" -> 'あ'
+* "U+1F333" -> '🌳'
 
 ## Operators
 
