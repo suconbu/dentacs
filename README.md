@@ -261,7 +261,9 @@ Identifier | Parameters  | Description                                          
 -----------|-------------|------------------------------------------------------|---------------------------------
 today      | ()          | Returns DateTime of the beginning of the current day | today() -> '2020/04/01 00:00:00'
 now        | ()          | Returns DateTime of the current time                 | now() -> '2020/04/01 07:36:13'
-dayofyear  | (datetime)  | Returns day of the year in a DateTime                | dayofyear('2020/04/01') -> '92'
+dayofyear  | (datetime)  | Returns day of the year in a DateTime                | dayofyear('2020/04/01') -> 92
+weekofyear | (datetime)  | Returns week number of specified DateTime | weekofyear("2010/04/01") -> 14
+cw         | (datetime)  | Returns week number and day of week of specified DateTime | weekofyear("2010/04/01") -> "14.3/2020"
 dayofweek  | (datetime)  | Returns day of the week in a DateTime                | dayofweek('2020/04/01') -> 'wed'
 daysinyear | (datetime)  | Returns how many days in specified year              | daysinyear('2020/04/01') -> 366
 daysinmonth| (datetime)  | Returns how many days in specified month             | daysinmonth('2020/04/01') -> 30
