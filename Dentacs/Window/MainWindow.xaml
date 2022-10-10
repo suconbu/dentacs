@@ -86,7 +86,12 @@
                     <local:KeypadPanel x:Name="FullScreenKeypadPanel"
                                        Visibility="{Binding RxFullScreenKeypadVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </Grid>
-                <TextBox Name="DecResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="0">
+                    <TextBox Name="DecResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
+                    <Border Style="{StaticResource ColorSampleStyle}"
+                            Background="{Binding RxColorSampleBrush.Value}"
+                            Visibility="{Binding RxColorSampleVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
                 <TextBox Name="HexResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" Tag="16" Grid.Row="1"/>
                 <TextBox Name="BinResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" Tag="2" Grid.Row="2"/>
                 <TextBox Name="HiddenResult" Grid.Column="1" Text="0000 0000 0000 0000 0000 0000 0000 0000" Style="{StaticResource ResultTextBoxStyle}" Grid.Row="3"/>

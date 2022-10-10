@@ -140,6 +140,7 @@
         <Setter Property="Background" Value="{x:Static Brushes.Transparent}"/>
         <Setter Property="Foreground" Value="{StaticResource WindowForeBrush}"/>
         <Setter Property="Template" Value="{DynamicResource StatusButtonTemplate}"/>
+        <Setter Property="Padding" Value="5,5"></Setter>
     </Style>
 
     <Style x:Key="StatusToggleButtonStyle" TargetType="ToggleButton">
@@ -158,6 +159,11 @@
 
     <Style x:Key="StatusUsageTextStyle" TargetType="Button" BasedOn="{StaticResource StatusTextStyle}">
         <Setter Property="Button.FontSize" Value="{c:Binding 11.5 * RxMildZoomRatio.Value}"></Setter>
+    </Style>
+
+    <Style x:Key="ColorSampleStyle" TargetType="Border">
+        <Setter Property="Width" Value="{c:Binding 20 * RxMildZoomRatio.Value}"></Setter>
+        <Setter Property="Margin" Value="0 4 4 4"></Setter>
     </Style>
 
     <!--Keypad row-->
