@@ -113,10 +113,8 @@
                     <Grid>
                         <Button Content="{Binding RxUsageText.Value}" Style="{StaticResource StatusUsageTextStyle}"
                                 Visibility="{Binding RxUsageText.Value, Converter={StaticResource StringToVisibilityConverter}}"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="{Binding RxErrorText.Value, Converter={StaticResource ErrorTextConverter}}" Style="{StaticResource StatusErrorTextStyle}"
-                                    Visibility="{Binding RxErrorTextVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        </StackPanel>
+                        <Button Content="{Binding RxErrorText.Value, Converter={StaticResource ErrorTextConverter}}" Style="{StaticResource StatusErrorTextStyle}"
+                                Visibility="{Binding RxErrorTextVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     </Grid>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
