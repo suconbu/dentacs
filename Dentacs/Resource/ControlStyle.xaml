@@ -76,6 +76,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{DynamicResource InputTextTemplate}"/>
+        <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
     <!--Result row-->

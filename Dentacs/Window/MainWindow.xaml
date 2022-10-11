@@ -61,8 +61,8 @@
                 <TextBox x:Name="InputTextBox" Style="{StaticResource InputTextBoxStyle}"
                          SelectionChanged="InputTextBox_SelectionChanged"
                          TextChanged="InputTextBox_TextChanged"/>
-                <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Top"/>
-                <Border Background="{StaticResource InputTextShadowBrush}" Height="5" VerticalAlignment="Bottom"/>
+                <Border Background="{StaticResource InputTextShadowBrush}" Height="4" VerticalAlignment="Top"/>
+                <Border Background="{StaticResource InputTextShadowBrush}" Height="4" VerticalAlignment="Bottom"/>
                 <Button x:Name="FullScreenCloseButton" Content="r" Style="{StaticResource CaptionButtonStyle}"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
