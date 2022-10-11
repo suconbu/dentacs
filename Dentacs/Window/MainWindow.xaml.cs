@@ -41,8 +41,6 @@ namespace Suconbu.Dentacs
         public ReadOnlyReactivePropertySlim<bool> RxFullScreenKeypadVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxErrorTextVisible { get; }
         public ReadOnlyReactivePropertySlim<bool> RxCharInfoVisible { get; }
-        public ReactivePropertySlim<Brush> RxColorSampleBrush { get; }
-        public ReadOnlyReactivePropertySlim<bool> RxColorSampleVisible { get; }
         public Color AccentColor = ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color;
 
         readonly Calculator calculator = new Calculator(CultureInfo.CurrentCulture);
@@ -79,7 +77,6 @@ namespace Suconbu.Dentacs
             this.RxKeypadEnabled = new ReactivePropertySlim<bool>();
             this.RxCurrentText = new ReactivePropertySlim<string>();
             this.RxSelectionLength = new ReactivePropertySlim<int>();
-            this.RxColorSampleBrush = new ReactivePropertySlim<Brush>();
 
             this.RxCaptionVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
             this.RxStatusVisible = this.RxFullScreenEnabled.Select(x => !x).ToReadOnlyReactivePropertySlim();
@@ -93,7 +90,6 @@ namespace Suconbu.Dentacs
             this.RxErrorTextVisible = Observable.CombineLatest(
                 this.RxErrorText, this.RxUsageText, (e, u) => !string.IsNullOrEmpty(e) && string.IsNullOrEmpty(u))
                 .ToReadOnlyReactivePropertySlim();
-            this.RxColorSampleVisible = this.RxColorSampleBrush.Select(x => x != null).ToReadOnlyReactivePropertySlim();
 
             this.KeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
             this.KeypadPanel.ItemMouseLeave += (s, item) => { this.RxUsageText.Value = null; };
@@ -356,18 +352,6 @@ namespace Suconbu.Dentacs
                 }
                 this.RxErrorText.Value = this.calculator.Error;
                 this.lastCalculatedLineIndex = lineIndex;
-
-                // Update the color sample
-                SolidColorBrush brush = null;
-                if (!string.IsNullOrEmpty(this.calculator.Result) && this.calculator.Result.StartsWith("\'"))
-                {
-                    string value = this.calculator.Result.Trim('\'');
-                    if (ColorUtility.TryParseColor(value, out var color))
-                    {
-                        brush = new SolidColorBrush(color);
-                    }
-                }
-                this.RxColorSampleBrush.Value = brush;
             }
 
             if (selectedText.Length == 0)

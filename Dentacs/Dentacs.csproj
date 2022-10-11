@@ -122,7 +122,9 @@
     <Compile Include="Calculator\MathmaticsModule.cs" />
     <Compile Include="Converter\CharInfoConverter.cs" />
     <Compile Include="Converter\ErrorTextConverter.cs" />
+    <Compile Include="Converter\ColorSampleConverter.cs" />
     <Compile Include="Converter\ResultConverter.cs" />
+    <Compile Include="Converter\ColorSampleVisibilityConverter.cs" />
     <Compile Include="Converter\StringToVisibilityConverter.cs" />
     <Compile Include="Memezo\Memezo.cs" />
     <Compile Include="App.xaml.cs">

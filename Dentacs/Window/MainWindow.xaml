@@ -25,6 +25,8 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <local:ErrorTextConverter x:Key="ErrorTextConverter"/>
+        <local:ColorSampleConverter x:Key="ColorSampleConverter"/>
+        <local:ColorSampleVisibilityConverter x:Key="ColorSampleVisibilityConverter"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -89,8 +91,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="0">
                     <TextBox Name="DecResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=10}" Style="{StaticResource ResultTextBoxStyle}" Tag="10" Grid.Row="0"/>
                     <Border Style="{StaticResource ColorSampleStyle}"
-                            Background="{Binding RxColorSampleBrush.Value}"
-                            Visibility="{Binding RxColorSampleVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            Background="{Binding RxResult.Value, Converter={StaticResource ColorSampleConverter}}"
+                            Visibility="{Binding RxResult.Value, Converter={StaticResource ColorSampleVisibilityConverter}}"/>
                 </StackPanel>
                 <TextBox Name="HexResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=16}" Style="{StaticResource ResultTextBoxStyle}" Tag="16" Grid.Row="1"/>
                 <TextBox Name="BinResult" Grid.Column="1" Text="{Binding RxResult.Value, Mode=OneWay, Converter={StaticResource ResultConverter}, ConverterParameter=2}" Style="{StaticResource ResultTextBoxStyle}" Tag="2" Grid.Row="2"/>
