@@ -5,6 +5,7 @@ using Suconbu.Scripting.Memezo;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Windows.Media;
 
 namespace Suconbu.Dentacs
 {
@@ -157,6 +158,24 @@ namespace Suconbu.Dentacs
             Assert.IsFalse(calculator.Calculate("'xyz' * 'xyz'"));
             Assert.IsFalse(calculator.Calculate("'xyz' / 123"));
             Assert.IsFalse(calculator.Calculate("'xyz' / 'xyz'"));
+        }
+
+        [TestMethod]
+        public void TestColorUtility()
+        {
+            Assert.IsTrue(ColorUtility.TryParseColor("green", out var _));
+            Assert.IsTrue(ColorUtility.TryParseColor("#fff", out var _));
+            Assert.IsTrue(ColorUtility.TryParseColor("#ffff", out var _));
+            Assert.IsTrue(ColorUtility.TryParseColor("#ffffff", out var _));
+            Assert.IsTrue(ColorUtility.TryParseColor("#ffffffff", out var _));
+
+            Assert.IsFalse(ColorUtility.TryParseColor(null, out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("", out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("greeen", out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("#f", out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("#ff", out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("#fffff", out var _));
+            Assert.IsFalse(ColorUtility.TryParseColor("#fffffff", out var _));
         }
 
         [TestMethod]
@@ -344,7 +363,6 @@ namespace Suconbu.Dentacs
                 Assert.AreEqual(pattern.days, DateTimeUtility.GetDaysInMonth(pattern.date.Year, pattern.date.Month));
             }
         }
-
 
         [TestMethod]
         public void TestDateTimeUtility_GetWeekOfYear()

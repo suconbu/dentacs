@@ -34,7 +34,7 @@ namespace Suconbu.Dentacs
             // #rgba
             // #rgb
             result = default;
-            if (!input.StartsWith("#")) return false;
+            if (input == null || !input.StartsWith("#")) return false;
 
             var s = input.TrimStart('#');
             if (s.Length == 3 || s.Length == 4)
