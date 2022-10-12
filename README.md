@@ -11,13 +11,13 @@ https://github.com/suconbu/dentacs/releases
 
 ## Table of contents
 
-* [Demo](#Demo) | [Features](#Features)
-* [Shortcut keys](#Shortcut-keys)
-* [Numbers](#Numbers) | [DateTime and TimeSpan](#DateTime-and-TimeSpan) | [Unicode codepoint](#unicode-codepoint)
-* [Operators](#Operators)
-* [Variables](#Variables) | [Functions](#Functions) | [Constants](#Constants)
-* [Reserved keywords](#Reserved-keywords)
-* [License](#License)
+* [Demo](#demo) | [Features](#features)
+* [Shortcut keys](#shortcut-keys)
+* [Numbers](#numbers) | [DateTime and TimeSpan](#datetime-and-timespan) | [Unicode codepoint](#unicode-codepoint) | [Color](#color)
+* [Operators](#operators)
+* [Variables](#variables) | [Functions](#functions) | [Constants](#constants)
+* [Reserved keywords](#reserved-keywords)
+* [License](#license)
 
 ## Demo
 
@@ -142,7 +142,7 @@ There are following types of specification methods.
 1. [Comma separated style](#TimeSpan---Comma-separated-style)
 2. [Unit specified style](#TimeSpan---Unit-specified-style)
 
-#### TimeSpan - Comma separated style
+#### TimeSpan - Coron separated style
 
 This style must start with a sign (+/-).  
 If the value is less than 24 hours, can be omit the date part.
@@ -178,7 +178,7 @@ Minute      | 'minute', 'min', 'm'
 Second      | 'second', 'sec', 's'
 Millisecond | 'millisecond', 'msec', 'ms'
 
-### Supported operations
+### Supported operations for DateTime and TimeSpan
 
 Left hand side | Operator   | Right hand side | Result
 ---------------|------------|-----------------|-------
@@ -205,6 +205,18 @@ Example:
 * "U+41" -> 'A'
 * "U+3042" -> 'あ'
 * "U+1F333" -> '🌳'
+
+![screenshot](image/unicode_codepoint.png)
+
+Also can be represented using variables like this.
+
+![screenshot](image/unicode_codepoint_variable.png)
+
+## Color
+
+Recognizes hex triplet colors (3, 4, 6 and 8 digits) starts with "#" and displays color sample on result.
+
+![screenshot](image/color_hextriplet.png)
 
 ## Operators
 
