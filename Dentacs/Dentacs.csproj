@@ -138,6 +138,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Window\Persistance.cs" />
     <Compile Include="Window\TextBoxHelper.cs" />
     <Page Include="Resource\Color.xaml">
       <Generator>MSBuild:Compile</Generator>

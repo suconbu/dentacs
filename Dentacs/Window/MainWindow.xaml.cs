@@ -11,6 +11,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Serialization;
+using System.Diagnostics;
 
 namespace Suconbu.Dentacs
 {
@@ -51,6 +53,7 @@ namespace Suconbu.Dentacs
 
         static readonly double[] kZoomTable = new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0 };
         static readonly int kCopyFlashInterval = 100;
+        readonly string kPersistanceFileName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + "_persistance.xml";
         readonly Random random = new Random();
 
         public MainWindow()
@@ -98,6 +101,64 @@ namespace Suconbu.Dentacs
             this.FullScreenKeypadPanel.ItemMouseEnter += (s, item) => { this.RxUsageText.Value = item.Usage; };
             this.FullScreenKeypadPanel.ItemMouseLeave += (s, item) => { this.RxUsageText.Value = null; };
             this.FullScreenKeypadPanel.ItemClick += (s, item) => this.KeypadPanel_ItemClick(item);
+
+            this.Loaded += MainWindow_Loaded;
+            this.Closed += MainWindow_Closed;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.LoadSetting();
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            this.SaveSetting();
+        }
+
+        void LoadSetting()
+        {
+            if (File.Exists(this.kPersistanceFileName))
+            {
+                try
+                {
+                    using (var reader = new StreamReader(this.kPersistanceFileName))
+                    {
+                        var xs = new XmlSerializer(typeof(Persistance));
+                        var persistent = xs.Deserialize(reader) as Persistance;
+
+                        this.InputTextBox.Text = persistent.Text;
+                        //this.RxZoomIndex.Value = persistent.ZoomIndex;
+                        //this.fullScreenZoomIndexBackup = persistent.ZoomIndexFullScreen;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+        }
+
+        void SaveSetting()
+        {
+            var persistent = new Persistance()
+            {
+                Text = this.InputTextBox.Text,
+                //ZoomIndex = this.RxZoomIndex.Value,
+                //ZoomIndexFullScreen = this.fullScreenZoomIndexBackup
+            };
+            var xs = new XmlSerializer(persistent.GetType());
+            try
+            {
+                using (var writer = new StreamWriter(this.kPersistanceFileName, false, System.Text.Encoding.UTF8))
+                {
+                    xs.Serialize(writer, persistent);
+                }
+            }
+            catch(IOException ex)
+            {
+                Debug.Write(ex);
+            }
         }
 
         string MakeTitleText()
